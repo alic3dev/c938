@@ -1,0 +1,39 @@
+name: continuous_integration_build
+on:
+  push:
+    branches: ["core"]
+  pull_request:
+    branches: ["core"]
+jobs:
+  continuous_integration_build:
+    runs-on: macos-latest
+    steps:
+      - name: git_initialization
+        run: git config --global init.defaultBranch core
+      - name: continuous_integration:repository->checkout
+        uses: actions/checkout@v4
+        with:
+          path: c938
+      - name: checkout_cer0
+        uses: actions/checkout@v4
+        with:
+          repository: alic3dev/cer0
+          path: cer0
+      - name: checkout_clic3
+        uses: actions/checkout@v4
+        with:
+          repository: alic3dev/clic3
+          path: clic3
+      - name: checkout_interrupt_handler
+        uses: actions/checkout@v4
+        with:
+          repository: alic3dev/interrupt_handler
+          path: interrupt_handler
+      - name: make_cer0
+        run: cd cer0 && make
+      - name: make_clic3
+        run: cd clic3 && make
+      - name: make_interrupt_handler
+        run: cd interrupt_handler && make
+      - name: make_c938
+        run: cd c938 && disable_metal_fast_options=1 make
