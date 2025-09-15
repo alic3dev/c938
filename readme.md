@@ -40,6 +40,18 @@ audio:volume->{0.27};
 - - [`clic3`](https://github.com/alic3dev/clic3)
 - - [`interrupt_handler`](https://github.com/alic3dev/interrupt_handler)
 
+### assets
+
+```zsh
+make pull_assets
+```
+
+#### redownload
+
+```zsh
+make pull_assets_all
+```
+
 ### build
 
 ```zsh
