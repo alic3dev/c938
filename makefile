@@ -66,8 +66,18 @@ files_air=${patsubst ${directory_metal}/%.metal,${directory_air}/%.air,${files_m
 files_storyboards=${wildcard ${directory_storyboards}/*.storyboard}
 files_storyboards_compiled=${patsubst ${directory_storyboards}/%.storyboard,${directory_app_contents_resources}/%.storyboardc,${files_storyboards}}
 
+prefix_asset_texture=__asset_texture
+prefix_asset_texture_always=${prefix_asset_texture}_always
+
+files_assets_textures_names=concrete_1.png concrete_2.png concrete_3.png concrete_4.png concrete_5.png red_1.png red_2.png red_3.png red_4.png red_5.png
+files_assets_textures=${addprefix ${prefix_asset_texture}/,${files_assets_textures_names}}
+files_assets_textures_always=${addprefix ${prefix_asset_texture_always}/,${files_assets_textures_names}}
+
 files_textures=${wildcard ${directory_textures}/*}
 files_textures_resources=${patsubst ${directory_textures}/%,${directory_app_contents_resources_textures}/%,${files_textures}}
+
+url_assets=https://content.alic3.dev/assets/${name}
+url_assets_textures=${url_assets}/textures
 
 target_device=mac
 target_macos_version=15.0
@@ -153,6 +163,19 @@ ${directory_app_contents_resources}/%.storyboardc: ${directory_storyboards}/%.st
 ${file_output_info_plist}: ${file_info_plist}
 	mkdir -p ${directory_app_contents}
 	cp ${file_info_plist} ${file_output_info_plist}
+
+pull_assets: ${directory_textures} ${files_assets_textures}
+
+pull_assets_all: ${directory_textures} ${files_assets_textures_always}
+
+${directory_textures}:
+	mkdir -p ${directory_textures}
+
+${prefix_asset_texture}/%:
+	if [[ ! -f ${patsubst ${prefix_asset_texture}/%,${directory_textures}/%,$@} ]]; then curl ${patsubst ${prefix_asset_texture}/%,${url_assets_textures}/%,$@} -o ${patsubst ${prefix_asset_texture}/%,${directory_textures}/%,$@}; fi
+
+${prefix_asset_texture_always}/%:
+	curl ${patsubst ${prefix_asset_texture_always}/%,${url_assets_textures}/%,$@} -o ${patsubst ${prefix_asset_texture_always}/%,${directory_textures}/%,$@}
 
 clean_all: clean
 
