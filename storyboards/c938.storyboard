@@ -16,7 +16,7 @@
         <application
           id="application-menu"
           sceneMemberID="viewController"
-          customClass="c938_application"
+          customClass="metil_application"
         >
           <menu
             id="menu-core"
@@ -67,12 +67,6 @@
           sceneMemberID="firstResponder"
         />
       </objects>
-
-      <point
-        key="canvasLocation"
-        x="75"
-        y="0.0"
-      />
     </scene>
 
     <scene sceneID="scene-window">
@@ -90,7 +84,7 @@
             releasedWhenClosed="0"
             animationBehavior="none"
             userLabel="c938"
-            customClass="c938_window"
+            customClass="metil_window"
           >
             <windowStyleMask
               key="styleMask"
@@ -101,13 +95,13 @@
 
             <rect
               key="contentRect"
-              width="1"
-              height="1"
+              width="1920"
+              height="1204"
             />
             <rect
               key="screenRect"
-              width="1"
-              height="1"
+              width="1920"
+              height="1204"
             />
 
             <connections>
@@ -137,18 +131,18 @@
       <objects>
         <viewController
           id="viewcontroller-view-core"
-          customClass="c938_view_controller"
+          customClass="metil_view_controller"
           sceneMemberID="viewController"
         >
           <view
             id="view-view-core"
             key="view"
-            customClass="c938_view"
+            customClass="metil_view"
           >
             <rect
               key="frame"
               width="1920"
-              height="1199"
+              height="1204"
             />
           </view>
         </viewController>

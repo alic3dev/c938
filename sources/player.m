@@ -1,79 +1,61 @@
 #include <player.h>
 
-#include <input/controller.h>
-#include <input/cursor.h>
-#include <input/keycodes.h>
-#include <input/map.h>
+#include <player_data.h>
+
+#include <metil_input/controller.h>
+#include <metil_input/cursor.h>
+#include <metil_input/keycodes.h>
+#include <metil_input/map.h>
+#include <metil_player.h>
 
 #include <math.h>
 
 unsigned long int delta_time_jump_threshold = 250;
 
-void player_initialize(
-  struct player* player
-) {
-  player->position.x = 0.0f;
-  player->position.y = 0.0f;
-  player->position.z = 0.0f;
-
-  player->speed_movement = 0.8f;
-  player->speed_rotation = (
-    player->speed_movement / 4.0f
-  );
-
-  player->velocity.x = 0.0f;
-  player->velocity.y = 0.0f;
-  player->velocity.z = 0.0f;
-
-  player->objects = (void*)0;
-  player->length_objects = 0;
-
-  player->time_jump = 0;
-
-  player->is_jumping = 0;
-  player->is_jumping_secondary = 0;
-}
-
 void player_poll_input(
-  struct player* player,
+  struct metil_player* player,
   unsigned long int time
 ) {
+  struct player_data* player_data = (
+    (struct player_data*) player->data
+  );
+
   float speed_original = player->speed_movement;
 
-  unsigned long int delta_time_jump = time - player->time_jump;
+  unsigned long int delta_time_jump = time - player_data->time_jump;
 
   if (
-    controller_state.available == 1 &&
-    controller_state.trigger_left >= 0.1f &&
-    controller_state.thumbstick_button_left == 0.0f
+    metil_controller_state.available == 1 &&
+    metil_controller_state.trigger_left >= 0.1f &&
+    metil_controller_state.thumbstick_button_left == 0.0f
   ) {
     player->speed_movement = (
       player->speed_movement *
-      controller_state.trigger_left +
+      metil_controller_state.trigger_left +
       1.0f
     );
   } else if (
-    controller_state.available == 1 &&
-    controller_state.trigger_left < 0.1f &&
-    controller_state.thumbstick_button_left >= 0.1f
+    metil_controller_state.available == 1 &&
+    metil_controller_state.trigger_left < 0.1f &&
+    metil_controller_state.thumbstick_button_left >= 0.1f
   ) {
     player->speed_movement = (
       player->speed_movement / 2.0f
     );
   } else if (
     (
-      input_map_keydown[
-        keycode_option_right
+      metil_input_map_keydown[
+        metil_keycode_option_right
       ] == 1 ||
-      input_map_keydown[
-        keycode_control
+      metil_input_map_keydown[
+        metil_keycode_control
       ] == 1
     )  && (
-      input_map_keydown[
-        keycode_shift_left
+      metil_input_map_keydown[
+        metil_keycode_shift_left
       ] == 0 &&
-      input_map_keydown[
-        keycode_shift_right
+      metil_input_map_keydown[
+        metil_keycode_shift_right
       ] == 0
     )
   ) {
@@ -82,18 +64,18 @@ void player_poll_input(
     );
   } else if (
     (
-      input_map_keydown[
-        keycode_option_right
+      metil_input_map_keydown[
+        metil_keycode_option_right
       ] == 0 &&
-      input_map_keydown[
-        keycode_control
+      metil_input_map_keydown[
+        metil_keycode_control
       ] == 0
     ) && (
-      input_map_keydown[
-        keycode_shift_left
+      metil_input_map_keydown[
+        metil_keycode_shift_left
       ] == 1 ||
-      input_map_keydown[
-        keycode_shift_right
+      metil_input_map_keydown[
+        metil_keycode_shift_right
       ] == 1 
     )
   ) {
@@ -120,38 +102,38 @@ void player_poll_input(
 
   player->rotation.y = (
     player->rotation.y + (
-      input_delta_cursor.x / 50.0f *
+      metil_input_delta_cursor.x / 50.0f *
       player->speed_rotation
     )
   );
 
   player->rotation.x = (
     player->rotation.x + (
-      input_delta_cursor.y / 50.0f *
+      metil_input_delta_cursor.y / 50.0f *
       player->speed_rotation
     )
   );
 
-  if (controller_state.available == 1) {
+  if (metil_controller_state.available == 1) {
     if (
-      controller_state.input_axis_x_right >= 0.1f || 
-      controller_state.input_axis_x_right <= -0.1f
+      metil_controller_state.input_axis_x_right >= 0.1f || 
+      metil_controller_state.input_axis_x_right <= -0.1f
     ) {
       player->rotation.y = (
         player->rotation.y + (
-          controller_state.input_axis_x_right *
+          metil_controller_state.input_axis_x_right *
           player->speed_rotation
         )
       );
     }
 
     if (
-      controller_state.thumbstick_axis_y_right >= 0.1f || 
-      controller_state.thumbstick_axis_y_right <= -0.1f
+      metil_controller_state.thumbstick_axis_y_right >= 0.1f || 
+      metil_controller_state.thumbstick_axis_y_right <= -0.1f
     ) {
       player->rotation.x = (
         player->rotation.x + (
-          -controller_state.thumbstick_axis_y_right *
+          -metil_controller_state.thumbstick_axis_y_right *
           player->speed_rotation
         )
       );
@@ -168,8 +150,8 @@ void player_poll_input(
     player->rotation.x = -M_PI / 2.0f;
   }
 
-  input_delta_cursor.x = 0;
-  input_delta_cursor.y = 0;
+  metil_input_delta_cursor.x = 0;
+  metil_input_delta_cursor.y = 0;
   
   float ratio_axis = fmod(
     player->rotation.y,
@@ -297,171 +279,171 @@ void player_poll_input(
     }
   }
 
-  if (controller_state.available == 1) {
+  if (metil_controller_state.available == 1) {
     movement.x = (
-      (controller_state.thumbstick_axis_y_left * ratio_movement.x) +
-      (controller_state.thumbstick_axis_x_left * ratio_movement_strafe.x)
+      (metil_controller_state.thumbstick_axis_y_left * ratio_movement.x) +
+      (metil_controller_state.thumbstick_axis_x_left * ratio_movement_strafe.x)
     );
 
     movement.z = (
-      (controller_state.thumbstick_axis_y_left * ratio_movement.y) +
-      (controller_state.thumbstick_axis_x_left * ratio_movement_strafe.y)
+      (metil_controller_state.thumbstick_axis_y_left * ratio_movement.y) +
+      (metil_controller_state.thumbstick_axis_x_left * ratio_movement_strafe.y)
     );
   }
 
   if (
-    (input_map_keydown[
-      keycode_e
+    (metil_input_map_keydown[
+      metil_keycode_e
     ] == 1 ||
-    input_map_keydown[
-      keycode_slash
+    metil_input_map_keydown[
+      metil_keycode_slash
     ] == 1) && (
-      player->is_jumping == 0 ||
-      (player->is_jumping_secondary == 0 && delta_time_jump >= delta_time_jump_threshold)
+      player_data->is_jumping == 0 ||
+      (player_data->is_jumping_secondary == 0 && delta_time_jump >= delta_time_jump_threshold)
     )
   ) {
     player->velocity.y += speed_original / 1.25f;
 
-    if (player->is_jumping == 0) {
-      player->is_jumping = 1;
-      player->time_jump = time;
+    if (player_data->is_jumping == 0) {
+      player_data->is_jumping = 1;
+      player_data->time_jump = time;
     } else {
-      player->is_jumping_secondary = 1;
+      player_data->is_jumping_secondary = 1;
     }
   }
 
   if (
-    controller_state.available == 1 &&
-    controller_state.trigger_right >= 0.1f
+    metil_controller_state.available == 1 &&
+    metil_controller_state.trigger_right >= 0.1f
   ) {
-    player->velocity.y -= controller_state.trigger_right;
+    player->velocity.y -= metil_controller_state.trigger_right;
   } else if (
-    input_map_keydown[
-      keycode_q
+    metil_input_map_keydown[
+      metil_keycode_q
     ] == 1 ||
-    input_map_keydown[
-      keycode_period
+    metil_input_map_keydown[
+      metil_keycode_period
     ] == 1
   ) {
     player->velocity.y -= 0.1f;
   }
 
   if (
-    input_map_keydown[
-      keycode_left_arrow
+    metil_input_map_keydown[
+      metil_keycode_left_arrow
     ] == 1 ||
-    input_map_keydown[
-      keycode_right_arrow
+    metil_input_map_keydown[
+      metil_keycode_right_arrow
     ] == 1 ||
-    input_map_keydown[
-      keycode_a
+    metil_input_map_keydown[
+      metil_keycode_a
     ] == 1 ||
-    input_map_keydown[
-      keycode_d
+    metil_input_map_keydown[
+      metil_keycode_d
     ] == 1  ||
-    input_map_keydown[
-      keycode_down_arrow
+    metil_input_map_keydown[
+      metil_keycode_down_arrow
     ] == 1 || 
-    input_map_keydown[
-      keycode_up_arrow
+    metil_input_map_keydown[
+      metil_keycode_up_arrow
     ] == 1 || 
-    input_map_keydown[
-      keycode_s
+    metil_input_map_keydown[
+      metil_keycode_s
     ] == 1 ||
-    input_map_keydown[
-      keycode_w
+    metil_input_map_keydown[
+      metil_keycode_w
     ] == 1
   ) {
     movement.x = (
       (
-        input_map_keydown[
-          keycode_up_arrow
-        ] || input_map_keydown[
-          keycode_w
+        metil_input_map_keydown[
+          metil_keycode_up_arrow
+        ] || metil_input_map_keydown[
+          metil_keycode_w
         ]
       ) * ratio_movement.x +
       -(
-        input_map_keydown[
-          keycode_down_arrow
+        metil_input_map_keydown[
+          metil_keycode_down_arrow
         ] || 
-        input_map_keydown[
-          keycode_s
+        metil_input_map_keydown[
+          metil_keycode_s
         ]
       ) * ratio_movement.x +
       (
-        input_map_keydown[
-          keycode_right_arrow
-        ] || input_map_keydown[
-          keycode_d
+        metil_input_map_keydown[
+          metil_keycode_right_arrow
+        ] || metil_input_map_keydown[
+          metil_keycode_d
         ]
       ) * ratio_movement_strafe.x +
       -(
-        input_map_keydown[
-          keycode_left_arrow
-        ] || input_map_keydown[
-          keycode_a
+        metil_input_map_keydown[
+          metil_keycode_left_arrow
+        ] || metil_input_map_keydown[
+          metil_keycode_a
         ]
       ) * ratio_movement_strafe.x
     );
 
     movement.z = (
       (
-        input_map_keydown[
-          keycode_up_arrow
-        ] || input_map_keydown[
-          keycode_w
+        metil_input_map_keydown[
+          metil_keycode_up_arrow
+        ] || metil_input_map_keydown[
+          metil_keycode_w
         ]
       ) * ratio_movement.y +
       -(
-        input_map_keydown[
-          keycode_down_arrow
-        ] || input_map_keydown[
-          keycode_s
+        metil_input_map_keydown[
+          metil_keycode_down_arrow
+        ] || metil_input_map_keydown[
+          metil_keycode_s
         ]
       ) * ratio_movement.y +
       (
-        input_map_keydown[
-          keycode_right_arrow
+        metil_input_map_keydown[
+          metil_keycode_right_arrow
         ] || 
-        input_map_keydown[
-          keycode_d
+        metil_input_map_keydown[
+          metil_keycode_d
         ]
       ) * ratio_movement_strafe.y + 
       -(
-        input_map_keydown[
-          keycode_left_arrow
-        ] || input_map_keydown[
-          keycode_a
+        metil_input_map_keydown[
+          metil_keycode_left_arrow
+        ] || metil_input_map_keydown[
+          metil_keycode_a
         ]
       ) * ratio_movement_strafe.y
     );
   }
 
   if (
-    (input_map_keydown[
-      keycode_space
+    (metil_input_map_keydown[
+      metil_keycode_space
     ] == 1 || (
-      controller_state.available == 1 &&
-      controller_state.button_cross >= 0.1f
+      metil_controller_state.available == 1 &&
+      metil_controller_state.button_cross >= 0.1f
     )) &&
     (
-      player->is_jumping == 0 || 
-      (player->is_jumping_secondary == 0 &&
+      player_data->is_jumping == 0 || 
+      (player_data->is_jumping_secondary == 0 &&
       delta_time_jump >= delta_time_jump_threshold)
     )
   ) {
     player->velocity.y += speed_original / 1.25f;
     
-    if (player->is_jumping == 0) {
-      player->is_jumping = 1;
-      player->time_jump = time;
+    if (player_data->is_jumping == 0) {
+      player_data->is_jumping = 1;
+      player_data->time_jump = time;
     } else {
-      player->is_jumping_secondary = 1;
+      player_data->is_jumping_secondary = 1;
     }
   }
 
-  player->has_collided = 0;
-  player->on_ground = 0;
+  player_data->has_collided = 0;
+  player_data->on_ground = 0;
   float position_ground_y = 0.0f;
 
   float addition_y = (
@@ -490,43 +472,43 @@ void player_poll_input(
 
   for (
     unsigned int index_object = 0;
-    index_object < player->length_objects;
+    index_object < player_data->length_objects;
     ++index_object
   ) {
     if (
-      position_updated.x >= player->objects[index_object]->position.x - 4 - player->objects[index_object]->mesh.size.x / 2.0f &&
-      position_updated.x <= player->objects[index_object]->position.x + 4 + player->objects[index_object]->mesh.size.x / 2.0f &&
-      position_updated.z >= player->objects[index_object]->position.z - 4 - player->objects[index_object]->mesh.size.z / 2.0f &&
-      position_updated.z <= player->objects[index_object]->position.z + 4 + player->objects[index_object]->mesh.size.z / 2.0f  
+      position_updated.x >= player_data->objects[index_object]->position.x - 4 - player_data->objects[index_object]->mesh.size.x / 2.0f &&
+      position_updated.x <= player_data->objects[index_object]->position.x + 4 + player_data->objects[index_object]->mesh.size.x / 2.0f &&
+      position_updated.z >= player_data->objects[index_object]->position.z - 4 - player_data->objects[index_object]->mesh.size.z / 2.0f &&
+      position_updated.z <= player_data->objects[index_object]->position.z + 4 + player_data->objects[index_object]->mesh.size.z / 2.0f  
     ) {
       if (
-        position_updated.y >= player->objects[index_object]->position.y + player->objects[index_object]->mesh.size.y &&
-        position_updated.y <= player->objects[index_object]->position.y + player->objects[index_object]->mesh.size.y + 4.0f
+        position_updated.y >= player_data->objects[index_object]->position.y + player_data->objects[index_object]->mesh.size.y &&
+        position_updated.y <= player_data->objects[index_object]->position.y + player_data->objects[index_object]->mesh.size.y + 4.0f
       ) {
-        player->on_ground = index_object + 1;
-        position_ground_y = player->objects[index_object]->position.y + player->objects[index_object]->mesh.size.y + 4.0f;
+        player_data->on_ground = index_object + 1;
+        position_ground_y = player_data->objects[index_object]->position.y + player_data->objects[index_object]->mesh.size.y + 4.0f;
       } else if (
-        position_updated.y >= player->objects[index_object]->position.y &&
-        position_updated.y <= player->objects[index_object]->position.y + player->objects[index_object]->mesh.size.y
+        position_updated.y >= player_data->objects[index_object]->position.y &&
+        position_updated.y <= player_data->objects[index_object]->position.y + player_data->objects[index_object]->mesh.size.y
       ) {
-        player->has_collided = index_object + 1;
+        player_data->has_collided = index_object + 1;
       }
     }
 
     if (
-      player->on_ground != 0 &&
-      player->has_collided != 0
+      player_data->on_ground != 0 &&
+      player_data->has_collided != 0
     ) {
       break;
     }
   }
 
-  if (player->has_collided == 0) {
+  if (player_data->has_collided == 0) {
     player->position.x = position_updated.x;
     player->position.z = position_updated.z;
   }
 
-  if (player->on_ground == 0) {
+  if (player_data->on_ground == 0) {
     player->position.y = position_updated.y;
 
     if (player->velocity.y > -1.0f) {
@@ -543,9 +525,9 @@ void player_poll_input(
   } else {
     player->position.y = position_ground_y;
     player->velocity.y = 0.0f;
-    player->time_jump = 0;
-    player->is_jumping = 0;
-    player->is_jumping_secondary = 0;
+    player_data->time_jump = 0;
+    player_data->is_jumping = 0;
+    player_data->is_jumping_secondary = 0;
   }
 
   if (player->velocity.y < -2.0f) {
@@ -556,9 +538,15 @@ void player_poll_input(
 }
 
 void player_poll(
-  struct player* player
+  struct metil_player* player
 ) {}
 
 void player_destroy(
-  struct player* player
-) {}
+  struct metil_player* player
+) {
+  free(player->data);
+
+  metil_player_destroy(
+    player
+  );
+}

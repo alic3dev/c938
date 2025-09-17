@@ -1,24 +1,24 @@
 #include <menus/menu_main.h>
 
-#include <menus/menu.h>
-#include <menus/menu_item.h>
+#include <metil_menus/menu.h>
+#include <metil_menus/menu_item.h>
 
 void menu_main_initialize(
-  struct menu* menu
+  struct metil_menu* menu
 ) {
-  menu_initialize(menu);
+  metil_menu_initialize(menu);
 
-  menu_item_add(
+  metil_menu_item_add(
     menu,
-    menu_item_type_selection,
-    menu_item_action_select,
+    metil_menu_item_type_selection,
+    metil_menu_item_action_select,
     (void*)0
   );
 
-  menu_item_add(
+  metil_menu_item_add(
     menu,
-    menu_item_type_selection,
-    menu_item_action_select,
+    metil_menu_item_type_selection,
+    metil_menu_item_action_select,
     (void*)0
   );
 }

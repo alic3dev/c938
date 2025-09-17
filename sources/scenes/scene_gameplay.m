@@ -1,37 +1,53 @@
 #include <scenes/scene_gameplay.h>
 
-#include <audio/audio.h>
 #include <mesh/mesh_building.h>
 #include <mesh/ground/mesh_ground.h>
 #include <mesh/mesh_player.h>
-#include <metal_kit_shader_types.h>
-#include <object.h>
-#include <paths/paths.h>
-#include <scenes/scene.h>
+#include <mode_texture.h>
+#include <player.h>
+#include <player_data.h>
+#include <scenes/scene_id.h>
+
+#include <metil_audio/audio.h>
+#include <metil_shader_types.h>
+#include <metil_object.h>
+#include <metil_paths/paths.h>
+#include <metil_scenes/scene.h>
 
 #include <stdlib.h>
 #include <stdio.h>
 
 void scene_gameplay_data_initialize(
-  struct scene* scene
+  struct metil_scene* scene
 ) {
   scene->data = (void*)0;
 }
 
 void scene_gameplay_initialize(
-  struct scene* scene,
+  struct metil_scene* scene,
   id<MTLDevice> metal_kit_device
 ) {
-  audio_io_proc_add(
+  metil_audio_io_proc_add(
     scene_gameplay_io_proc
   );
 
-  scene_initialize(
+  metil_scene_initialize(
     scene,
     metal_kit_device
   );
 
-  scene->type = scene_type_game;
+  scene->player.poll = player_poll;
+  scene->player.poll_input = player_poll_input;
+  scene->player.destroy = player_destroy;
+
+  static struct player_data* player_data;
+  player_data = malloc(
+    sizeof(struct player_data)
+  );
+
+  scene->player.data = player_data;
+
+  scene->type = metil_scene_type_game;
   scene->id = scene_id_gameplay;
 
   scene->poll = scene_gameplay_poll;
@@ -40,7 +56,7 @@ void scene_gameplay_initialize(
   scene->length_objects = 100;
   scene->objects = realloc(
     scene->objects,
-    sizeof(struct object*) *
+    sizeof(struct metil_object*) *
     scene->length_objects
   );
 
@@ -50,7 +66,7 @@ void scene_gameplay_initialize(
     ++index_object
   ) {
     scene->objects[index_object] = malloc(
-      sizeof(struct object)
+      sizeof(struct metil_object)
     );
   }
 
@@ -70,7 +86,7 @@ void scene_gameplay_initialize(
       isDirectory: 0
       relativeToURL: [NSURL
         fileURLWithPath:[NSString
-          stringWithUTF8String: paths.directory_textures
+          stringWithUTF8String: metil_paths.directory_textures
         ]
         isDirectory: 1
       ]
@@ -87,7 +103,7 @@ void scene_gameplay_initialize(
       isDirectory: 0
       relativeToURL: [NSURL
         fileURLWithPath:[NSString
-          stringWithUTF8String: paths.directory_textures
+          stringWithUTF8String: metil_paths.directory_textures
         ]
         isDirectory: 1
       ]
@@ -104,7 +120,7 @@ void scene_gameplay_initialize(
       isDirectory: 0
       relativeToURL: [NSURL
         fileURLWithPath:[NSString
-          stringWithUTF8String: paths.directory_textures
+          stringWithUTF8String: metil_paths.directory_textures
         ]
         isDirectory: 1
       ]
@@ -121,7 +137,7 @@ void scene_gameplay_initialize(
       isDirectory: 0
       relativeToURL: [NSURL
         fileURLWithPath:[NSString
-          stringWithUTF8String: paths.directory_textures
+          stringWithUTF8String: metil_paths.directory_textures
         ]
         isDirectory: 1
       ]
@@ -138,7 +154,7 @@ void scene_gameplay_initialize(
       isDirectory: 0
       relativeToURL: [NSURL
         fileURLWithPath:[NSString
-          stringWithUTF8String: paths.directory_textures
+          stringWithUTF8String: metil_paths.directory_textures
         ]
         isDirectory: 1
       ]
@@ -166,7 +182,7 @@ void scene_gameplay_initialize(
   ];
 
   scene->objects[0]->data = [metal_kit_device
-    newBufferWithLength: sizeof(metal_kit_data_frame_object)
+    newBufferWithLength: sizeof(metil_kit_data_frame_object)
     options: MTLResourceStorageModeShared
   ];
 
@@ -176,7 +192,7 @@ void scene_gameplay_initialize(
 
   unsigned short int iterator_id = 0;
 
-  metal_kit_data_frame_object* data = scene->objects[0]->data.contents;
+  metil_kit_data_frame_object* data = scene->objects[0]->data.contents;
   data->id = iterator_id++;
   data->mode_texture = mode_texture_player;
 
@@ -202,7 +218,7 @@ void scene_gameplay_initialize(
   ];
 
   scene->objects[1]->data = [metal_kit_device
-    newBufferWithLength: sizeof(metal_kit_data_frame_object)
+    newBufferWithLength: sizeof(metil_kit_data_frame_object)
     options: MTLResourceStorageModeShared
   ];
 
@@ -261,7 +277,7 @@ void scene_gameplay_initialize(
     ];
 
     scene->objects[index_object]->data = [metal_kit_device
-      newBufferWithLength: sizeof(metal_kit_data_frame_object)
+      newBufferWithLength: sizeof(metil_kit_data_frame_object)
       options: MTLResourceStorageModeShared
     ];
 
@@ -274,15 +290,19 @@ void scene_gameplay_initialize(
     data->mode_texture = mode_texture_building;
   }
 
-  scene->player.length_objects = scene->length_objects - 2;
-  scene->player.objects = scene->objects + 2;
+  player_data->length_objects = scene->length_objects - 2;
+  player_data->objects = scene->objects + 2;
 }
 
 void scene_gameplay_poll(
-  struct scene* scene
+  struct metil_scene* scene
 ) {
+  struct player_data* player_data = (
+    (struct player_data*) scene->player.data
+  );
+
   if (
-    scene->player.on_ground == 2 ||
+    player_data->on_ground == 2 ||
     scene->player.position.y <= -490.0f
   ) {
     // TODO: don't destroy/reinit, instead just reset existing values
@@ -295,7 +315,7 @@ void scene_gameplay_poll(
     return;
   }
 
-  scene_poll_default(scene);
+  metil_scene_poll_default(scene);
 
   scene->objects[0]->position.x = (
     scene->player.position.x  - 1.0f
@@ -312,13 +332,13 @@ void scene_gameplay_poll(
 
 
 void scene_gameplay_destroy(
-  struct scene* scene
+  struct metil_scene* scene
 ) {
-  audio_io_proc_remove(
+  metil_audio_io_proc_remove(
     scene_gameplay_io_proc
   );
 
-  scene_destroy_default(scene);
+  metil_scene_destroy_default(scene);
 }
 
 OSStatus scene_gameplay_io_proc(

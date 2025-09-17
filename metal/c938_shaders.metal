@@ -1,4 +1,6 @@
-#include <metal_kit_shader_types.h>
+#include <mode_texture.h>
+
+#include <metil_shader_types.h>
 
 #include <metal_stdlib>
 
@@ -15,9 +17,9 @@ struct output_vertex {
 };
 
 [[vertex]] output_vertex c938_vertex(
-  const device simd_float4* positions [[buffer(metal_kit_vertex_input_index_positions)]],
-  constant metal_kit_data_frame& data_frame [[buffer(metal_kit_vertex_input_index_frame_data)]],
-  constant metal_kit_data_frame_object& data [[buffer(metal_kit_vertex_input_index_data)]],
+  const device simd_float4* positions [[buffer(metil_kit_vertex_input_index_positions)]],
+  constant metil_kit_data_frame& data_frame [[buffer(metil_kit_vertex_input_index_frame_data)]],
+  constant metil_kit_data_frame_object& data [[buffer(metil_kit_vertex_input_index_data)]],
   unsigned int id_vertex [[vertex_id]]
 ) {
   struct output_vertex output_vertex;
@@ -57,7 +59,7 @@ struct output_vertex {
     size_half.y = (data.height / 2.0f);
     size_half.z = (data.depth / 2.0f);
 
-    output_vertex.brightness = 0.0125f;
+    output_vertex.brightness = 1.0f;
 
     if (
       (
@@ -233,8 +235,6 @@ struct output_vertex {
   }
   
   if (in.mode_texture == mode_texture_building) {
-    //brightness = 1.0f;
-
     color_texture[0] = color_texture[0] * 0.6f + 0.4;
       color_texture[1] = color_texture[1] * 0.5f + 0.5;
       color_texture[2] = color_texture[2] * 0.5f + 0.5;
@@ -244,26 +244,6 @@ struct output_vertex {
       color_texture[1] = color_texture[1] * 0.4f + 0.5;
       color_texture[2] = color_texture[2] * 0.4f + 0.5;
     }
-
-    /*
-    switch (in.id % 3) {
-      case 0:
-        color_texture[0] = color_texture[0] * 0.3f + 0.2;
-        color_texture[1] = color_texture[1] * 0.4f + 0.25;
-        color_texture[2] = color_texture[2] * 0.5f + 0.25;
-        break;
-      case 1:
-        color_texture[0] = color_texture[0] * 0.3f + 0.2;
-        color_texture[1] = color_texture[1] * 0.4f + 0.25;
-        color_texture[2] = color_texture[2] * 0.5f + 0.2;
-        break;
-      case 2:
-        color_texture[0] = color_texture[0] * 0.3f + 0.2;
-        color_texture[1] = color_texture[1] * 0.4f + 0.2;
-        color_texture[2] = color_texture[2] * 0.5f + 0.25;
-        break;
-    }
-    */
   }
 
   return float4(

@@ -1,7 +1,7 @@
 #ifndef __scenes_scene_gameplay_h
 #define __scenes_scene_gameplay_h
 
-#include <scenes/scene.h>
+#include <metil_scenes/scene.h>
 
 #include <CoreAudio/CoreAudio.h>
 #include <MetalKit/MetalKit.h>
@@ -11,16 +11,16 @@ enum textures_scene_gameplay {
 };
 
 void scene_gameplay_initialize(
-  struct scene*,
+  struct metil_scene*,
   id<MTLDevice>
 );
 
 void scene_gameplay_poll(
-  struct scene*
+  struct metil_scene*
 );
 
 void scene_gameplay_destroy(
-  struct scene*
+  struct metil_scene*
 );
 
 OSStatus scene_gameplay_io_proc(
