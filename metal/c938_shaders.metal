@@ -235,8 +235,6 @@ struct output_vertex {
   }
   
   if (in.mode_texture == mode_texture_building) {
-    //brightness = 1.0f;
-
     color_texture[0] = color_texture[0] * 0.6f + 0.4;
       color_texture[1] = color_texture[1] * 0.5f + 0.5;
       color_texture[2] = color_texture[2] * 0.5f + 0.5;
@@ -246,26 +244,6 @@ struct output_vertex {
       color_texture[1] = color_texture[1] * 0.4f + 0.5;
       color_texture[2] = color_texture[2] * 0.4f + 0.5;
     }
-
-    /*
-    switch (in.id % 3) {
-      case 0:
-        color_texture[0] = color_texture[0] * 0.3f + 0.2;
-        color_texture[1] = color_texture[1] * 0.4f + 0.25;
-        color_texture[2] = color_texture[2] * 0.5f + 0.25;
-        break;
-      case 1:
-        color_texture[0] = color_texture[0] * 0.3f + 0.2;
-        color_texture[1] = color_texture[1] * 0.4f + 0.25;
-        color_texture[2] = color_texture[2] * 0.5f + 0.2;
-        break;
-      case 2:
-        color_texture[0] = color_texture[0] * 0.3f + 0.2;
-        color_texture[1] = color_texture[1] * 0.4f + 0.2;
-        color_texture[2] = color_texture[2] * 0.5f + 0.25;
-        break;
-    }
-    */
   }
 
   return float4(
