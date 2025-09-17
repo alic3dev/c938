@@ -67,12 +67,6 @@
           sceneMemberID="firstResponder"
         />
       </objects>
-
-      <point
-        key="canvasLocation"
-        x="75"
-        y="0.0"
-      />
     </scene>
 
     <scene sceneID="scene-window">
@@ -101,13 +95,13 @@
 
             <rect
               key="contentRect"
-              width="1"
-              height="1"
+              width="1920"
+              height="1204"
             />
             <rect
               key="screenRect"
-              width="1"
-              height="1"
+              width="1920"
+              height="1204"
             />
 
             <connections>
@@ -148,7 +142,7 @@
             <rect
               key="frame"
               width="1920"
-              height="1199"
+              height="1204"
             />
           </view>
         </viewController>
