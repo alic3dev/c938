@@ -1,6 +1,6 @@
 #include <mesh/mesh_player.h>
 
-#include <mesh/mesh.h>
+#include <metil_mesh/mesh.h>
 
 #include <clic3_vector.h>
 
@@ -26,9 +26,9 @@ const struct clic3_vector3_float mesh_player_size_quarter = {
 };
 
 void mesh_player_initialize(
-  struct mesh* mesh
+  struct metil_mesh* mesh
 ) {
-  mesh_initialize(mesh);
+  metil_mesh_initialize(mesh);
 
   mesh->size.x = mesh_player_size.x;
   mesh->size.y = mesh_player_size.y;
@@ -39,7 +39,7 @@ void mesh_player_initialize(
     (mesh->length_vertices - 1) * 3
   );
 
-  mesh->positioning = mesh_positioning_player;
+  mesh->positioning = metil_mesh_positioning_player;
 
   mesh->indices = realloc(
     mesh->indices,

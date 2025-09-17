@@ -1,6 +1,6 @@
 #include <mesh/mesh_building.h>
 
-#include <mesh/mesh.h>
+#include <metil_mesh/mesh.h>
 
 #include <clic3_vector.h>
 
@@ -8,12 +8,12 @@
 #include <stdlib.h>
 
 void mesh_building_initialize(
-  struct mesh* mesh,
+  struct metil_mesh* mesh,
   float width,
   float height,
   float depth
 ) {
-  mesh_initialize(mesh);
+  metil_mesh_initialize(mesh);
 
   struct clic3_vector3_float size_half = {
     .x = width / 2.0f,

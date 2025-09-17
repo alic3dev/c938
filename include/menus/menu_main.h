@@ -1,10 +1,10 @@
 #ifndef __menus_menu_main_h
 #define __menus_menu_main_h
 
-#include <menus/menu.h>
+#include <metil_menus/menu.h>
 
 void menu_main_initialize(
-  struct menu*
+  struct metil_menu*
 );
 
 #endif

@@ -1,6 +1,6 @@
 #include <mesh/ground/mesh_ground.h>
 
-#include <mesh/mesh.h>
+#include <metil_mesh/mesh.h>
 
 #include <clic3.h>
 
@@ -13,12 +13,12 @@ const struct clic3_vector2_unsigned_int mesh_ground_length_vertices = {
 };
 
 void mesh_ground_initialize(
-  struct mesh* mesh,
+  struct metil_mesh* mesh,
   float width,
   float height,
   float depth
 ) {
-  mesh_initialize(mesh);
+  metil_mesh_initialize(mesh);
 
   mesh->size.x = width;
   mesh->size.y = height;
