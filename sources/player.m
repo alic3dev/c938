@@ -20,23 +20,61 @@ void player_poll_input(
     (struct player_data*) player->data
   );
 
-  float speed_original = player->speed_movement;
-
   unsigned long int delta_time_jump = time - player_data->time_jump;
 
   if (
+    player_data->is_boosted == 0 &&
+    (metil_input_map_keydown[
+      metil_keycode_x
+    ] == 1 || (
+      metil_controller_state.available == 1 &&
+      metil_controller_state.r1 >= 0.1f
+    ))
+  ) {
+    player->speed_movement = (
+      metil_player_speed_movement_default * 4.0f
+    );
+
+    player_data->is_boosted = 1;
+    player_data->time_boost = time;
+  } else if (
+    player_data->is_boosted == 1
+  ) {
+    unsigned long int delta_time_boost = time - player_data->time_boost;
+
+    if (
+      delta_time_boost >= 2000
+    ) {
+      player_data->is_boosted = 0;
+      player->speed_movement = metil_player_speed_movement_default;
+    } else {
+      if (delta_time_boost > 1000) {
+        delta_time_boost = 1000;
+      }
+
+      player->speed_movement = (
+        metil_player_speed_movement_default * (
+          4.0f - (((float) delta_time_boost / 1000.0f) * 3.0f)
+        )
+      );
+    }
+  }
+
+  float speed_original = player->speed_movement;
+
+  if (
     metil_controller_state.available == 1 &&
-    metil_controller_state.trigger_left >= 0.1f &&
+    metil_controller_state.l2 >= 0.1f &&
     metil_controller_state.thumbstick_button_left == 0.0f
   ) {
     player->speed_movement = (
       player->speed_movement *
-      metil_controller_state.trigger_left +
+      metil_controller_state.l2 +
       1.0f
     );
   } else if (
     metil_controller_state.available == 1 &&
-    metil_controller_state.trigger_left < 0.1f &&
+    metil_controller_state.l2 < 0.1f &&
     metil_controller_state.thumbstick_button_left >= 0.1f
   ) {
     player->speed_movement = (
@@ -302,7 +340,7 @@ void player_poll_input(
       (player_data->is_jumping_secondary == 0 && delta_time_jump >= delta_time_jump_threshold)
     )
   ) {
-    player->velocity.y += speed_original / 1.25f;
+    player->velocity.y += metil_player_speed_movement_default / 1.25f;
 
     if (player_data->is_jumping == 0) {
       player_data->is_jumping = 1;
@@ -314,9 +352,9 @@ void player_poll_input(
 
   if (
     metil_controller_state.available == 1 &&
-    metil_controller_state.trigger_right >= 0.1f
+    metil_controller_state.r2 >= 0.1f
   ) {
-    player->velocity.y -= metil_controller_state.trigger_right;
+    player->velocity.y -= metil_controller_state.r2;
   } else if (
     metil_input_map_keydown[
       metil_keycode_q
@@ -432,7 +470,7 @@ void player_poll_input(
       delta_time_jump >= delta_time_jump_threshold)
     )
   ) {
-    player->velocity.y += speed_original / 1.25f;
+    player->velocity.y += metil_player_speed_movement_default / 1.25f;
     
     if (player_data->is_jumping == 0) {
       player_data->is_jumping = 1;
@@ -514,7 +552,7 @@ void player_poll_input(
     if (player->velocity.y > -1.0f) {
       player->velocity.y = (
         player->velocity.y - (
-          speed_original / 50.0f
+          metil_player_speed_movement_default / 50.0f
         )
       );
 
