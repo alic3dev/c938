@@ -52,78 +52,7 @@ struct output_vertex {
   }
 
   if (
-    data.mode_texture == mode_texture_ground
-  ) {
-    float3 size_half;
-    size_half.x = (data.width / 2.0f);
-    size_half.y = (data.height / 2.0f);
-    size_half.z = (data.depth / 2.0f);
-
-    output_vertex.brightness = 1.0f;
-
-    if (
-      (
-        (positions[id_vertex].x + size_half.x) < data.width * 0.12f ||
-        (positions[id_vertex].x + size_half.x) > data.width * 0.88f
-      ) || (
-        (positions[id_vertex].z + size_half.z) < data.depth * 0.12f ||
-        (positions[id_vertex].z + size_half.z) > data.depth * 0.88f
-      )
-    ) {
-      output_vertex.index_texture = 1;
-      output_vertex.position_texture = float2(
-        ((float) data_frame.frame / 5000.0f) + (positions[id_vertex].x + size_half.x) / (data.width / 50.0f) + (positions[id_vertex].y + size_half.y) / (data.height / 50.0f),
-        ((float) data_frame.frame / 5000.0f) + (positions[id_vertex].z + size_half.z) / (data.depth / 50.0f) + (positions[id_vertex].y + size_half.y) / (data.height / 50.0f)
-      );
-    } else {
-      output_vertex.index_texture = 0;
-      output_vertex.position_texture = float2(
-        (id_vertex / 10) % 10 == 0 
-        ? ((float) data_frame.frame / 100000.0f) + (positions[id_vertex].x + size_half.x) / (data.width / 1.0f) + (positions[id_vertex].y + size_half.y) / (data.height / 5.0f)
-        : ((float) data_frame.frame / 100000.0f) + (positions[id_vertex].x + size_half.x) / (data.width / 500.0f) + (positions[id_vertex].y + size_half.y) / (data.height / 500.0f),
-        (id_vertex / 10) % 10 == 0 
-        ? ((float) data_frame.frame / 100000.0f) + (positions[id_vertex].z + size_half.z) / (data.depth / 1.0f) + (positions[id_vertex].y + size_half.y) / (data.height / 5.0f)
-        : ((float) data_frame.frame / 100000.0f) + (positions[id_vertex].z + size_half.z) / (data.depth / 500.0f) + (positions[id_vertex].y + size_half.y) / (data.height / 500.0f)
-      );
-    }
-
-    unsigned char z = 0;
-    unsigned char x = 0;
-
-    while (output_vertex.position_texture.x > 1.0f) {
-      output_vertex.position_texture.x = (
-        output_vertex.position_texture.x - 1.0f
-      );
-
-      z = z == 0 ? 1 : 0;
-    }
-
-    while (output_vertex.position_texture.y > 1.0f) {
-      output_vertex.position_texture.y = (
-        output_vertex.position_texture.y - 1.0f
-      );
-
-      x = x == 0 ? 1 : 0;
-    }
-
-    if (z == 1) {
-      output_vertex.position_texture.x = 1.0f - (
-        output_vertex.position_texture.x
-      );
-    }
-
-    if (x == 1) {
-      output_vertex.position_texture.y = 1.0f - (
-        output_vertex.position_texture.y
-      );
-    }
-
-    if (positions[id_vertex].y <= data.height / 20.0f) {
-      output_vertex.height = positions[id_vertex].y / (data.height / 20.0f) * 0.5f;
-    } else {
-      output_vertex.height = (positions[id_vertex].y / data.height) * 0.4;
-    }
-  } else if (
+    data.mode_texture == mode_texture_ground ||
     data.mode_texture == mode_texture_building
   ) {
     output_vertex.index_texture = 0;
@@ -143,7 +72,11 @@ struct output_vertex {
       id_vertex == 3
     ) ? 0 : 1;
 
-    output_vertex.brightness = id_vertex > 3 ? 1.0f : 0.0125f;
+    output_vertex.brightness = (
+      id_vertex > 3 && data.mode_texture == mode_texture_building
+      ? 1.0f
+      : 0.125f
+    );
   } else if (
     data.mode_texture == mode_texture_player
   ) {

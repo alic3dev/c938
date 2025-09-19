@@ -3,7 +3,7 @@
 
 #include <metil_rendering/rendering_properties.h>
 
-#include <MetalKit/MetalKit.h>
+#include <Metal/MTLDevice.h>
 
 extern id<MTLDevice> _Nullable metal_kit_device;
 

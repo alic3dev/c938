@@ -3,8 +3,14 @@
 
 #include <metil_player.h>
 
+extern const float player_speed_movement_default;
+extern const float player_speed_rotation_default;
+
+extern const unsigned long int delta_time_jump_threshold;
+
 void player_poll_input(
   struct metil_player*,
+  unsigned long int,
   unsigned long int
 );
 

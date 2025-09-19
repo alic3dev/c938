@@ -196,14 +196,14 @@ void scene_gameplay_initialize(
   data->id = iterator_id++;
   data->mode_texture = mode_texture_player;
 
-  mesh_ground_initialize(
+  mesh_building_initialize(
     &scene->objects[1]->mesh,
-    2000.0f,
-    500.0f,
-    2000.0f
+    5000.0f,
+    1.0f,
+    5000.0f
   );
 
-  scene->objects[1]->position.y = -500.0f;
+  scene->objects[1]->position.y = 0.0f;
 
   scene->objects[1]->vertices = [metal_kit_device
     newBufferWithBytes: scene->objects[1]->mesh.vertices
@@ -241,15 +241,15 @@ void scene_gameplay_initialize(
   ) {
     mesh_building_initialize(
       &scene->objects[index_object]->mesh,
-      25.0f + (rand() % 100),
-      400.0f + (rand() % 100),
-      25.0f + (rand() % 100)
+      83.0f + (rand() % 67),
+      1000.0f + (rand() % 500),
+      83.0f + (rand() % 67)
     );
 
-    scene->objects[index_object]->position.y = -500.0f;
+    scene->objects[index_object]->position.y = 0.0f;
 
     if (index_object == 2) {
-      scene->player.position.y = -500.0f + scene->objects[index_object]->mesh.size.y + 1.0f;
+      scene->player.position.y = scene->objects[index_object]->mesh.size.y + 1.0f;
 
       scene->objects[0]->position.y = scene->player.position.y;
     } else {
@@ -259,8 +259,8 @@ void scene_gameplay_initialize(
         scene->objects[index_object]->position.z - scene->objects[index_object]->mesh.size.z / 2.0f <= scene->objects[2]->mesh.size.z / 2.0f &&
         scene->objects[index_object]->position.z + scene->objects[index_object]->mesh.size.z / 2.0f >= -scene->objects[2]->mesh.size.z / 2.0f
       ) {
-        scene->objects[index_object]->position.x = -700.0f + (rand() % 1400);
-        scene->objects[index_object]->position.z = -700.0f + (rand() % 1400);
+        scene->objects[index_object]->position.x = -200.0f + (rand() % 1400);
+        scene->objects[index_object]->position.z = -200.0f + (rand() % 1400);
       }
     } 
 
@@ -303,7 +303,7 @@ void scene_gameplay_poll(
 
   if (
     player_data->on_ground == 2 ||
-    scene->player.position.y <= -490.0f
+    scene->player.position.y <= 10.0f
   ) {
     // TODO: don't destroy/reinit, instead just reset existing values
     scene_gameplay_destroy(scene);
