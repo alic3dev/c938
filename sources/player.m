@@ -10,7 +10,7 @@
 
 #include <math.h>
 
-const float player_speed_movement_default = 200.0f;
+const float player_speed_movement_default = 100.0f;
 
 const unsigned long int delta_time_jump_threshold = 250;
 
