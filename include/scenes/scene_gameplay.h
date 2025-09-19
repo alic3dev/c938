@@ -15,6 +15,10 @@ void scene_gameplay_initialize(
   id<MTLDevice>
 );
 
+void scene_gameplay_populate(
+  struct metil_scene*
+);
+
 void scene_gameplay_poll(
   struct metil_scene*
 );
