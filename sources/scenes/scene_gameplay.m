@@ -9,6 +9,7 @@
 #include <scenes/scene_id.h>
 
 #include <metil_audio/audio.h>
+#include <metil_debug/log.h>
 #include <metil_shader_types.h>
 #include <metil_object.h>
 #include <metil_paths/paths.h>
@@ -16,12 +17,6 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-
-void scene_gameplay_data_initialize(
-  struct metil_scene* scene
-) {
-  scene->data = (void*)0;
-}
 
 void scene_gameplay_initialize(
   struct metil_scene* scene,
@@ -60,14 +55,16 @@ void scene_gameplay_initialize(
     scene->length_objects
   );
 
+  scene->objects[0] = malloc(
+    sizeof(struct metil_object)
+  );
+
   for (
-    unsigned char index_object = 0;
+    unsigned char index_object = 1;
     index_object < scene->length_objects;
     ++index_object
   ) {
-    scene->objects[index_object] = malloc(
-      sizeof(struct metil_object)
-    );
+    scene->objects[index_object] = (void*)0;
   }
 
   scene->length_textures = 5;
@@ -190,11 +187,73 @@ void scene_gameplay_initialize(
     textures_scene_gameplay_player
   ];
 
-  unsigned short int iterator_id = 0;
-
   metil_kit_data_frame_object* data = scene->objects[0]->data.contents;
-  data->id = iterator_id++;
+  data->id = 0;
   data->mode_texture = mode_texture_player;
+
+  scene_gameplay_populate(scene);
+}
+
+void scene_gameplay_populate(
+  struct metil_scene* scene
+) {
+  scene->player.rotation.x = 0.0f;
+  scene->player.rotation.y = 0.0f;
+  scene->player.rotation.z = 0.0f;
+
+  scene->player.speed_movement = metil_player_speed_movement_default;
+
+  scene->player.velocity.x = 0.0f;
+  scene->player.velocity.y = 0.0f;
+  scene->player.velocity.z = 0.0f;
+
+  struct player_data* player_data = (
+    (struct player_data*) scene->player.data
+  );
+
+  player_data_initialize(
+    player_data
+  );
+
+  unsigned short int iterator_id = 1;
+
+  if (scene->objects[1] != (void*)0) {
+    
+    for (
+      unsigned short int index_object = 1;
+      index_object < scene->length_objects;
+      ++index_object
+    ) {
+      [scene->objects[index_object]->data release];
+      [scene->objects[index_object]->indices release];
+      [scene->objects[index_object]->vertices release];
+
+      metil_object_destroy(
+        scene->objects[index_object]
+      );
+
+      free(scene->objects[index_object]);
+    }
+  }
+
+  scene->length_objects = 100;
+  scene->objects = realloc(
+    scene->objects,
+    sizeof(struct metil_object*) *
+    scene->length_objects
+  );
+
+  for (
+    unsigned char index_object = 1;
+    index_object < scene->length_objects;
+    ++index_object
+  ) {
+    scene->objects[
+      index_object
+    ] = malloc(
+      sizeof(struct metil_object)
+    );
+  }
 
   mesh_building_initialize(
     &scene->objects[1]->mesh,
@@ -205,19 +264,19 @@ void scene_gameplay_initialize(
 
   scene->objects[1]->position.y = 0.0f;
 
-  scene->objects[1]->vertices = [metal_kit_device
+  scene->objects[1]->vertices = [scene->metal_kit_device
     newBufferWithBytes: scene->objects[1]->mesh.vertices
     length: scene->objects[1]->mesh.length_vertices * sizeof(struct clic3_vector4_float)
     options: MTLResourceStorageModeShared
   ];
 
-  scene->objects[1]->indices = [metal_kit_device
+  scene->objects[1]->indices = [scene->metal_kit_device
     newBufferWithBytes: scene->objects[1]->mesh.indices
     length: scene->objects[1]->mesh.length_indices * sizeof(unsigned int)
     options: MTLResourceStorageModeShared
   ];
 
-  scene->objects[1]->data = [metal_kit_device
+  scene->objects[1]->data = [scene->metal_kit_device
     newBufferWithLength: sizeof(metil_kit_data_frame_object)
     options: MTLResourceStorageModeShared
   ];
@@ -230,7 +289,7 @@ void scene_gameplay_initialize(
     2
   ];
 
-  data = scene->objects[1]->data.contents;
+  metil_kit_data_frame_object* data = scene->objects[1]->data.contents;
   data->id = iterator_id++;
   data->mode_texture = mode_texture_ground;
 
@@ -249,7 +308,9 @@ void scene_gameplay_initialize(
     scene->objects[index_object]->position.y = 0.0f;
 
     if (index_object == 2) {
-      scene->player.position.y = scene->objects[index_object]->mesh.size.y + 1.0f;
+      scene->player.position.x = scene->objects[index_object]->position.x;
+      scene->player.position.y = scene->objects[index_object]->position.y + scene->objects[index_object]->mesh.size.y;
+      scene->player.position.z = scene->objects[index_object]->position.z;
 
       scene->objects[0]->position.y = scene->player.position.y;
     } else {
@@ -264,19 +325,19 @@ void scene_gameplay_initialize(
       }
     } 
 
-    scene->objects[index_object]->vertices = [metal_kit_device
+    scene->objects[index_object]->vertices = [scene->metal_kit_device
       newBufferWithBytes: scene->objects[index_object]->mesh.vertices
       length: scene->objects[index_object]->mesh.length_vertices * sizeof(struct clic3_vector4_float)
       options: MTLResourceStorageModeShared
     ];
 
-    scene->objects[index_object]->indices = [metal_kit_device
+    scene->objects[index_object]->indices = [scene->metal_kit_device
       newBufferWithBytes: scene->objects[index_object]->mesh.indices
       length: scene->objects[index_object]->mesh.length_indices * sizeof(unsigned int)
       options: MTLResourceStorageModeShared
     ];
 
-    scene->objects[index_object]->data = [metal_kit_device
+    scene->objects[index_object]->data = [scene->metal_kit_device
       newBufferWithLength: sizeof(metil_kit_data_frame_object)
       options: MTLResourceStorageModeShared
     ];
@@ -305,11 +366,8 @@ void scene_gameplay_poll(
     player_data->on_ground == 2 ||
     scene->player.position.y <= 10.0f
   ) {
-    // TODO: don't destroy/reinit, instead just reset existing values
-    scene_gameplay_destroy(scene);
-    scene_gameplay_initialize(
-      scene,
-      scene->metal_kit_device
+    scene_gameplay_populate(
+      scene
     );
 
     return;
@@ -318,7 +376,7 @@ void scene_gameplay_poll(
   metil_scene_poll_default(scene);
 
   scene->objects[0]->position.x = (
-    scene->player.position.x  - 1.0f
+    scene->player.position.x - 1.0f
   );
 
   scene->objects[0]->position.y = (
@@ -330,13 +388,22 @@ void scene_gameplay_poll(
   );
 }
 
-
 void scene_gameplay_destroy(
   struct metil_scene* scene
 ) {
   metil_audio_io_proc_remove(
     scene_gameplay_io_proc
   );
+
+  for (
+    unsigned short int index_object = 1;
+    index_object < scene->length_objects;
+    ++index_object
+  ) {
+    [scene->objects[index_object]->data release];
+    [scene->objects[index_object]->indices release];
+    [scene->objects[index_object]->vertices release];
+  }
 
   metil_scene_destroy_default(scene);
 }
