@@ -1,12 +1,18 @@
 #include <c938.h>
 
+#include <player.h>
 #include <scenes/scene_id.h>
 #include <scenes/scene_menu_main.h>
 #include <scenes/scene_gameplay.h>
 
-#include <metil.h>
+#include <metil_initialize.h>
+#include <metil_library.h>
+#include <metil_player.h>
+#include <metil_rendering/rendering_properties.h>
+#include <metil_scenes/scene.h>
+#include <metil_scenes/scene_controller.h>
 
-#include <AppKit/AppKit.h>
+#include <Metal/MTLDevice.h>
 
 id<MTLDevice> metal_kit_device = (void*)0;
 
@@ -14,6 +20,8 @@ int main(
   int length_parameters,
   const char** parameters
 ) {
+  metil_player_speed_movement_default = player_speed_movement_default;
+
   return metil_initialize(
     length_parameters,
     parameters,

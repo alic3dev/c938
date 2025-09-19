@@ -16,7 +16,6 @@ struct player_data {
   unsigned char is_jumping;
   unsigned char is_jumping_secondary;
 
-  unsigned int has_collided;
   unsigned int on_ground;
 };
 

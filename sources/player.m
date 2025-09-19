@@ -10,15 +10,20 @@
 
 #include <math.h>
 
-unsigned long int delta_time_jump_threshold = 250;
+const float player_speed_movement_default = 200.0f;
+
+const unsigned long int delta_time_jump_threshold = 250;
 
 void player_poll_input(
   struct metil_player* player,
-  unsigned long int time
+  unsigned long int time,
+  unsigned long int time_delta
 ) {
   struct player_data* player_data = (
     (struct player_data*) player->data
   );
+
+  float speed_delta = (float) time_delta / 1000.0f;
 
   unsigned long int delta_time_jump = time - player_data->time_jump;
 
@@ -32,7 +37,7 @@ void player_poll_input(
     ))
   ) {
     player->speed_movement = (
-      metil_player_speed_movement_default * 4.0f
+      player_speed_movement_default * 4.0f
     );
 
     player_data->is_boosted = 1;
@@ -46,14 +51,14 @@ void player_poll_input(
       delta_time_boost >= 2000
     ) {
       player_data->is_boosted = 0;
-      player->speed_movement = metil_player_speed_movement_default;
+      player->speed_movement = player_speed_movement_default;
     } else {
       if (delta_time_boost > 1000) {
         delta_time_boost = 1000;
       }
 
       player->speed_movement = (
-        metil_player_speed_movement_default * (
+        player_speed_movement_default * (
           4.0f - (((float) delta_time_boost / 1000.0f) * 3.0f)
         )
       );
@@ -62,6 +67,11 @@ void player_poll_input(
 
   float speed_original = player->speed_movement;
 
+  player->speed_movement = (
+    player->speed_movement *
+    (float) time_delta / 1000.0f
+  );
+
   if (
     metil_controller_state.available == 1 &&
     metil_controller_state.l2 >= 0.1f &&
@@ -69,8 +79,7 @@ void player_poll_input(
   ) {
     player->speed_movement = (
       player->speed_movement *
-      metil_controller_state.l2 +
-      1.0f
+      (metil_controller_state.l2 + 1.0f)
     );
   } else if (
     metil_controller_state.available == 1 &&
@@ -340,7 +349,7 @@ void player_poll_input(
       (player_data->is_jumping_secondary == 0 && delta_time_jump >= delta_time_jump_threshold)
     )
   ) {
-    player->velocity.y += metil_player_speed_movement_default / 1.25f;
+    player->velocity.y += player_speed_movement_default / 1.25f;
 
     if (player_data->is_jumping == 0) {
       player_data->is_jumping = 1;
@@ -354,7 +363,10 @@ void player_poll_input(
     metil_controller_state.available == 1 &&
     metil_controller_state.r2 >= 0.1f
   ) {
-    player->velocity.y -= metil_controller_state.r2;
+    player->velocity.y = (
+      player->velocity.y -
+      (metil_controller_state.r2 * time_delta * 5.0f)
+    );
   } else if (
     metil_input_map_keydown[
       metil_keycode_q
@@ -363,7 +375,10 @@ void player_poll_input(
       metil_keycode_period
     ] == 1
   ) {
-    player->velocity.y -= 1.0f;
+    player->velocity.y = (
+      player->velocity.y -
+      time_delta * 5.0f
+    );
   }
 
   if (
@@ -470,7 +485,10 @@ void player_poll_input(
       delta_time_jump >= delta_time_jump_threshold)
     )
   ) {
-    player->velocity.y += metil_player_speed_movement_default / 1.25f;
+    player->velocity.y = (
+      player->velocity.y + 
+      (player_speed_movement_default / 1.25f)
+    );
     
     if (player_data->is_jumping == 0) {
       player_data->is_jumping = 1;
@@ -480,14 +498,16 @@ void player_poll_input(
     }
   }
 
-  player_data->has_collided = 0;
   player_data->on_ground = 0;
   float position_ground_y = 0.0f;
 
-  float addition_y = (
-    movement.y *
-    player->speed_movement
-  ) + player->velocity.y;
+  float addition_y = ((
+      movement.y *
+      player->speed_movement
+    ) + (
+      player->velocity.y * speed_delta
+    )
+  );
 
   struct clic3_vector3_float position_updated = {
     .x = (
@@ -514,62 +534,84 @@ void player_poll_input(
     ++index_object
   ) {
     if (
-      position_updated.x >= player_data->objects[index_object]->position.x - 4 - player_data->objects[index_object]->mesh.size.x / 2.0f &&
-      position_updated.x <= player_data->objects[index_object]->position.x + 4 + player_data->objects[index_object]->mesh.size.x / 2.0f &&
-      position_updated.z >= player_data->objects[index_object]->position.z - 4 - player_data->objects[index_object]->mesh.size.z / 2.0f &&
-      position_updated.z <= player_data->objects[index_object]->position.z + 4 + player_data->objects[index_object]->mesh.size.z / 2.0f  
+      position_updated.x >= player_data->objects[index_object]->position.x - player->size.x - player_data->objects[index_object]->mesh.size.x / 2.0f &&
+      position_updated.x <= player_data->objects[index_object]->position.x + player->size.x + player_data->objects[index_object]->mesh.size.x / 2.0f &&
+      position_updated.z >= player_data->objects[index_object]->position.z - player->size.z - player_data->objects[index_object]->mesh.size.z / 2.0f &&
+      position_updated.z <= player_data->objects[index_object]->position.z + player->size.z + player_data->objects[index_object]->mesh.size.z / 2.0f &&
+      position_updated.y <= player_data->objects[index_object]->position.y + player_data->objects[index_object]->mesh.size.y &&
+      position_updated.y >= player_data->objects[index_object]->position.y + player->size.y
     ) {
+      // TODO: This should be updated to use line intersections with applied rotations
+
       if (
-        position_updated.y >= player_data->objects[index_object]->position.y + player_data->objects[index_object]->mesh.size.y &&
-        position_updated.y <= player_data->objects[index_object]->position.y + player_data->objects[index_object]->mesh.size.y + 4.0f
+        position_updated.y <= player_data->objects[index_object]->position.y + player_data->objects[index_object]->mesh.size.y &&
+        player->position.y >= player_data->objects[index_object]->position.y + player_data->objects[index_object]->mesh.size.y
       ) {
         player_data->on_ground = index_object + 1;
-        position_ground_y = player_data->objects[index_object]->position.y + player_data->objects[index_object]->mesh.size.y + 4.0f;
-      } else if (
-        position_updated.y >= player_data->objects[index_object]->position.y &&
-        position_updated.y <= player_data->objects[index_object]->position.y + player_data->objects[index_object]->mesh.size.y
+        position_updated.y = player_data->objects[index_object]->position.y + player_data->objects[index_object]->mesh.size.y;
+
+        if (
+          position_updated.x == player->position.x &&
+          position_updated.z == player->position.z
+        ) {
+          break;
+        }
+
+        continue;
+      }
+
+      // TODO: Needs Y collision detection besides from top to bottom
+
+      if (
+        player->position.x < player_data->objects[index_object]->position.x - player->size.x / 2.0f - player_data->objects[index_object]->mesh.size.x / 2.0f &&
+        player->position.x > player_data->objects[index_object]->position.x + player->size.x / 2.0f + player_data->objects[index_object]->mesh.size.x / 2.0f &&
+        position_updated.z < player_data->objects[index_object]->position.z - player->size.z / 2.0f - player_data->objects[index_object]->mesh.size.z / 2.0f &&
+        position_updated.z > player_data->objects[index_object]->position.z + player->size.z / 2.0f + player_data->objects[index_object]->mesh.size.z / 2.0f  
       ) {
-        player_data->has_collided = index_object + 1;
+        position_updated.x = player->position.x;
+      } else if (
+        position_updated.x < player_data->objects[index_object]->position.x - player->size.x / 2.0f - player_data->objects[index_object]->mesh.size.x / 2.0f &&
+        position_updated.x > player_data->objects[index_object]->position.x + player->size.x / 2.0f + player_data->objects[index_object]->mesh.size.x / 2.0f &&
+        player->position.z < player_data->objects[index_object]->position.z - player->size.z / 2.0f - player_data->objects[index_object]->mesh.size.z / 2.0f &&
+        player->position.z > player_data->objects[index_object]->position.z + player->size.z / 2.0f + player_data->objects[index_object]->mesh.size.z / 2.0f  
+      ) {
+        position_updated.z = player->position.z;
+      } else {
+        position_updated.x = player->position.x;
+        position_updated.z = player->position.z;
+
+        if (player_data->on_ground != 0) {
+          break;
+        }
       }
     }
-
-    if (
-      player_data->on_ground != 0 &&
-      player_data->has_collided != 0
-    ) {
-      break;
-    }
   }
 
-  if (player_data->has_collided == 0) {
-    player->position.x = position_updated.x;
-    player->position.z = position_updated.z;
-  }
+  player->position.x = position_updated.x;
+  player->position.y = position_updated.y;
+  player->position.z = position_updated.z;
 
   if (player_data->on_ground == 0) {
-    player->position.y = position_updated.y;
-
-    if (player->velocity.y > -1.0f) {
+    if (player->velocity.y > -1000.0f) {
       player->velocity.y = (
         player->velocity.y - (
-          metil_player_speed_movement_default / 50.0f
-        )
+          player_speed_movement_default
+        ) * speed_delta * 1.5f
       );
 
-      if (player->velocity.y < -1.0f) {
-        player->velocity.y = -1.0f;
+      if (player->velocity.y < -1000.0f) {
+        player->velocity.y = -1000.0f;
       }
     }
   } else {
-    player->position.y = position_ground_y;
     player->velocity.y = 0.0f;
     player_data->time_jump = 0;
     player_data->is_jumping = 0;
     player_data->is_jumping_secondary = 0;
   }
 
-  if (player->velocity.y < -2.0f) {
-    player->velocity.y = -2.0f;
+  if (player->velocity.y < -1000.0f) {
+    player->velocity.y = -1000.0f;
   }
 
   player->speed_movement = speed_original;

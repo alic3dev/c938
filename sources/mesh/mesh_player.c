@@ -1,6 +1,7 @@
 #include <mesh/mesh_player.h>
 
 #include <metil_mesh/mesh.h>
+#include <metil_player.h>
 
 #include <clic3_vector.h>
 
@@ -8,9 +9,9 @@
 #include <stdlib.h>
 
 const struct clic3_vector3_float mesh_player_size = {
-  .x = 2.0f,
-  .y = 1.0f,
-  .z = 2.0f
+  .x = __metil_player_size_default_x,
+  .y = __metil_player_size_default_y * 13.0f / 16.0f,
+  .z = __metil_player_size_default_z
 };
 
 const struct clic3_vector3_float mesh_player_size_half = {
@@ -71,7 +72,7 @@ void mesh_player_initialize(
     
     mesh->vertices[index_vertex].x = cos(angle) * mesh_player_size_half.x;
     mesh->vertices[index_vertex].y = 0;
-    mesh->vertices[index_vertex].z = sin(angle) * mesh_player_size_half.x;
+    mesh->vertices[index_vertex].z = sin(angle) * mesh_player_size_half.z;
     mesh->vertices[index_vertex].w = 1.0f;
   }
 
