@@ -16,7 +16,6 @@
 #include <metil_scenes/scene.h>
 
 #include <stdlib.h>
-#include <stdio.h>
 
 void scene_gameplay_initialize(
   struct metil_scene* scene,
