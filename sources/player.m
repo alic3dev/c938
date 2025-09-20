@@ -148,7 +148,7 @@ void player_poll_input(
   };
 
   player->rotation.y = (
-    player->rotation.y - (
+    player->rotation.y + (
       metil_input_delta_cursor.x / 50.0f *
       player->speed_rotation
     )
@@ -167,7 +167,7 @@ void player_poll_input(
       metil_controller_state.right_stick.x <= -0.1f
     ) {
       player->rotation.y = (
-        player->rotation.y - (
+        player->rotation.y + (
           metil_controller_state.right_stick.x *
           player->speed_rotation
         )
@@ -188,29 +188,31 @@ void player_poll_input(
   }
 
   if (
-    player->rotation.x > M_PI / 2.0f
+    player->rotation.x > M_PI_2
   ) {
-    player->rotation.x = M_PI / 2.0f;
+    player->rotation.x = M_PI_2;
   } else if (
-    player->rotation.x < -M_PI / 2.0f
+    player->rotation.x < -M_PI_2
   ) {
-    player->rotation.x = -M_PI / 2.0f;
+    player->rotation.x = -M_PI_2;
   }
+
+  player->rotation.y = fmod(
+    player->rotation.y,
+    (M_PI * 2.0f)
+  );
 
   metil_input_delta_cursor.x = 0;
   metil_input_delta_cursor.y = 0;
   
-  float ratio_axis = fmod(
-    player->rotation.y,
-    (M_PI * 2.0f)
-  ) / (M_PI * 2.0f);
+  float ratio_axis = player->rotation.y / (M_PI * 2.0f);
 
   if (
     ratio_axis >= 0.0f &&
     ratio_axis <= 0.25f
   ) {
-    ratio_movement.y = -(0.25f - ratio_axis) / 0.25f;
-    ratio_movement.x = -(ratio_axis / 0.25f);
+    ratio_movement.y = (0.25f - ratio_axis) / 0.25f;
+    ratio_movement.x = (ratio_axis / 0.25f);
 
     ratio_movement_strafe.y = -(ratio_axis / 0.25f);
     ratio_movement_strafe.x = (0.25f - ratio_axis) / 0.25f;
@@ -220,8 +222,8 @@ void player_poll_input(
   ) {
     ratio_axis = ratio_axis - 0.25f;
 
-    ratio_movement.y = (ratio_axis / 0.25f);
-    ratio_movement.x = -(0.25f - ratio_axis) / 0.25f;
+    ratio_movement.y = -(ratio_axis / 0.25f);
+    ratio_movement.x = (0.25f - ratio_axis) / 0.25f;
 
     ratio_movement_strafe.y = -(0.25f - ratio_axis) / 0.25f;
     ratio_movement_strafe.x = -(ratio_axis / 0.25f);
@@ -231,8 +233,8 @@ void player_poll_input(
   ) {
     ratio_axis = ratio_axis - 0.5f;
 
-    ratio_movement.y = (0.25f - ratio_axis) / 0.25f;
-    ratio_movement.x = (ratio_axis / 0.25f);
+    ratio_movement.y = -(0.25f - ratio_axis) / 0.25f;
+    ratio_movement.x = -(ratio_axis / 0.25f);
 
     ratio_movement_strafe.y = (ratio_axis / 0.25f);
     ratio_movement_strafe.x = -(0.25f - ratio_axis) / 0.25f;
@@ -241,16 +243,16 @@ void player_poll_input(
   ) {
     ratio_axis = ratio_axis - 0.75f;
 
-    ratio_movement.y = -(ratio_axis / 0.25f);
-    ratio_movement.x = (0.25f - ratio_axis) / 0.25f;
+    ratio_movement.y = (ratio_axis / 0.25f);
+    ratio_movement.x = -(0.25f - ratio_axis) / 0.25f;
 
     ratio_movement_strafe.y = (0.25f - ratio_axis) / 0.25f;
     ratio_movement_strafe.x = (ratio_axis / 0.25f);
   } else if (
     ratio_axis >= -0.25f
   ) {
-    ratio_movement.y = -(-0.25f - ratio_axis) / -0.25f;
-    ratio_movement.x = -(ratio_axis / 0.25f);
+    ratio_movement.y = (-0.25f - ratio_axis) / -0.25f;
+    ratio_movement.x = (ratio_axis / 0.25f);
 
     ratio_movement_strafe.y = -(ratio_axis / 0.25f);
     ratio_movement_strafe.x = (-0.25f - ratio_axis) / -0.25f;
@@ -260,8 +262,8 @@ void player_poll_input(
   ) {
     ratio_axis = ratio_axis + 0.25f;
 
-    ratio_movement.y = (ratio_axis / -0.25f);
-    ratio_movement.x = -(-0.25f - ratio_axis) / 0.25f;
+    ratio_movement.y = -(ratio_axis / -0.25f);
+    ratio_movement.x = (-0.25f - ratio_axis) / 0.25f;
 
     ratio_movement_strafe.y = -(-0.25f - ratio_axis) / 0.25f;
     ratio_movement_strafe.x = -(ratio_axis / -0.25f);
@@ -271,16 +273,16 @@ void player_poll_input(
   ) {
     ratio_axis = ratio_axis + 0.5f;
 
-    ratio_movement.y = (-0.25f - ratio_axis) / -0.25f;
-    ratio_movement.x = (ratio_axis / 0.25f);
+    ratio_movement.y = -(-0.25f - ratio_axis) / -0.25f;
+    ratio_movement.x = -(ratio_axis / 0.25f);
 
     ratio_movement_strafe.y = (ratio_axis / 0.25f);
     ratio_movement_strafe.x = -(-0.25f - ratio_axis) / -0.25f;
   } else {
     ratio_axis = ratio_axis + 0.75f;
 
-    ratio_movement.y = -(ratio_axis / -0.25f);
-    ratio_movement.x = (-0.25f - ratio_axis) / 0.25f;
+    ratio_movement.y = (ratio_axis / -0.25f);
+    ratio_movement.x = -(-0.25f - ratio_axis) / 0.25f;
 
     ratio_movement_strafe.y = (-0.25f - ratio_axis) / 0.25f;
     ratio_movement_strafe.x = (ratio_axis / -0.25f);
