@@ -209,37 +209,16 @@ void player_poll_input(
     ratio_axis >= 0.0f &&
     ratio_axis <= 0.25f
   ) {
-    ratio_movement.y = (0.25f - ratio_axis) / 0.25f;
-    ratio_movement.x = (ratio_axis / 0.25f);
-
-    ratio_movement_strafe.y = (ratio_axis / 0.25f);
-    ratio_movement_strafe.x = -(0.25f - ratio_axis) / 0.25f;
-  } else if (
-    ratio_axis >= 0.25f &&
-    ratio_axis <= 0.5f 
-  ) {
-    ratio_axis = ratio_axis - 0.25f;
-
-    ratio_movement.y = -(ratio_axis / 0.25f);
-    ratio_movement.x = (0.25f - ratio_axis) / 0.25f;
-
-    ratio_movement_strafe.y = (0.25f - ratio_axis) / 0.25f;
-    ratio_movement_strafe.x = (ratio_axis / 0.25f);
-  } else if (
-    ratio_axis >= 0.5f &&
-    ratio_axis <= 0.75f 
-  ) {
-    ratio_axis = ratio_axis - 0.5f;
-
     ratio_movement.y = -(0.25f - ratio_axis) / 0.25f;
     ratio_movement.x = -(ratio_axis / 0.25f);
 
     ratio_movement_strafe.y = -(ratio_axis / 0.25f);
     ratio_movement_strafe.x = (0.25f - ratio_axis) / 0.25f;
   } else if (
-    ratio_axis > 0.75f
+    ratio_axis >= 0.25f &&
+    ratio_axis <= 0.5f 
   ) {
-    ratio_axis = ratio_axis - 0.75f;
+    ratio_axis = ratio_axis - 0.25f;
 
     ratio_movement.y = (ratio_axis / 0.25f);
     ratio_movement.x = -(0.25f - ratio_axis) / 0.25f;
@@ -247,43 +226,64 @@ void player_poll_input(
     ratio_movement_strafe.y = -(0.25f - ratio_axis) / 0.25f;
     ratio_movement_strafe.x = -(ratio_axis / 0.25f);
   } else if (
-    ratio_axis >= -0.25f
+    ratio_axis >= 0.5f &&
+    ratio_axis <= 0.75f 
   ) {
-    ratio_movement.y = (-0.25f - ratio_axis) / -0.25f;
+    ratio_axis = ratio_axis - 0.5f;
+
+    ratio_movement.y = (0.25f - ratio_axis) / 0.25f;
     ratio_movement.x = (ratio_axis / 0.25f);
 
     ratio_movement_strafe.y = (ratio_axis / 0.25f);
-    ratio_movement_strafe.x = -(-0.25f - ratio_axis) / -0.25f;
+    ratio_movement_strafe.x = -(0.25f - ratio_axis) / 0.25f;
+  } else if (
+    ratio_axis > 0.75f
+  ) {
+    ratio_axis = ratio_axis - 0.75f;
+
+    ratio_movement.y = -(ratio_axis / 0.25f);
+    ratio_movement.x = (0.25f - ratio_axis) / 0.25f;
+
+    ratio_movement_strafe.y = (0.25f - ratio_axis) / 0.25f;
+    ratio_movement_strafe.x = (ratio_axis / 0.25f);
+  } else if (
+    ratio_axis >= -0.25f
+  ) {
+    ratio_movement.y = -(-0.25f - ratio_axis) / -0.25f;
+    ratio_movement.x = -(ratio_axis / 0.25f);
+
+    ratio_movement_strafe.y = -(ratio_axis / 0.25f);
+    ratio_movement_strafe.x = (-0.25f - ratio_axis) / -0.25f;
   } else if (
     ratio_axis <= -0.25f &&
     ratio_axis >= -0.5f
   ) {
     ratio_axis = ratio_axis + 0.25f;
 
-    ratio_movement.y = -(ratio_axis / -0.25f);
-    ratio_movement.x = (-0.25f - ratio_axis) / 0.25f;
+    ratio_movement.y = (ratio_axis / -0.25f);
+    ratio_movement.x = -(-0.25f - ratio_axis) / 0.25f;
 
-    ratio_movement_strafe.y = (-0.25f - ratio_axis) / 0.25f;
-    ratio_movement_strafe.x = (ratio_axis / -0.25f);
+    ratio_movement_strafe.y = -(-0.25f - ratio_axis) / 0.25f;
+    ratio_movement_strafe.x = -(ratio_axis / -0.25f);
   } else if (
     ratio_axis <= -0.5f &&
     ratio_axis >= -0.75f 
   ) {
     ratio_axis = ratio_axis + 0.5f;
 
-    ratio_movement.y = -(-0.25f - ratio_axis) / -0.25f;
-    ratio_movement.x = -(ratio_axis / 0.25f);
+    ratio_movement.y = (-0.25f - ratio_axis) / -0.25f;
+    ratio_movement.x = (ratio_axis / 0.25f);
 
-    ratio_movement_strafe.y = -(ratio_axis / 0.25f);
-    ratio_movement_strafe.x = (-0.25f - ratio_axis) / -0.25f;
+    ratio_movement_strafe.y = (ratio_axis / 0.25f);
+    ratio_movement_strafe.x = -(-0.25f - ratio_axis) / -0.25f;
   } else {
     ratio_axis = ratio_axis + 0.75f;
 
-    ratio_movement.y = (ratio_axis / -0.25f);
-    ratio_movement.x = -(-0.25f - ratio_axis) / 0.25f;
+    ratio_movement.y = -(ratio_axis / -0.25f);
+    ratio_movement.x = (-0.25f - ratio_axis) / 0.25f;
 
-    ratio_movement_strafe.y = -(-0.25f - ratio_axis) / 0.25f;
-    ratio_movement_strafe.x = -(ratio_axis / -0.25f);
+    ratio_movement_strafe.y = (-0.25f - ratio_axis) / 0.25f;
+    ratio_movement_strafe.x = (ratio_axis / -0.25f);
   }
 
   if (
@@ -441,7 +441,7 @@ void player_poll_input(
 
   struct clic3_vector3_float position_updated = {
     .x = (
-      player->position.x - (
+      player->position.x + (
         movement.x *
         player->speed_movement
       )
@@ -451,7 +451,7 @@ void player_poll_input(
       addition_y
     ),
     .z = (
-      player->position.z - (
+      player->position.z + (
         movement.z *
         player->speed_movement
       )
