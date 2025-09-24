@@ -222,15 +222,15 @@ void scene_gameplay_poll(
   metil_scene_poll_default(scene);
 
   scene->objects[0]->position.x = (
-    scene->player.position.x - 1.0f
+    scene->player.position.x
   );
 
   scene->objects[0]->position.y = (
-    scene->player.position.y + 1.0f
+    scene->player.position.y
   );
 
   scene->objects[0]->position.z = (
-    scene->player.position.z + 1.0f
+    scene->player.position.z
   );
 }
 
