@@ -1,9 +1,10 @@
 #include <scenes/scene_menu_main.h>
 
+#include <generate/generate_buildings.h>
 #include <menus/menu_main.h>
-#include <mesh/ground/mesh_ground.h>
 #include <mode_texture.h>
 #include <scenes/scene_id.h>
+#include <textures/textures_buildings.h>
 
 #include <metil_audio/audio.h>
 #include <metil_debug/log.h>
@@ -54,7 +55,7 @@ void scene_menu_main_initialize(
   scene->type = metil_scene_type_menu;
   scene->id = scene_id_menu_main;
 
-  scene->length_objects = 4;
+  scene->length_objects = 103;
   scene->objects = realloc(
     scene->objects,
     sizeof(struct metil_object*) *
@@ -65,7 +66,7 @@ void scene_menu_main_initialize(
     sizeof(struct metil_object)
   );
 
-  scene->length_textures = 4;
+  scene->length_textures = 7;
   scene->textures = malloc(
     sizeof(id<MTLTexture>) *
     scene->length_textures
@@ -73,33 +74,27 @@ void scene_menu_main_initialize(
 
   MTKTextureLoader* texture_loader = [[MTKTextureLoader alloc] initWithDevice: metal_kit_device];
 
-  scene->textures[
-    textures_scene_menu_main_ground
-  ] = [texture_loader
-    newTextureWithContentsOfURL: [NSURL
-      fileURLWithPath:@"concrete_1.png"
-      isDirectory: 0
-      relativeToURL: [NSURL
-        fileURLWithPath:[NSString
-          stringWithUTF8String: metil_paths.directory_textures
-        ]
-        isDirectory: 1
-      ]
-    ]
-    options: (void*)0
-    error: (void*)0
-  ];
+  textures_buildings_load(
+    texture_loader,
+    scene->textures + 3
+  );
 
   [texture_loader release];
 
-  mesh_ground_initialize(
-    &scene->objects[0]->mesh,
-    666.0f,
-    6666.6f,
-    200.0f
+  unsigned short int iterator_id = 0;
+
+  scene->objects[0] = malloc(
+    sizeof(struct metil_object)
   );
 
-  scene->objects[0]->position.y = -10.0f;
+  scene->textures[
+    textures_scene_menu_main_title
+  ] = metil_text_mesh_with_texture_initialize(
+    metal_kit_device,
+    &scene->objects[0]->mesh,
+    "c938",
+    metil_font_reference_monospace
+  ); // TODO: Check for null
 
   scene->objects[0]->vertices = [metal_kit_device
     newBufferWithBytes: scene->objects[0]->mesh.vertices
@@ -109,8 +104,11 @@ void scene_menu_main_initialize(
 
   scene->objects[0]->indices = [metal_kit_device
     newBufferWithBytes: scene->objects[0]->mesh.indices
-    length: scene->objects[0]->mesh.length_indices * sizeof(unsigned int)
-    options: MTLResourceStorageModeShared
+    length: (
+      sizeof(unsigned int) *
+      scene->objects[0]->mesh.length_indices
+    )
+    options: MTLResourceStorageModePrivate
   ];
 
   scene->objects[0]->data = [metal_kit_device
@@ -118,26 +116,28 @@ void scene_menu_main_initialize(
     options: MTLResourceStorageModeShared
   ];
 
-  scene->objects[0]->texture = scene->textures[
-    textures_scene_menu_main_ground
-  ];
-
-  unsigned short int iterator_id = 0;
+  scene->objects[0]->position.y = 0.5f - (scene->objects[0]->mesh.size.y / 4.0f);
 
   metil_kit_data_frame_object* data_object = scene->objects[0]->data.contents;
+  
   data_object->id = iterator_id++;
-  data_object->mode_texture = mode_texture_ground;
+  data_object->mode_texture = mode_texture_text;
+  data_object->noise = 0;
+
+  scene->objects[0]->texture = scene->textures[
+    textures_scene_menu_main_title
+  ];
 
   scene->objects[1] = malloc(
     sizeof(struct metil_object)
   );
 
   scene->textures[
-    textures_scene_menu_main_title
+    textures_scene_menu_main_menu_enter
   ] = metil_text_mesh_with_texture_initialize(
     metal_kit_device,
     &scene->objects[1]->mesh,
-    "c938",
+    "enter",
     metil_font_reference_monospace
   ); // TODO: Check for null
 
@@ -161,16 +161,15 @@ void scene_menu_main_initialize(
     options: MTLResourceStorageModeShared
   ];
 
-  scene->objects[1]->position.y = 0.5f - (scene->objects[1]->mesh.size.y / 4.0f);
+  scene->objects[1]->position.y = -scene->objects[1]->mesh.size.y * 6.0;
 
   data_object = scene->objects[1]->data.contents;
   
   data_object->id = iterator_id++;
   data_object->mode_texture = mode_texture_text;
-  data_object->noise = 1;
 
   scene->objects[1]->texture = scene->textures[
-    textures_scene_menu_main_title
+    textures_scene_menu_main_menu_enter
   ];
 
   scene->objects[2] = malloc(
@@ -178,13 +177,13 @@ void scene_menu_main_initialize(
   );
 
   scene->textures[
-    textures_scene_menu_main_menu_enter
+    textures_scene_menu_main_menu_exit
   ] = metil_text_mesh_with_texture_initialize(
     metal_kit_device,
     &scene->objects[2]->mesh,
-    "enter",
+    "exit",
     metil_font_reference_monospace
-  ); // TODO: Check for null
+  );
 
   scene->objects[2]->vertices = [metal_kit_device
     newBufferWithBytes: scene->objects[2]->mesh.vertices
@@ -206,7 +205,7 @@ void scene_menu_main_initialize(
     options: MTLResourceStorageModeShared
   ];
 
-  scene->objects[2]->position.y = -scene->objects[2]->mesh.size.y * 6.0;
+  scene->objects[2]->position.y = -scene->objects[2]->mesh.size.y * 10.0f;
 
   data_object = scene->objects[2]->data.contents;
   
@@ -214,75 +213,43 @@ void scene_menu_main_initialize(
   data_object->mode_texture = mode_texture_text;
 
   scene->objects[2]->texture = scene->textures[
-    textures_scene_menu_main_menu_enter
+    textures_scene_menu_main_menu_exit
   ];
 
-  scene->objects[3] = malloc(
-    sizeof(struct metil_object)
+  generate_buildings(
+    scene->metal_kit_device,
+    scene->objects + 3,
+    scene->length_objects - 3,
+    scene->textures + 3,
+    scene->length_textures - 3,
+    iterator_id
   );
 
-  scene->textures[
-    textures_scene_menu_main_menu_exit
-  ] = metil_text_mesh_with_texture_initialize(
-    metal_kit_device,
-    &scene->objects[3]->mesh,
-    "exit",
-    metil_font_reference_monospace
-  ); // TODO: Check for null
-
-  scene->objects[3]->vertices = [metal_kit_device
-    newBufferWithBytes: scene->objects[3]->mesh.vertices
-    length: scene->objects[3]->mesh.length_vertices * sizeof(struct clic3_vector4_float)
-    options: MTLResourceStorageModeShared
-  ];
-
-  scene->objects[3]->indices = [metal_kit_device
-    newBufferWithBytes: scene->objects[3]->mesh.indices
-    length: (
-      sizeof(unsigned int) *
-      scene->objects[3]->mesh.length_indices
-    )
-    options: MTLResourceStorageModePrivate
-  ];
-
-  scene->objects[3]->data = [metal_kit_device
-    newBufferWithLength: sizeof(metil_kit_data_frame_object)
-    options: MTLResourceStorageModeShared
-  ];
-
-  scene->objects[3]->position.y = -scene->objects[3]->mesh.size.y * 10.0f;
-
-  data_object = scene->objects[3]->data.contents;
-  
-  data_object->id = iterator_id++;
-  data_object->mode_texture = mode_texture_text;
-
-  scene->objects[3]->texture = scene->textures[
-    textures_scene_menu_main_menu_exit
-  ];
-
   scene->player.position.y = (
-    6.66f
+    1600.0f
   );
 
   scene->player.position.z = (
-    -50.0f
+    -1500.0f
   );
 
-  scene->player.rotation.x = -0.6f;
+  scene->player.rotation.x = -0.3f;
 }
 
 void scene_menu_main_poll(
   struct metil_scene* scene
 ) {
-  scene->player.rotation.x = fmax(
-    scene->player.rotation.x - (
-      ((scene->player.rotation.x - -0.666f) / 0.066f) *
-      0.00001f *
-      scene->time_delta
-    ),
-    -0.666f
-  );
+  float angle = ((float) (scene->time - 1758700000000) / 100000.0f) * M_PI * 2.0f;
+
+  scene->player.position.x = cos(
+    angle
+  ) * 1500.0f;
+  
+  scene->player.position.z = sin(
+    angle
+  ) * 1500.0f;
+
+  scene->player.rotation.y = -angle - M_PI / 2.0f;
 
   struct metil_scene_menu_main_data* data = (struct metil_scene_menu_main_data*) scene->data;
 
@@ -290,16 +257,16 @@ void scene_menu_main_poll(
 
   switch (menu->index_current) {
     case 0: {
-      metil_kit_data_frame_object* data_object = scene->objects[2]->data.contents;
+      metil_kit_data_frame_object* data_object = scene->objects[1]->data.contents;
       data_object->noise = 1;
-      data_object = scene->objects[3]->data.contents;
+      data_object = scene->objects[2]->data.contents;
       data_object->noise = 0;
       break;
     }
     case 1: {
-      metil_kit_data_frame_object* data_object = scene->objects[3]->data.contents;
+      metil_kit_data_frame_object* data_object = scene->objects[2]->data.contents;
       data_object->noise = 1;
-      data_object = scene->objects[2]->data.contents;
+      data_object = scene->objects[1]->data.contents;
       data_object->noise = 0;
       break;
     }
