@@ -53,7 +53,7 @@ void c938_renderer_on_initialize(
   metil_rendering_properties->color_clear.z = 0.0649f;
   metil_rendering_properties->color_clear.w = 1.0f;
 
-  scene_gameplay_initialize(
+  scene_menu_main_initialize(
     &metil_scene_controller.scene,
     metal_kit_device
   );
