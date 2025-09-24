@@ -14,18 +14,6 @@ const struct clic3_vector3_float mesh_player_size = {
   .z = __metil_player_size_default_z
 };
 
-const struct clic3_vector3_float mesh_player_size_half = {
-  .x = mesh_player_size.x / 2.0f,
-  .y = mesh_player_size.y / 2.0f,
-  .z = mesh_player_size.z / 2.0f
-};
-
-const struct clic3_vector3_float mesh_player_size_quarter = {
-  .x = 0,
-  .y = 0,
-  .z = 0
-};
-
 void mesh_player_initialize(
   struct metil_mesh* mesh
 ) {
@@ -70,9 +58,9 @@ void mesh_player_initialize(
       M_PI * 2.0f
     );
     
-    mesh->vertices[index_vertex].x = cos(angle) * mesh_player_size_half.x;
+    mesh->vertices[index_vertex].x = cos(angle) * mesh_player_size.x;
     mesh->vertices[index_vertex].y = 0;
-    mesh->vertices[index_vertex].z = sin(angle) * mesh_player_size_half.z;
+    mesh->vertices[index_vertex].z = sin(angle) * mesh_player_size.z;
     mesh->vertices[index_vertex].w = 1.0f;
   }
 
