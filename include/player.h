@@ -4,7 +4,8 @@
 #include <metil_player.h>
 
 extern const float player_speed_movement_default;
-extern const float player_speed_rotation_default;
+
+extern const float player_jump_velocity;
 
 extern const unsigned long int delta_time_jump_threshold;
 
