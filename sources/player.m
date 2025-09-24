@@ -12,6 +12,8 @@
 
 const float player_speed_movement_default = 100.0f;
 
+const float player_jump_velocity = 90.0f;
+
 const unsigned long int delta_time_jump_threshold = 250;
 
 void player_poll_input(
@@ -372,7 +374,7 @@ void player_poll_input(
       (player_data->is_jumping_secondary == 0 && delta_time_jump >= delta_time_jump_threshold)
     )
   ) {
-    player->velocity.y += player_speed_movement_default / 1.25f;
+    player->velocity.y += player_jump_velocity;
 
     if (player_data->is_jumping == 0) {
       player_data->is_jumping = 1;
@@ -419,7 +421,7 @@ void player_poll_input(
   ) {
     player->velocity.y = (
       player->velocity.y + 
-      (player_speed_movement_default / 1.25f)
+      player_jump_velocity
     );
     
     if (player_data->is_jumping == 0) {

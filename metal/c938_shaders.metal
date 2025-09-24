@@ -34,7 +34,7 @@ struct output_vertex {
     data.mode_texture == mode_texture_text
   ) {
     output_vertex.index_texture = 0;
-    output_vertex.brightness = data_frame.brightness_text;
+    output_vertex.brightness = data.noise == 1 ? data_frame.brightness_text / 4.0f : data_frame.brightness_text;
 
     output_vertex.position_texture.x = (
       id_vertex == 0 || id_vertex == 3

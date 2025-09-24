@@ -1,12 +1,13 @@
 #include <scenes/scene_gameplay.h>
 
-#include <mesh/mesh_building.h>
+#include <generate/generate_buildings.h>
 #include <mesh/ground/mesh_ground.h>
 #include <mesh/mesh_player.h>
 #include <mode_texture.h>
 #include <player.h>
 #include <player_data.h>
 #include <scenes/scene_id.h>
+#include <textures/textures_buildings.h>
 
 #include <metil_audio/audio.h>
 #include <metil_debug/log.h>
@@ -47,7 +48,7 @@ void scene_gameplay_initialize(
   scene->poll = scene_gameplay_poll;
   scene->destroy = scene_gameplay_destroy;
 
-  scene->length_objects = 100;
+  scene->length_objects = 200;
   scene->objects = realloc(
     scene->objects,
     sizeof(struct metil_object*) *
@@ -72,7 +73,10 @@ void scene_gameplay_initialize(
     scene->length_textures
   );
 
-  MTKTextureLoader* texture_loader = [[MTKTextureLoader alloc] initWithDevice: metal_kit_device];
+  MTKTextureLoader* texture_loader = [
+    [MTKTextureLoader alloc]
+    initWithDevice: metal_kit_device
+  ];
 
   scene->textures[
     textures_scene_gameplay_player
@@ -91,73 +95,10 @@ void scene_gameplay_initialize(
     error: (void*)0
   ];
 
-  scene->textures[
-    1
-  ] = [texture_loader
-    newTextureWithContentsOfURL: [NSURL
-      fileURLWithPath:@"concrete_1.png"
-      isDirectory: 0
-      relativeToURL: [NSURL
-        fileURLWithPath:[NSString
-          stringWithUTF8String: metil_paths.directory_textures
-        ]
-        isDirectory: 1
-      ]
-    ]
-    options: (void*)0
-    error: (void*)0
-  ];
-
-  scene->textures[
-    2
-  ] = [texture_loader
-    newTextureWithContentsOfURL: [NSURL
-      fileURLWithPath:@"concrete_2.png"
-      isDirectory: 0
-      relativeToURL: [NSURL
-        fileURLWithPath:[NSString
-          stringWithUTF8String: metil_paths.directory_textures
-        ]
-        isDirectory: 1
-      ]
-    ]
-    options: (void*)0
-    error: (void*)0
-  ];
-
-  scene->textures[
-    3
-  ] = [texture_loader
-    newTextureWithContentsOfURL: [NSURL
-      fileURLWithPath:@"concrete_4.png"
-      isDirectory: 0
-      relativeToURL: [NSURL
-        fileURLWithPath:[NSString
-          stringWithUTF8String: metil_paths.directory_textures
-        ]
-        isDirectory: 1
-      ]
-    ]
-    options: (void*)0
-    error: (void*)0
-  ];
-
-  scene->textures[
-    4
-  ] = [texture_loader
-    newTextureWithContentsOfURL: [NSURL
-      fileURLWithPath:@"concrete_5.png"
-      isDirectory: 0
-      relativeToURL: [NSURL
-        fileURLWithPath:[NSString
-          stringWithUTF8String: metil_paths.directory_textures
-        ]
-        isDirectory: 1
-      ]
-    ]
-    options: (void*)0
-    error: (void*)0
-  ];
+  textures_buildings_load(
+    texture_loader,
+    scene->textures + 1
+  );
 
   [texture_loader release];
 
@@ -217,7 +158,6 @@ void scene_gameplay_populate(
   unsigned short int iterator_id = 1;
 
   if (scene->objects[1] != (void*)0) {
-    
     for (
       unsigned short int index_object = 1;
       index_object < scene->length_objects;
@@ -242,113 +182,20 @@ void scene_gameplay_populate(
     scene->length_objects
   );
 
-  for (
-    unsigned char index_object = 1;
-    index_object < scene->length_objects;
-    ++index_object
-  ) {
-    scene->objects[
-      index_object
-    ] = malloc(
-      sizeof(struct metil_object)
-    );
-  }
-
-  mesh_building_initialize(
-    &scene->objects[1]->mesh,
-    5000.0f,
-    1.0f,
-    5000.0f
+  generate_buildings(
+    scene->metal_kit_device,
+    scene->objects + 1,
+    scene->length_objects - 1,
+    scene->textures + 1,
+    scene->length_textures - 1,
+    1
   );
 
-  scene->objects[1]->position.y = 0.0f;
+  scene->player.position.x = scene->objects[2]->position.x;
+  scene->player.position.y = scene->objects[2]->position.y + scene->objects[2]->mesh.size.y;
+  scene->player.position.z = scene->objects[2]->position.z;
 
-  scene->objects[1]->vertices = [scene->metal_kit_device
-    newBufferWithBytes: scene->objects[1]->mesh.vertices
-    length: scene->objects[1]->mesh.length_vertices * sizeof(struct clic3_vector4_float)
-    options: MTLResourceStorageModeShared
-  ];
-
-  scene->objects[1]->indices = [scene->metal_kit_device
-    newBufferWithBytes: scene->objects[1]->mesh.indices
-    length: scene->objects[1]->mesh.length_indices * sizeof(unsigned int)
-    options: MTLResourceStorageModeShared
-  ];
-
-  scene->objects[1]->data = [scene->metal_kit_device
-    newBufferWithLength: sizeof(metil_kit_data_frame_object)
-    options: MTLResourceStorageModeShared
-  ];
-
-  scene->objects[1]->texture = scene->textures[
-    1
-  ];
-
-  scene->objects[1]->texture_secondary = scene->textures[
-    2
-  ];
-
-  metil_kit_data_frame_object* data = scene->objects[1]->data.contents;
-  data->id = iterator_id++;
-  data->mode_texture = mode_texture_ground;
-
-  for (
-    unsigned char index_object = 2;
-    index_object < scene->length_objects;
-    ++index_object
-  ) {
-    mesh_building_initialize(
-      &scene->objects[index_object]->mesh,
-      83.0f + (rand() % 67),
-      1000.0f + (rand() % 500),
-      83.0f + (rand() % 67)
-    );
-
-    scene->objects[index_object]->position.y = 0.0f;
-
-    if (index_object == 2) {
-      scene->player.position.x = scene->objects[index_object]->position.x;
-      scene->player.position.y = scene->objects[index_object]->position.y + scene->objects[index_object]->mesh.size.y;
-      scene->player.position.z = scene->objects[index_object]->position.z;
-
-      scene->objects[0]->position.y = scene->player.position.y;
-    } else {
-      while (
-        scene->objects[index_object]->position.x - scene->objects[index_object]->mesh.size.x / 2.0f <= scene->objects[2]->mesh.size.x / 2.0f &&
-        scene->objects[index_object]->position.x + scene->objects[index_object]->mesh.size.x / 2.0f >= -scene->objects[2]->mesh.size.x / 2.0f &&
-        scene->objects[index_object]->position.z - scene->objects[index_object]->mesh.size.z / 2.0f <= scene->objects[2]->mesh.size.z / 2.0f &&
-        scene->objects[index_object]->position.z + scene->objects[index_object]->mesh.size.z / 2.0f >= -scene->objects[2]->mesh.size.z / 2.0f
-      ) {
-        scene->objects[index_object]->position.x = -200.0f + (rand() % 1400);
-        scene->objects[index_object]->position.z = -200.0f + (rand() % 1400);
-      }
-    } 
-
-    scene->objects[index_object]->vertices = [scene->metal_kit_device
-      newBufferWithBytes: scene->objects[index_object]->mesh.vertices
-      length: scene->objects[index_object]->mesh.length_vertices * sizeof(struct clic3_vector4_float)
-      options: MTLResourceStorageModeShared
-    ];
-
-    scene->objects[index_object]->indices = [scene->metal_kit_device
-      newBufferWithBytes: scene->objects[index_object]->mesh.indices
-      length: scene->objects[index_object]->mesh.length_indices * sizeof(unsigned int)
-      options: MTLResourceStorageModeShared
-    ];
-
-    scene->objects[index_object]->data = [scene->metal_kit_device
-      newBufferWithLength: sizeof(metil_kit_data_frame_object)
-      options: MTLResourceStorageModeShared
-    ];
-
-    scene->objects[index_object]->texture = scene->textures[
-      (rand() % (scene->length_textures - 1)) + 1
-    ];
-
-    data = scene->objects[index_object]->data.contents;
-    data->id = iterator_id++;
-    data->mode_texture = mode_texture_building;
-  }
+  scene->objects[0]->position.y = scene->player.position.y;
 
   player_data->length_objects = scene->length_objects - 2;
   player_data->objects = scene->objects + 2;

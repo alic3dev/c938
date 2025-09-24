@@ -10,10 +10,9 @@
 extern const unsigned long int scene_menu_main_time_scene_transition;
 
 enum textures_scene_menu_main {
-  textures_scene_menu_main_ground = 0,
-  textures_scene_menu_main_title = 1,
-  textures_scene_menu_main_menu_enter = 2,
-  textures_scene_menu_main_menu_exit = 3
+  textures_scene_menu_main_title = 0,
+  textures_scene_menu_main_menu_enter = 1,
+  textures_scene_menu_main_menu_exit = 2
 };
 
 struct metil_scene_menu_main_data {

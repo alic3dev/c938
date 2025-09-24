@@ -2,3 +2,5 @@ air
 objects
 output
 textures
+!sources/textures
+!include/textures
