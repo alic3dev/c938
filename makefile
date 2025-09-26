@@ -93,7 +93,9 @@ url_assets=https://content.alic3.dev/assets/${name}
 url_assets_textures=${url_assets}/textures
 
 target_device=mac
-target_macos_version=26.0
+ifndef target_macos_version
+	target_macos_version=26.0
+endif
 target_macos_version_metal=${target_macos_version}
 target_platform=arm64-apple-macos${target_macos_version}
 target_platform_metal=air64-apple-macos${target_macos_version_metal}
