@@ -239,7 +239,9 @@ void scene_menu_main_initialize(
 void scene_menu_main_poll(
   struct metil_scene* scene
 ) {
-  float angle = ((float) (scene->time - 1758700000000) / 100000.0f) * M_PI * 2.0f;
+  float angle = (
+    ((float) (scene->time % 10000) / 10000.0f) * M_PI * 2.0f
+  ) / 10.0f;
 
   scene->player.position.x = cos(
     angle
