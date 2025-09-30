@@ -93,8 +93,9 @@ void scene_menu_main_initialize(
     metal_kit_device,
     &scene->objects[0]->mesh,
     "c938",
-    metil_font_reference_monospace
-  ); // TODO: Check for null
+    metil_font_reference_monospace,
+    0.001f
+  );
 
   scene->objects[0]->vertices = [metal_kit_device
     newBufferWithBytes: scene->objects[0]->mesh.vertices
@@ -138,8 +139,9 @@ void scene_menu_main_initialize(
     metal_kit_device,
     &scene->objects[1]->mesh,
     "enter",
-    metil_font_reference_monospace
-  ); // TODO: Check for null
+    metil_font_reference_monospace,
+    0.001f
+  );
 
   scene->objects[1]->vertices = [metal_kit_device
     newBufferWithBytes: scene->objects[1]->mesh.vertices
@@ -182,7 +184,8 @@ void scene_menu_main_initialize(
     metal_kit_device,
     &scene->objects[2]->mesh,
     "exit",
-    metil_font_reference_monospace
+    metil_font_reference_monospace,
+    0.001f
   );
 
   scene->objects[2]->vertices = [metal_kit_device
