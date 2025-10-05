@@ -32,6 +32,9 @@ directory_interrupt_handler=../interrupt_handler
 directory_interrupt_handler_include=${directory_interrupt_handler}/include
 directory_interrupt_handler_library=${directory_interrupt_handler}/library
 
+directory_math_c=../math_c
+directory_math_c_library=${directory_math_c}/library
+
 directory_metil=../metil
 directory_metil_include=${directory_metil}/include
 ifeq (${debug}, 1)
@@ -55,6 +58,7 @@ directory_macos_sdk=${shell xcrun --show-sdk-path}
 file_cer0_library=${directory_cer0_library}/cer0.o
 file_clic3_library=${directory_clic3_library}/clic3.o
 file_interrupt_handler_library=${directory_interrupt_handler_library}/interrupt_handler.o
+file_math_c_library=${directory_math_c_library}/math_c.o
 ifeq (${debug}, 1)
 	file_metil_library=${directory_metil_library}/metil_debug.o
 else
@@ -67,7 +71,7 @@ file_output=${directory_app_contents_macos}/${name}
 file_output_info_plist=${directory_app_contents}/Info.plist
 file_output_metal=${directory_app_contents_resources}/default.metallib
 
-files_libraries=${file_cer0_library} ${file_clic3_library} ${file_interrupt_handler_library} ${file_metil_library}
+files_libraries=${file_cer0_library} ${file_clic3_library} ${file_interrupt_handler_library} ${file_math_c_library} ${file_metil_library}
 
 files_sources_c=${shell find ${directory_sources} -name "*.c"}
 files_sources_objc=${shell find ${directory_sources} -name "*.m"}
