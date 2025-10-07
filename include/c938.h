@@ -5,8 +5,6 @@
 
 #include <Metal/MTLDevice.h>
 
-extern id<MTLDevice> _Nullable metal_kit_device;
-
 int main(
   int,
   const char* _Nonnull * _Nonnull
@@ -14,12 +12,13 @@ int main(
 
 void c938_renderer_on_initialize(
   _Nonnull id<MTLDevice>,
-  struct metil_rendering_properties* _Nonnull
+  struct metil_rendering_properties* _Nonnull,
+  void* _Nullable
 );
 
 void c938_on_scene_change(
   int,
-  void* _Nullable
+  void* _Nonnull
 );
 
 #endif
