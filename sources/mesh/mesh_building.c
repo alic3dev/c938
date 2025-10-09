@@ -4,7 +4,6 @@
 
 #include <clic3_vector.h>
 
-#include <math.h>
 #include <stdlib.h>
 
 void mesh_building_initialize(

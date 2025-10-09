@@ -109,6 +109,14 @@ struct output_vertex {
     }
   }
 
+  if (
+    data.mode_texture == mode_texture_hud_item
+  ) {
+    output_vertex.color.r = (float) (2000 - data.noise) / 2000.0f;
+    output_vertex.color.g = (float) data.noise / 2000.0f;
+    output_vertex.color.b = (float) (data.noise % 2000) / 2000.0f;
+  }
+
   output_vertex.distance = (
     metal::fabs((data.position.x + positions[id_vertex].x) - data_frame.position_player.x) + 
     metal::fabs((data.position.y + positions[id_vertex].y) - data_frame.position_player.y) + 
@@ -123,6 +131,15 @@ struct output_vertex {
   metal::texture2d<half> texture_primary [[ texture(0) ]],
   metal::texture2d<half> texture_secondary [[ texture(1) ]]
 ) {
+  if (in.mode_texture == mode_texture_hud_item) {
+    return float4(
+      in.color.r * in.brightness,
+      in.color.g * in.brightness,
+      in.color.b * in.brightness,
+      1.0f
+    );
+  }
+
   constexpr metal::sampler sampler_texture(
     metal::filter::linear,
     metal::mip_filter::linear
@@ -151,9 +168,9 @@ struct output_vertex {
 
   if (in.mode_texture == mode_texture_text) {
     return float4(
-      color_texture[0] * in.color.r * brightness,
-      color_texture[1] * in.color.g * brightness,
-      color_texture[2] * in.color.b * brightness,
+      color_texture[0] * brightness,
+      color_texture[1] * brightness,
+      color_texture[2] * brightness,
       color_texture[3]
     );
   }
@@ -169,8 +186,8 @@ struct output_vertex {
   
   if (in.mode_texture == mode_texture_building) {
     color_texture[0] = color_texture[0] * 0.6f + 0.4;
-      color_texture[1] = color_texture[1] * 0.5f + 0.5;
-      color_texture[2] = color_texture[2] * 0.5f + 0.5;
+    color_texture[1] = color_texture[1] * 0.5f + 0.5;
+    color_texture[2] = color_texture[2] * 0.5f + 0.5;
 
     if (in.id == 3) {
       color_texture[0] = color_texture[0] * 0.3f + 0.7;
