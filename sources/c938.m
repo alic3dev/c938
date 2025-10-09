@@ -57,9 +57,9 @@ void c938_renderer_on_initialize(
     newFunctionWithName: @"metil_fps_display_fragment"
   ];
 
-  metil_rendering_properties->color_clear.x = 0.0324f;
-  metil_rendering_properties->color_clear.y = 0.0424f;
-  metil_rendering_properties->color_clear.z = 0.0649f;
+  metil_rendering_properties->color_clear.x = 0.0724f;
+  metil_rendering_properties->color_clear.y = 0.0824f;
+  metil_rendering_properties->color_clear.z = 0.1049f;
   metil_rendering_properties->color_clear.w = 1.0f;
 
   scene_menu_main_initialize(

@@ -1,6 +1,7 @@
 #include <scenes/scene_gameplay.h>
 
 #include <generate/generate_buildings.h>
+#include <mesh/mesh_hud_item.h>
 #include <mesh/ground/mesh_ground.h>
 #include <mesh/mesh_player.h>
 #include <mode_texture.h>
@@ -48,7 +49,7 @@ void scene_gameplay_initialize(
   scene->poll = scene_gameplay_poll;
   scene->destroy = scene_gameplay_destroy;
 
-  scene->length_objects = 200;
+  scene->length_objects = 205;
   scene->objects = realloc(
     scene->objects,
     sizeof(struct metil_object*) *
@@ -59,9 +60,29 @@ void scene_gameplay_initialize(
     sizeof(struct metil_object)
   );
 
+  scene->objects[scene->length_objects - 1] = malloc(
+    sizeof(struct metil_object)
+  );
+
+  scene->objects[scene->length_objects - 2] = malloc(
+    sizeof(struct metil_object)
+  );
+
+  scene->objects[scene->length_objects - 3] = malloc(
+    sizeof(struct metil_object)
+  );
+
+  metil_object_initialize(
+    scene->objects[0]
+  );
+
+  metil_object_initialize(
+    scene->objects[scene->length_objects - 1]
+  );
+
   for (
     unsigned char index_object = 1;
-    index_object < scene->length_objects;
+    index_object < scene->length_objects - 3;
     ++index_object
   ) {
     scene->objects[index_object] = (void*)0;
@@ -131,6 +152,105 @@ void scene_gameplay_initialize(
   data->id = 0;
   data->mode_texture = mode_texture_player;
 
+  mesh_hud_item_initialize(
+    &scene->objects[scene->length_objects - 1]->mesh  
+  );
+
+  scene->objects[scene->length_objects - 1]->mesh.positioning = metil_mesh_positioning_static;
+
+  scene->objects[scene->length_objects - 1]->vertices = [metal_kit_device
+    newBufferWithBytes: scene->objects[scene->length_objects - 1]->mesh.vertices
+    length: scene->objects[scene->length_objects - 1]->mesh.length_vertices * sizeof(struct clic3_vector4_float)
+    options: MTLResourceStorageModeShared
+  ];
+
+  scene->objects[scene->length_objects - 1]->indices = [metal_kit_device
+    newBufferWithBytes: scene->objects[scene->length_objects - 1]->mesh.indices
+    length: scene->objects[scene->length_objects - 1]->mesh.length_indices * sizeof(unsigned int)
+    options: MTLResourceStorageModeShared
+  ];
+
+  scene->objects[scene->length_objects - 1]->data = [metal_kit_device
+    newBufferWithLength: sizeof(metil_kit_data_frame_object)
+    options: MTLResourceStorageModeShared
+  ];
+
+  data = scene->objects[scene->length_objects - 1]->data.contents;
+  data->id = scene->length_objects - 1;
+  data->mode_texture = mode_texture_hud_item;
+
+  data->noise = 2000;
+
+  scene->objects[scene->length_objects - 1]->position.x = -0.9f;
+  scene->objects[scene->length_objects - 1]->position.y = -0.9f;
+  scene->objects[scene->length_objects - 1]->position.z = 0.0f;
+
+  mesh_hud_item_initialize(
+    &scene->objects[scene->length_objects - 2]->mesh  
+  );
+
+  scene->objects[scene->length_objects - 2]->mesh.positioning = metil_mesh_positioning_static;
+
+  scene->objects[scene->length_objects - 2]->vertices = [metal_kit_device
+    newBufferWithBytes: scene->objects[scene->length_objects - 2]->mesh.vertices
+    length: scene->objects[scene->length_objects - 2]->mesh.length_vertices * sizeof(struct clic3_vector4_float)
+    options: MTLResourceStorageModeShared
+  ];
+
+  scene->objects[scene->length_objects - 2]->indices = [metal_kit_device
+    newBufferWithBytes: scene->objects[scene->length_objects - 2]->mesh.indices
+    length: scene->objects[scene->length_objects - 2]->mesh.length_indices * sizeof(unsigned int)
+    options: MTLResourceStorageModeShared
+  ];
+
+  scene->objects[scene->length_objects - 2]->data = [metal_kit_device
+    newBufferWithLength: sizeof(metil_kit_data_frame_object)
+    options: MTLResourceStorageModeShared
+  ];
+
+  data = scene->objects[scene->length_objects - 2]->data.contents;
+  data->id = scene->length_objects - 2;
+  data->mode_texture = mode_texture_hud_item;
+
+  data->noise = 1.0f;
+
+  scene->objects[scene->length_objects - 2]->position.x = -0.9f;
+  scene->objects[scene->length_objects - 2]->position.y = -0.8f;
+  scene->objects[scene->length_objects - 2]->position.z = 0.0f;
+
+  mesh_hud_item_initialize(
+    &scene->objects[scene->length_objects - 3]->mesh  
+  );
+
+  scene->objects[scene->length_objects - 3]->mesh.positioning = metil_mesh_positioning_static;
+
+  scene->objects[scene->length_objects - 3]->vertices = [metal_kit_device
+    newBufferWithBytes: scene->objects[scene->length_objects - 3]->mesh.vertices
+    length: scene->objects[scene->length_objects - 3]->mesh.length_vertices * sizeof(struct clic3_vector4_float)
+    options: MTLResourceStorageModeShared
+  ];
+
+  scene->objects[scene->length_objects - 3]->indices = [metal_kit_device
+    newBufferWithBytes: scene->objects[scene->length_objects - 3]->mesh.indices
+    length: scene->objects[scene->length_objects - 3]->mesh.length_indices * sizeof(unsigned int)
+    options: MTLResourceStorageModeShared
+  ];
+
+  scene->objects[scene->length_objects - 3]->data = [metal_kit_device
+    newBufferWithLength: sizeof(metil_kit_data_frame_object)
+    options: MTLResourceStorageModeShared
+  ];
+
+  data = scene->objects[scene->length_objects - 3]->data.contents;
+  data->id = scene->length_objects - 3;
+  data->mode_texture = mode_texture_hud_item;
+
+  data->noise = 2000;
+
+  scene->objects[scene->length_objects - 3]->position.x = -0.9f;
+  scene->objects[scene->length_objects - 3]->position.y = -0.7f;
+  scene->objects[scene->length_objects - 3]->position.z = 0.0f;
+
   scene_gameplay_populate(scene);
 }
 
@@ -160,7 +280,7 @@ void scene_gameplay_populate(
   if (scene->objects[1] != (void*)0) {
     for (
       unsigned short int index_object = 1;
-      index_object < scene->length_objects;
+      index_object < scene->length_objects - 3;
       ++index_object
     ) {
       [scene->objects[index_object]->data release];
@@ -175,7 +295,7 @@ void scene_gameplay_populate(
     }
   }
 
-  scene->length_objects = 100;
+  scene->length_objects = 205;
   scene->objects = realloc(
     scene->objects,
     sizeof(struct metil_object*) *
@@ -185,7 +305,7 @@ void scene_gameplay_populate(
   generate_buildings(
     scene->metal_kit_device,
     scene->objects + 1,
-    scene->length_objects - 1,
+    scene->length_objects - 4,
     scene->textures + 1,
     scene->length_textures - 1,
     1
@@ -197,7 +317,7 @@ void scene_gameplay_populate(
 
   scene->objects[0]->position.y = scene->player.position.y;
 
-  player_data->length_objects = scene->length_objects - 2;
+  player_data->length_objects = scene->length_objects - 6;
   player_data->objects = scene->objects + 2;
 }
 
@@ -232,6 +352,24 @@ void scene_gameplay_poll(
   scene->objects[0]->position.z = (
     scene->player.position.z
   );
+
+  metil_kit_data_frame_object* data = scene->objects[scene->length_objects - 1]->data.contents;
+
+  if (
+    player_data->is_boosted == 1
+  ) {
+    unsigned long int delta_time_boost = scene->time_input - player_data->time_boost;
+
+    data->noise = delta_time_boost > 2000 ? 2000 : delta_time_boost;
+  } else {
+    data->noise = 2000;
+  }
+
+  data = scene->objects[scene->length_objects - 2]->data.contents;
+  data->noise = player_data->is_jumping != 0 ? 0 : 2000;
+
+  data = scene->objects[scene->length_objects - 3]->data.contents;
+  data->noise = player_data->is_jumping_secondary != 0 ? 0 : 2000;
 }
 
 void scene_gameplay_destroy(
@@ -242,7 +380,7 @@ void scene_gameplay_destroy(
   );
 
   for (
-    unsigned short int index_object = 1;
+    unsigned short int index_object = 0;
     index_object < scene->length_objects;
     ++index_object
   ) {
