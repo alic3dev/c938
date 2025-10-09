@@ -18,6 +18,7 @@ enum textures_scene_menu_main {
 struct metil_scene_menu_main_data {
   struct metil_menu menu;
   unsigned long int time_started;
+  float angle;
 };
 
 void scene_menu_main_initialize(
