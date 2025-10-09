@@ -46,6 +46,8 @@ void scene_menu_main_initialize(
 
   struct metil_scene_menu_main_data* data = (struct metil_scene_menu_main_data*) scene->data;
 
+  data->angle = 0.0f;
+
   data->time_started = 0;
 
   menu_main_initialize(
@@ -244,21 +246,21 @@ void scene_menu_main_initialize(
 void scene_menu_main_poll(
   struct metil_scene* scene
 ) {
-  float angle = (
-    ((float) (scene->time % 10000) / 10000.0f) * M_PI * 2.0f
-  ) / 10.0f;
+  struct metil_scene_menu_main_data* data = (struct metil_scene_menu_main_data*) scene->data;
+
+  data->angle = (
+    fmod(data->angle + scene->time_delta / 20000.0f, M_PI * 2.0f)
+  );
 
   scene->player.position.x = cos(
-    angle
+    data->angle
   ) * 1500.0f;
   
   scene->player.position.z = sin(
-    angle
+    data->angle
   ) * 1500.0f;
 
-  scene->player.rotation.y = -angle - M_PI / 2.0f;
-
-  struct metil_scene_menu_main_data* data = (struct metil_scene_menu_main_data*) scene->data;
+  scene->player.rotation.y = -data->angle - M_PI / 2.0f;
 
   struct metil_menu* menu = &data->menu;
 
