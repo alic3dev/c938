@@ -2,7 +2,6 @@
 #define __c938_generate_generate_buildings_h
 
 #include <metil_object.h>
-#include <metil_shader_types.h>
 
 #include <Metal/MTLDevice.h>
 #include <Metal/MTLTexture.h>

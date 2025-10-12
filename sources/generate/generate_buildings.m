@@ -4,7 +4,7 @@
 #include <mode_texture.h>
 
 #include <metil_object.h>
-#include <metil_shader_types.h>
+#include <metil_rendering/metil_renderer_data_object.h>
 
 #include <Metal/MTLDevice.h>
 #include <Metal/MTLTexture.h>
@@ -40,22 +40,10 @@ void generate_buildings(
 
   objects[0]->position.y = 0.0f;
 
-  objects[0]->vertices = [metal_kit_device
-    newBufferWithBytes: objects[0]->mesh.vertices
-    length: objects[0]->mesh.length_vertices * sizeof(struct clic3_vector4_float)
-    options: MTLResourceStorageModeShared
-  ];
-
-  objects[0]->indices = [metal_kit_device
-    newBufferWithBytes: objects[0]->mesh.indices
-    length: objects[0]->mesh.length_indices * sizeof(unsigned int)
-    options: MTLResourceStorageModeShared
-  ];
-
-  objects[0]->data = [metal_kit_device
-    newBufferWithLength: sizeof(metil_kit_data_frame_object)
-    options: MTLResourceStorageModeShared
-  ];
+  metil_object_buffers_initialize(
+    objects[0],
+    metal_kit_device
+  );
 
   objects[0]->texture = textures[
     0
@@ -67,7 +55,7 @@ void generate_buildings(
 
   unsigned short int iterator_id = offset_id;
 
-  metil_kit_data_frame_object* data = objects[0]->data.contents;
+  struct metil_renderer_data_object* data = objects[0]->data.contents;
   data->id = iterator_id++;
   data->mode_texture = mode_texture_ground;
 
@@ -95,24 +83,12 @@ void generate_buildings(
         objects[index_object]->position.x = -size / 2 + (rand() % size);
         objects[index_object]->position.z = -size / 2 + (rand() % size);
       }
-    } 
+    }
 
-    objects[index_object]->vertices = [metal_kit_device
-      newBufferWithBytes: objects[index_object]->mesh.vertices
-      length: objects[index_object]->mesh.length_vertices * sizeof(struct clic3_vector4_float)
-      options: MTLResourceStorageModeShared
-    ];
-
-    objects[index_object]->indices = [metal_kit_device
-      newBufferWithBytes: objects[index_object]->mesh.indices
-      length: objects[index_object]->mesh.length_indices * sizeof(unsigned int)
-      options: MTLResourceStorageModeShared
-    ];
-
-    objects[index_object]->data = [metal_kit_device
-      newBufferWithLength: sizeof(metil_kit_data_frame_object)
-      options: MTLResourceStorageModeShared
-    ];
+    metil_object_buffers_initialize(
+      objects[index_object],
+      metal_kit_device
+    );
 
     objects[index_object]->texture = textures[
       (rand() % (length_textures - 1))
