@@ -149,19 +149,26 @@ void player_poll_input(
     .y = 0.0f
   };
 
-  player->rotation.y = (
-    player->rotation.y + (
-      metil_input_delta_cursor.x / 50.0f *
-      player->speed_rotation
-    )
-  );
+  if (
+    metil_input_cursor.locked == 1
+  ) {
+    player->rotation.y = (
+      player->rotation.y + (
+        metil_input_cursor.delta.x / 50.0f *
+        player->speed_rotation
+      )
+    );
 
-  player->rotation.x = (
-    player->rotation.x - (
-      metil_input_delta_cursor.y / 50.0f *
-      player->speed_rotation
-    )
-  );
+    player->rotation.x = (
+      player->rotation.x - (
+        metil_input_cursor.delta.y / 50.0f *
+        player->speed_rotation
+      )
+    );
+
+    metil_input_cursor.delta.x = 0;
+    metil_input_cursor.delta.y = 0;
+  }
 
   if (metil_controller_state.available == 1) {
     if (
@@ -203,9 +210,6 @@ void player_poll_input(
     player->rotation.y,
     (M_PI * 2.0f)
   );
-
-  metil_input_delta_cursor.x = 0;
-  metil_input_delta_cursor.y = 0;
   
   float ratio_axis = player->rotation.y / (M_PI * 2.0f);
 
