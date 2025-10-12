@@ -12,9 +12,9 @@
 
 #include <metil_audio/audio.h>
 #include <metil_debug/log.h>
-#include <metil_shader_types.h>
 #include <metil_object.h>
 #include <metil_paths/paths.h>
+#include <metil_rendering/metil_renderer_data_object.h>
 #include <metil_scenes/scene.h>
 
 #include <stdlib.h>
@@ -127,28 +127,16 @@ void scene_gameplay_initialize(
     &scene->objects[0]->mesh
   );
 
-  scene->objects[0]->vertices = [metal_kit_device
-    newBufferWithBytes: scene->objects[0]->mesh.vertices
-    length: scene->objects[0]->mesh.length_vertices * sizeof(struct clic3_vector4_float)
-    options: MTLResourceStorageModeShared
-  ];
-
-  scene->objects[0]->indices = [metal_kit_device
-    newBufferWithBytes: scene->objects[0]->mesh.indices
-    length: scene->objects[0]->mesh.length_indices * sizeof(unsigned int)
-    options: MTLResourceStorageModeShared
-  ];
-
-  scene->objects[0]->data = [metal_kit_device
-    newBufferWithLength: sizeof(metil_kit_data_frame_object)
-    options: MTLResourceStorageModeShared
-  ];
+  metil_object_buffers_initialize(
+    scene->objects[0],
+    scene->metal_kit_device
+  );
 
   scene->objects[0]->texture = scene->textures[
     textures_scene_gameplay_player
   ];
 
-  metil_kit_data_frame_object* data = scene->objects[0]->data.contents;
+  struct metil_renderer_data_object* data = scene->objects[0]->data.contents;
   data->id = 0;
   data->mode_texture = mode_texture_player;
 
@@ -158,22 +146,10 @@ void scene_gameplay_initialize(
 
   scene->objects[scene->length_objects - 1]->mesh.positioning = metil_mesh_positioning_static;
 
-  scene->objects[scene->length_objects - 1]->vertices = [metal_kit_device
-    newBufferWithBytes: scene->objects[scene->length_objects - 1]->mesh.vertices
-    length: scene->objects[scene->length_objects - 1]->mesh.length_vertices * sizeof(struct clic3_vector4_float)
-    options: MTLResourceStorageModeShared
-  ];
-
-  scene->objects[scene->length_objects - 1]->indices = [metal_kit_device
-    newBufferWithBytes: scene->objects[scene->length_objects - 1]->mesh.indices
-    length: scene->objects[scene->length_objects - 1]->mesh.length_indices * sizeof(unsigned int)
-    options: MTLResourceStorageModeShared
-  ];
-
-  scene->objects[scene->length_objects - 1]->data = [metal_kit_device
-    newBufferWithLength: sizeof(metil_kit_data_frame_object)
-    options: MTLResourceStorageModeShared
-  ];
+  metil_object_buffers_initialize(
+    scene->objects[scene->length_objects - 1],
+    metal_kit_device
+  );
 
   data = scene->objects[scene->length_objects - 1]->data.contents;
   data->id = scene->length_objects - 1;
@@ -191,22 +167,10 @@ void scene_gameplay_initialize(
 
   scene->objects[scene->length_objects - 2]->mesh.positioning = metil_mesh_positioning_static;
 
-  scene->objects[scene->length_objects - 2]->vertices = [metal_kit_device
-    newBufferWithBytes: scene->objects[scene->length_objects - 2]->mesh.vertices
-    length: scene->objects[scene->length_objects - 2]->mesh.length_vertices * sizeof(struct clic3_vector4_float)
-    options: MTLResourceStorageModeShared
-  ];
-
-  scene->objects[scene->length_objects - 2]->indices = [metal_kit_device
-    newBufferWithBytes: scene->objects[scene->length_objects - 2]->mesh.indices
-    length: scene->objects[scene->length_objects - 2]->mesh.length_indices * sizeof(unsigned int)
-    options: MTLResourceStorageModeShared
-  ];
-
-  scene->objects[scene->length_objects - 2]->data = [metal_kit_device
-    newBufferWithLength: sizeof(metil_kit_data_frame_object)
-    options: MTLResourceStorageModeShared
-  ];
+  metil_object_buffers_initialize(
+    scene->objects[scene->length_objects - 2],
+    metal_kit_device
+  );
 
   data = scene->objects[scene->length_objects - 2]->data.contents;
   data->id = scene->length_objects - 2;
@@ -224,22 +188,10 @@ void scene_gameplay_initialize(
 
   scene->objects[scene->length_objects - 3]->mesh.positioning = metil_mesh_positioning_static;
 
-  scene->objects[scene->length_objects - 3]->vertices = [metal_kit_device
-    newBufferWithBytes: scene->objects[scene->length_objects - 3]->mesh.vertices
-    length: scene->objects[scene->length_objects - 3]->mesh.length_vertices * sizeof(struct clic3_vector4_float)
-    options: MTLResourceStorageModeShared
-  ];
-
-  scene->objects[scene->length_objects - 3]->indices = [metal_kit_device
-    newBufferWithBytes: scene->objects[scene->length_objects - 3]->mesh.indices
-    length: scene->objects[scene->length_objects - 3]->mesh.length_indices * sizeof(unsigned int)
-    options: MTLResourceStorageModeShared
-  ];
-
-  scene->objects[scene->length_objects - 3]->data = [metal_kit_device
-    newBufferWithLength: sizeof(metil_kit_data_frame_object)
-    options: MTLResourceStorageModeShared
-  ];
+  metil_object_buffers_initialize(
+    scene->objects[scene->length_objects - 3],
+    metal_kit_device
+  );
 
   data = scene->objects[scene->length_objects - 3]->data.contents;
   data->id = scene->length_objects - 3;
@@ -353,7 +305,7 @@ void scene_gameplay_poll(
     scene->player.position.z
   );
 
-  metil_kit_data_frame_object* data = scene->objects[scene->length_objects - 1]->data.contents;
+  struct metil_renderer_data_object* data = scene->objects[scene->length_objects - 1]->data.contents;
 
   if (
     player_data->is_boosted == 1
