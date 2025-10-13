@@ -81,7 +81,7 @@
             title="c938"
             allowsToolTipsWhenApplicationIsInactive="0"
             autorecalculatesKeyViewLoop="0"
-            releasedWhenClosed="0"
+            releasedWhenClosed="1"
             animationBehavior="none"
             userLabel="c938"
             customClass="metil_window"
