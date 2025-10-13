@@ -235,10 +235,6 @@ void scene_gameplay_populate(
       index_object < scene->length_objects - 3;
       ++index_object
     ) {
-      [scene->objects[index_object]->data release];
-      [scene->objects[index_object]->indices release];
-      [scene->objects[index_object]->vertices release];
-
       metil_object_destroy(
         scene->objects[index_object]
       );
@@ -330,16 +326,6 @@ void scene_gameplay_destroy(
   metil_audio_io_proc_remove(
     scene_gameplay_io_proc
   );
-
-  for (
-    unsigned short int index_object = 0;
-    index_object < scene->length_objects;
-    ++index_object
-  ) {
-    [scene->objects[index_object]->data release];
-    [scene->objects[index_object]->indices release];
-    [scene->objects[index_object]->vertices release];
-  }
 
   metil_scene_destroy_default(scene);
 }
