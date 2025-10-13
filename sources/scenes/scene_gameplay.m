@@ -265,7 +265,7 @@ void scene_gameplay_populate(
 
   scene->objects[0]->position.y = scene->player.position.y;
 
-  player_data->length_objects = scene->length_objects - 6;
+  player_data->length_objects = scene->length_objects - 5;
   player_data->objects = scene->objects + 2;
 }
 
