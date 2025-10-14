@@ -6,6 +6,7 @@
 #include <scenes/scene_menu_main.h>
 #include <scenes/scene_gameplay.h>
 
+#include <metil_configuration/configuration.h>
 #include <metil_initialize.h>
 #include <metil_library.h>
 #include <metil_player.h>
@@ -53,9 +54,9 @@ void c938_renderer_on_initialize(
     (void*)0
   );
 
-  metil_renderer_interface->rendering_properties->color_clear.x = 0.0724f;
-  metil_renderer_interface->rendering_properties->color_clear.y = 0.0824f;
-  metil_renderer_interface->rendering_properties->color_clear.z = 0.1049f;
+  metil_renderer_interface->rendering_properties->color_clear.x = 0.0724f * metil_configuration.rendering_properties.brightness;
+  metil_renderer_interface->rendering_properties->color_clear.y = 0.0824f * metil_configuration.rendering_properties.brightness;
+  metil_renderer_interface->rendering_properties->color_clear.z = 0.1049f * metil_configuration.rendering_properties.brightness;
   metil_renderer_interface->rendering_properties->color_clear.w = 1.0f;
 
   c938_pipeline_index_building = [

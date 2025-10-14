@@ -38,8 +38,6 @@ struct data_vertex {
     positions[id_vertex]
   );
 
-  data_vertex.brightness = data_frame->brightness;
-
   data_vertex.position_texture.x = (
     id_vertex == 4 ||
     id_vertex == 6 ||
@@ -60,7 +58,7 @@ struct data_vertex {
     id_vertex > 3 && data_object->mode_texture == mode_texture_building
     ? 1.0f
     : 0.125f
-  );
+  ) * data_frame->brightness;
 
   data_vertex.distance = (
     metal::fabs((data_object->position.x + positions[id_vertex].x) - data_frame->position_player.x) + 

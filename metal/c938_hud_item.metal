@@ -37,7 +37,7 @@ struct data_vertex {
     positions[id_vertex]
   );
 
-  data_vertex.brightness = data_frame->brightness;
+  data_vertex.brightness = data_frame->brightness_text;
 
   data_vertex.color.r = (float) (2000 - data_object->noise) / 2000.0f;
   data_vertex.color.g = (float) data_object->noise / 2000.0f;
