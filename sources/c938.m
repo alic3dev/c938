@@ -1,5 +1,6 @@
 #include <c938.h>
 
+#include <pipeline_index.h>
 #include <player.h>
 #include <scenes/scene_id.h>
 #include <scenes/scene_menu_main.h>
@@ -8,7 +9,7 @@
 #include <metil_initialize.h>
 #include <metil_library.h>
 #include <metil_player.h>
-#include <metil_rendering/rendering_properties.h>
+#include <metil_rendering/metil_renderer_interface.h>
 #include <metil_scenes/scene.h>
 #include <metil_scenes/scene_controller.h>
 
@@ -29,11 +30,13 @@ int main(
 }
 
 void c938_renderer_on_initialize(
-  id<MTLDevice> metal_kit_device,
-  struct metil_rendering_properties* metil_rendering_properties,
+  struct metil_renderer_interface* metil_renderer_interface,
   void* data
 ) {
-  metil_library.library = [metal_kit_device newDefaultLibrary];
+  metil_library.library = [
+    metil_renderer_interface->metal_device
+    newDefaultLibrary
+  ];
 
   metil_library.function_vertex = [
     metil_library.library
@@ -45,24 +48,84 @@ void c938_renderer_on_initialize(
     newFunctionWithName: @"c938_fragment"
   ];
 
-  metil_library_initialize_fps_display(
-    metal_kit_device,
+  metil_library_fps_display_initialize(
+    metil_renderer_interface->metal_device,
     (void*)0
   );
 
-  metil_rendering_properties->color_clear.x = 0.0724f;
-  metil_rendering_properties->color_clear.y = 0.0824f;
-  metil_rendering_properties->color_clear.z = 0.1049f;
-  metil_rendering_properties->color_clear.w = 1.0f;
+  metil_renderer_interface->rendering_properties->color_clear.x = 0.0724f;
+  metil_renderer_interface->rendering_properties->color_clear.y = 0.0824f;
+  metil_renderer_interface->rendering_properties->color_clear.z = 0.1049f;
+  metil_renderer_interface->rendering_properties->color_clear.w = 1.0f;
+
+  c938_pipeline_index_building = [
+    metil_renderer_interface->renderer
+    pipeline_add: [
+      metil_library.library
+      newFunctionWithName: @"c938_building_fragment"
+    ]
+    function_vertex: [
+      metil_library.library
+      newFunctionWithName: @"c938_building_vertex"
+    ]
+  ];
+
+  c938_pipeline_index_ground = [
+    metil_renderer_interface->renderer
+    pipeline_add: [
+      metil_library.library
+      newFunctionWithName: @"c938_ground_fragment"
+    ]
+    function_vertex: [
+      metil_library.library
+      newFunctionWithName: @"c938_ground_vertex"
+    ]
+  ];
+
+  c938_pipeline_index_hud_item = [
+    metil_renderer_interface->renderer
+    pipeline_add: [
+      metil_library.library
+      newFunctionWithName: @"c938_hud_item_fragment"
+    ]
+    function_vertex: [
+      metil_library.library
+      newFunctionWithName: @"c938_hud_item_vertex"
+    ]
+  ];
+
+  c938_pipeline_index_player = [
+    metil_renderer_interface->renderer
+    pipeline_add: [
+      metil_library.library
+      newFunctionWithName: @"c938_player_fragment"
+    ]
+    function_vertex: [
+      metil_library.library
+      newFunctionWithName: @"c938_player_vertex"
+    ]
+  ];
+
+  c938_pipeline_index_text = [
+    metil_renderer_interface->renderer
+    pipeline_add: [
+      metil_library.library
+      newFunctionWithName: @"c938_text_fragment"
+    ]
+    function_vertex: [
+      metil_library.library
+      newFunctionWithName: @"c938_text_vertex"
+    ]
+  ];
 
   scene_menu_main_initialize(
     &metil_scene_controller.scene,
-    metal_kit_device
+    metil_renderer_interface->metal_device
   );
 
   metil_scene_controller_on_scene_change_add(
     c938_on_scene_change,
-    metal_kit_device
+    metil_renderer_interface
   );
 }
 
@@ -70,8 +133,8 @@ void c938_on_scene_change(
   int id_scene,
   void* data
 ) {
-  id<MTLDevice> metal_kit_device = (
-    (id<MTLDevice>) data
+  struct metil_renderer_interface* metil_renderer_interface = (
+    (struct metil_renderer_interface*) data
   );
 
   metil_scene_destroy(
@@ -85,13 +148,13 @@ void c938_on_scene_change(
     case scene_id_menu_main:
       scene_menu_main_initialize(
         &metil_scene_controller.scene,
-        metal_kit_device
+        metil_renderer_interface->metal_device
       );
       break;
     case scene_id_gameplay:
       scene_gameplay_initialize(
         &metil_scene_controller.scene,
-        metal_kit_device
+        metil_renderer_interface->metal_device
       );
       break;
   }

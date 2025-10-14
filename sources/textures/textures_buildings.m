@@ -47,7 +47,7 @@ void textures_buildings_load(
     2
   ] = [texture_loader
     newTextureWithContentsOfURL: [NSURL
-      fileURLWithPath:@"concrete_4.png"
+      fileURLWithPath:@"concrete_3.png"
       isDirectory: 0
       relativeToURL: [NSURL
         fileURLWithPath:[NSString
@@ -64,7 +64,92 @@ void textures_buildings_load(
     3
   ] = [texture_loader
     newTextureWithContentsOfURL: [NSURL
-      fileURLWithPath:@"concrete_5.png"
+      fileURLWithPath:@"concrete_4.png"
+      isDirectory: 0
+      relativeToURL: [NSURL
+        fileURLWithPath:[NSString
+          stringWithUTF8String: metil_paths.directory_textures
+        ]
+        isDirectory: 1
+      ]
+    ]
+    options: (void*)0
+    error: (void*)0
+  ];
+
+  textures[
+    4
+  ] = [texture_loader
+    newTextureWithContentsOfURL: [NSURL
+      fileURLWithPath:@"red_1.png"
+      isDirectory: 0
+      relativeToURL: [NSURL
+        fileURLWithPath:[NSString
+          stringWithUTF8String: metil_paths.directory_textures
+        ]
+        isDirectory: 1
+      ]
+    ]
+    options: (void*)0
+    error: (void*)0
+  ];
+
+  textures[
+    5
+  ] = [texture_loader
+    newTextureWithContentsOfURL: [NSURL
+      fileURLWithPath:@"red_2.png"
+      isDirectory: 0
+      relativeToURL: [NSURL
+        fileURLWithPath:[NSString
+          stringWithUTF8String: metil_paths.directory_textures
+        ]
+        isDirectory: 1
+      ]
+    ]
+    options: (void*)0
+    error: (void*)0
+  ];
+
+  textures[
+    6
+  ] = [texture_loader
+    newTextureWithContentsOfURL: [NSURL
+      fileURLWithPath:@"red_3.png"
+      isDirectory: 0
+      relativeToURL: [NSURL
+        fileURLWithPath:[NSString
+          stringWithUTF8String: metil_paths.directory_textures
+        ]
+        isDirectory: 1
+      ]
+    ]
+    options: (void*)0
+    error: (void*)0
+  ];
+
+  textures[
+    7
+  ] = [texture_loader
+    newTextureWithContentsOfURL: [NSURL
+      fileURLWithPath:@"red_4.png"
+      isDirectory: 0
+      relativeToURL: [NSURL
+        fileURLWithPath:[NSString
+          stringWithUTF8String: metil_paths.directory_textures
+        ]
+        isDirectory: 1
+      ]
+    ]
+    options: (void*)0
+    error: (void*)0
+  ];
+
+  textures[
+    8
+  ] = [texture_loader
+    newTextureWithContentsOfURL: [NSURL
+      fileURLWithPath:@"red_5.png"
       isDirectory: 0
       relativeToURL: [NSURL
         fileURLWithPath:[NSString

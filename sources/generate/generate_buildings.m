@@ -2,6 +2,7 @@
 
 #include <mesh/mesh_building.h>
 #include <mode_texture.h>
+#include <pipeline_index.h>
 
 #include <metil_object.h>
 #include <metil_rendering/metil_renderer_data_object.h>
@@ -10,7 +11,7 @@
 #include <Metal/MTLTexture.h>
 
 void generate_buildings(
-  id<MTLDevice> metal_kit_device,
+  id<MTLDevice> metal_device,
   struct metil_object** objects,
   unsigned short int length_objects,
   id<MTLTexture>* textures,
@@ -29,6 +30,12 @@ void generate_buildings(
     ] = malloc(
       sizeof(struct metil_object)
     );
+
+    metil_object_initialize(
+      objects[index_object]
+    );
+
+    objects[index_object]->index_pipeline_render = c938_pipeline_index_building;
   }
 
   mesh_building_initialize(
@@ -38,19 +45,17 @@ void generate_buildings(
     size * 2
   );
 
+  objects[0]->index_pipeline_render = c938_pipeline_index_ground;
+
   objects[0]->position.y = 0.0f;
 
   metil_object_buffers_initialize(
     objects[0],
-    metal_kit_device
+    metal_device
   );
 
   objects[0]->texture = textures[
     0
-  ];
-
-  objects[0]->texture_secondary = textures[
-    1
   ];
 
   unsigned short int iterator_id = offset_id;
@@ -85,17 +90,35 @@ void generate_buildings(
       }
     }
 
+    if (index_object == 2) {
+      objects[index_object]->texture = textures[
+        ((rand() % 5) + 4) % length_textures
+      ];
+    } else {
+      objects[index_object]->texture = textures[
+        (rand() % length_textures) % 4
+      ];
+    }
+
     metil_object_buffers_initialize(
       objects[index_object],
-      metal_kit_device
+      metal_device
     );
-
-    objects[index_object]->texture = textures[
-      (rand() % (length_textures - 1))
-    ];
 
     data = objects[index_object]->data.contents;
     data->id = iterator_id++;
     data->mode_texture = mode_texture_building;
+
+    if (index_object == 2) {
+      data->color.x = 1.0f;
+      data->color.y = 1.0f;
+      data->color.z = 1.0f;
+      data->color.w = 1.0f;
+    } else {
+      data->color.x = 1.0f;
+      data->color.y = 1.0f;
+      data->color.z = 1.0f;
+      data->color.w = 1.0f;
+    }
   }
 }

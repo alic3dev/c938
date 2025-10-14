@@ -88,7 +88,7 @@ files_storyboards_compiled=${patsubst ${directory_storyboards}/%.storyboard,${di
 prefix_asset_texture=__asset_texture
 prefix_asset_texture_always=${prefix_asset_texture}_always
 
-files_assets_textures_names=concrete_1.png concrete_2.png concrete_3.png concrete_4.png concrete_5.png red_1.png red_2.png red_3.png red_4.png red_5.png
+files_assets_textures_names=concrete_1.png concrete_2.png concrete_3.png concrete_4.png player.png red_1.png red_2.png red_3.png red_4.png red_5.png
 files_assets_textures=${addprefix ${prefix_asset_texture}/,${files_assets_textures_names}}
 files_assets_textures_always=${addprefix ${prefix_asset_texture_always}/,${files_assets_textures_names}}
 
