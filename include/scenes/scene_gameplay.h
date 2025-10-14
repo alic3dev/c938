@@ -6,6 +6,8 @@
 #include <CoreAudio/CoreAudio.h>
 #include <MetalKit/MetalKit.h>
 
+#define scene_gameplay_length_objects_default 205
+
 enum textures_scene_gameplay {
   textures_scene_gameplay_player = 0
 };
@@ -16,7 +18,8 @@ void scene_gameplay_initialize(
 );
 
 void scene_gameplay_populate(
-  struct metil_scene*
+  struct metil_scene*,
+  unsigned short int
 );
 
 void scene_gameplay_poll(

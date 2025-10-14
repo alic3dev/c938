@@ -76,7 +76,7 @@ struct data_vertex {
   );
 
   return float4(
-    color_texture[0] * data_vertex.brightness * 0.5f,
+    color_texture[0] * data_vertex.brightness * 0.7f + 0.15f,
     color_texture[1] * data_vertex.brightness * 0.5f,
     color_texture[2] * data_vertex.brightness * 0.7f + 0.3f,
     color_texture[3]

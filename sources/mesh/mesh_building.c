@@ -24,8 +24,13 @@ void mesh_building_initialize(
   mesh->size.y = height;
   mesh->size.z = depth;
 
-  mesh->length_vertices = 8;
-  mesh->length_indices = 36;
+  unsigned char layers = 2;
+
+  mesh->length_vertices = 4 * layers;
+
+  mesh->length_indices = (
+    (layers - 1) * 24
+  ) + 12;
 
   mesh->indices = realloc(
     mesh->indices,
@@ -45,46 +50,6 @@ void mesh_building_initialize(
   // | 2__|_3
   // 0/___1/
 
-  mesh->vertices[0].x = -size_half.x;
-  mesh->vertices[0].y = 0;
-  mesh->vertices[0].z = -size_half.z;
-  mesh->vertices[0].w = 1.0f;
-
-  mesh->vertices[1].x = size_half.x;
-  mesh->vertices[1].y = 0;
-  mesh->vertices[1].z = -size_half.z;
-  mesh->vertices[1].w = 1.0f;
-
-  mesh->vertices[2].x = -size_half.x;
-  mesh->vertices[2].y = 0;
-  mesh->vertices[2].z = size_half.z;
-  mesh->vertices[2].w = 1.0f;
-
-  mesh->vertices[3].x = size_half.x;
-  mesh->vertices[3].y = 0;
-  mesh->vertices[3].z = size_half.z;
-  mesh->vertices[3].w = 1.0f;
-
-  mesh->vertices[4].x = -size_half.x;
-  mesh->vertices[4].y = mesh->size.y;
-  mesh->vertices[4].z = -size_half.z;
-  mesh->vertices[4].w = 1.0f;
-
-  mesh->vertices[5].x = size_half.x;
-  mesh->vertices[5].y = mesh->size.y;
-  mesh->vertices[5].z = -size_half.z;
-  mesh->vertices[5].w = 1.0f;
-
-  mesh->vertices[6].x = -size_half.x;
-  mesh->vertices[6].y = mesh->size.y;
-  mesh->vertices[6].z = size_half.z;
-  mesh->vertices[6].w = 1.0f;
-
-  mesh->vertices[7].x = size_half.x;
-  mesh->vertices[7].y = mesh->size.y;
-  mesh->vertices[7].z = size_half.z;
-  mesh->vertices[7].w = 1.0f;
-
   mesh->indices[0] = 0;
   mesh->indices[1] = 1;
   mesh->indices[2] = 2;
@@ -93,43 +58,175 @@ void mesh_building_initialize(
   mesh->indices[4] = 3;
   mesh->indices[5] = 1;
 
-  mesh->indices[6] = 1;
-  mesh->indices[7] = 0;
-  mesh->indices[8] = 4;
+  for (
+    unsigned short int index_layer = 0;
+    index_layer < layers;
+    ++index_layer
+  ) {
+    unsigned short int index_vertex = (
+      index_layer * 4
+    );
 
-  mesh->indices[9] = 4;
-  mesh->indices[10] = 5;
-  mesh->indices[11] = 1;
+    float position_y = (
+      (float) index_layer /
+      (float) (layers - 1)
+    ) * mesh->size.y;
 
-  mesh->indices[12] = 1;
-  mesh->indices[13] = 3;
-  mesh->indices[14] = 5;
+    mesh->vertices[index_vertex].x = -size_half.x;
+    mesh->vertices[index_vertex].y = position_y;
+    mesh->vertices[index_vertex].z = -size_half.z;
+    mesh->vertices[index_vertex].w = 1.0f;
 
-  mesh->indices[15] = 5;
-  mesh->indices[16] = 7;
-  mesh->indices[17] = 3;
+    mesh->vertices[index_vertex + 1].x = size_half.x;
+    mesh->vertices[index_vertex + 1].y = position_y;
+    mesh->vertices[index_vertex + 1].z = -size_half.z;
+    mesh->vertices[index_vertex + 1].w = 1.0f;
 
-  mesh->indices[18] = 3;
-  mesh->indices[19] = 2;
-  mesh->indices[20] = 7;
+    mesh->vertices[index_vertex + 2].x = -size_half.x;
+    mesh->vertices[index_vertex + 2].y = position_y;
+    mesh->vertices[index_vertex + 2].z = size_half.z;
+    mesh->vertices[index_vertex + 2].w = 1.0f;
 
-  mesh->indices[21] = 7;
-  mesh->indices[22] = 6;
-  mesh->indices[23] = 2;
+    mesh->vertices[index_vertex + 3].x = size_half.x;
+    mesh->vertices[index_vertex + 3].y = position_y;
+    mesh->vertices[index_vertex + 3].z = size_half.z;
+    mesh->vertices[index_vertex + 3].w = 1.0f;
 
-  mesh->indices[24] = 2;
-  mesh->indices[25] = 0;
-  mesh->indices[26] = 4;
+    if (
+      index_layer < layers - 1
+    ) {
+      unsigned short int offset_index_index = (
+        index_layer * 24
+      ) + 6;
 
-  mesh->indices[27] = 4;
-  mesh->indices[28] = 2;
-  mesh->indices[29] = 6;
+      mesh->indices[
+        offset_index_index
+      ] = index_vertex;
 
-  mesh->indices[30] = 6;
-  mesh->indices[31] = 4;
-  mesh->indices[32] = 5;
+      mesh->indices[
+        offset_index_index + 1
+      ] = index_vertex + 1;
 
-  mesh->indices[33] = 5;
-  mesh->indices[34] = 6;
-  mesh->indices[35] = 7;
+      mesh->indices[
+        offset_index_index + 2
+      ] = index_vertex + 4;
+
+      mesh->indices[
+        offset_index_index + 3
+      ] = index_vertex + 4;
+
+      mesh->indices[
+        offset_index_index + 4
+      ] = index_vertex + 5;
+
+      mesh->indices[
+        offset_index_index + 5
+      ] = index_vertex + 1;
+
+      mesh->indices[
+        offset_index_index + 6
+      ] = index_vertex + 1;
+
+      mesh->indices[
+        offset_index_index + 7
+      ] = index_vertex + 3;
+
+      mesh->indices[
+        offset_index_index + 8
+      ] = index_vertex + 5;
+
+      mesh->indices[
+        offset_index_index + 9
+      ] = index_vertex + 5;
+
+      mesh->indices[
+        offset_index_index + 10
+      ] = index_vertex + 7;
+
+      mesh->indices[
+        offset_index_index + 11
+      ] = index_vertex + 3;
+
+      mesh->indices[
+        offset_index_index + 12
+      ] = index_vertex + 3;
+
+      mesh->indices[
+        offset_index_index + 13
+      ] = index_vertex + 2;
+
+      mesh->indices[
+        offset_index_index + 14
+      ] = index_vertex + 7;
+
+      mesh->indices[
+        offset_index_index + 15
+      ] = index_vertex + 7;
+
+      mesh->indices[
+        offset_index_index + 16
+      ] = index_vertex + 6;
+
+      mesh->indices[
+        offset_index_index + 17
+      ] = index_vertex + 2;
+
+      mesh->indices[
+        offset_index_index + 18
+      ] = index_vertex + 2;
+
+      mesh->indices[
+        offset_index_index + 19
+      ] = index_vertex;
+
+      mesh->indices[
+        offset_index_index + 20
+      ] = index_vertex + 6;
+
+      mesh->indices[
+        offset_index_index + 21
+      ] = index_vertex + 6;
+
+      mesh->indices[
+        offset_index_index + 22
+      ] = index_vertex + 4;
+
+      mesh->indices[
+        offset_index_index + 23
+      ] = index_vertex;
+    }
+  }
+
+  mesh->indices[
+    mesh->length_indices - 6
+  ] = (
+    mesh->length_vertices - 2
+  );
+
+  mesh->indices[
+    mesh->length_indices - 5
+  ] = (
+    mesh->length_vertices - 4
+  );
+  mesh->indices[
+    mesh->length_indices - 4
+  ] = (
+    mesh->length_vertices - 3
+  );
+
+  mesh->indices[
+    mesh->length_indices - 3
+  ] = (
+    mesh->length_vertices - 3
+  );
+  mesh->indices[
+    mesh->length_indices - 2
+  ] = (
+    mesh->length_vertices - 2
+  );
+  mesh->indices[
+    mesh->length_indices - 1
+  ] = (
+    mesh->length_vertices - 1
+  );
 }
