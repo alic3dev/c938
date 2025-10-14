@@ -1,9 +1,7 @@
 #ifndef __c938_h
 #define __c938_h
 
-#include <metil_rendering/rendering_properties.h>
-
-#include <Metal/MTLDevice.h>
+#include <metil_rendering/metil_renderer_interface.h>
 
 int main(
   int,
@@ -11,8 +9,7 @@ int main(
 );
 
 void c938_renderer_on_initialize(
-  _Nonnull id<MTLDevice>,
-  struct metil_rendering_properties* _Nonnull,
+  struct metil_renderer_interface* _Nonnull,
   void* _Nullable
 );
 

@@ -5,6 +5,7 @@
 #include <mesh/ground/mesh_ground.h>
 #include <mesh/mesh_player.h>
 #include <mode_texture.h>
+#include <pipeline_index.h>
 #include <player.h>
 #include <player_data.h>
 #include <scenes/scene_id.h>
@@ -21,7 +22,7 @@
 
 void scene_gameplay_initialize(
   struct metil_scene* scene,
-  id<MTLDevice> metal_kit_device
+  id<MTLDevice> metal_device
 ) {
   metil_audio_io_proc_add(
     scene_gameplay_io_proc
@@ -29,7 +30,7 @@ void scene_gameplay_initialize(
 
   metil_scene_initialize(
     scene,
-    metal_kit_device
+    metal_device
   );
 
   scene->player.poll = player_poll;
@@ -80,6 +81,19 @@ void scene_gameplay_initialize(
     scene->objects[scene->length_objects - 1]
   );
 
+  metil_object_initialize(
+    scene->objects[scene->length_objects - 2]
+  );
+
+  metil_object_initialize(
+    scene->objects[scene->length_objects - 3]
+  );
+
+  scene->objects[0]->index_pipeline_render = c938_pipeline_index_player;
+  scene->objects[scene->length_objects - 1]->index_pipeline_render = c938_pipeline_index_hud_item;
+  scene->objects[scene->length_objects - 2]->index_pipeline_render = c938_pipeline_index_hud_item;
+  scene->objects[scene->length_objects - 3]->index_pipeline_render = c938_pipeline_index_hud_item;
+
   for (
     unsigned char index_object = 1;
     index_object < scene->length_objects - 3;
@@ -88,7 +102,7 @@ void scene_gameplay_initialize(
     scene->objects[index_object] = (void*)0;
   }
 
-  scene->length_textures = 5;
+  scene->length_textures = 10;
   scene->textures = malloc(
     sizeof(id<MTLTexture>) *
     scene->length_textures
@@ -96,14 +110,14 @@ void scene_gameplay_initialize(
 
   MTKTextureLoader* texture_loader = [
     [MTKTextureLoader alloc]
-    initWithDevice: metal_kit_device
+    initWithDevice: metal_device
   ];
 
   scene->textures[
     textures_scene_gameplay_player
   ] = [texture_loader
     newTextureWithContentsOfURL: [NSURL
-      fileURLWithPath:@"concrete_3.jpeg"
+      fileURLWithPath:@"concrete_3.png"
       isDirectory: 0
       relativeToURL: [NSURL
         fileURLWithPath:[NSString
@@ -129,7 +143,7 @@ void scene_gameplay_initialize(
 
   metil_object_buffers_initialize(
     scene->objects[0],
-    scene->metal_kit_device
+    scene->metal_device
   );
 
   scene->objects[0]->texture = scene->textures[
@@ -148,7 +162,7 @@ void scene_gameplay_initialize(
 
   metil_object_buffers_initialize(
     scene->objects[scene->length_objects - 1],
-    metal_kit_device
+    metal_device
   );
 
   data = scene->objects[scene->length_objects - 1]->data.contents;
@@ -169,7 +183,7 @@ void scene_gameplay_initialize(
 
   metil_object_buffers_initialize(
     scene->objects[scene->length_objects - 2],
-    metal_kit_device
+    metal_device
   );
 
   data = scene->objects[scene->length_objects - 2]->data.contents;
@@ -190,7 +204,7 @@ void scene_gameplay_initialize(
 
   metil_object_buffers_initialize(
     scene->objects[scene->length_objects - 3],
-    metal_kit_device
+    metal_device
   );
 
   data = scene->objects[scene->length_objects - 3]->data.contents;
@@ -251,7 +265,7 @@ void scene_gameplay_populate(
   );
 
   generate_buildings(
-    scene->metal_kit_device,
+    scene->metal_device,
     scene->objects + 1,
     scene->length_objects - 4,
     scene->textures + 1,

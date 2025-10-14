@@ -3,6 +3,7 @@
 #include <generate/generate_buildings.h>
 #include <menus/menu_main.h>
 #include <mode_texture.h>
+#include <pipeline_index.h>
 #include <scenes/scene_id.h>
 #include <textures/textures_buildings.h>
 
@@ -25,7 +26,7 @@ const unsigned long int scene_menu_main_time_scene_transition = 333;
 
 void scene_menu_main_initialize(
   struct metil_scene* scene,
-  id<MTLDevice> metal_kit_device
+  id<MTLDevice> metal_device
 ) {
   metil_audio_io_proc_add(
     scene_menu_main_io_proc
@@ -33,7 +34,7 @@ void scene_menu_main_initialize(
 
   metil_scene_initialize(
     scene,
-    metal_kit_device
+    metal_device
   );
 
   scene->poll = scene_menu_main_poll;
@@ -64,17 +65,13 @@ void scene_menu_main_initialize(
     scene->length_objects
   );
 
-  scene->objects[0] = malloc(
-    sizeof(struct metil_object)
-  );
-
-  scene->length_textures = 7;
+  scene->length_textures = 13;
   scene->textures = malloc(
     sizeof(id<MTLTexture>) *
     scene->length_textures
   );
 
-  MTKTextureLoader* texture_loader = [[MTKTextureLoader alloc] initWithDevice: metal_kit_device];
+  MTKTextureLoader* texture_loader = [[MTKTextureLoader alloc] initWithDevice: metal_device];
 
   textures_buildings_load(
     texture_loader,
@@ -86,7 +83,7 @@ void scene_menu_main_initialize(
   unsigned short int iterator_id = 0;
 
   generate_buildings(
-    scene->metal_kit_device,
+    scene->metal_device,
     scene->objects,
     scene->length_objects - 3,
     scene->textures + 3,
@@ -100,10 +97,16 @@ void scene_menu_main_initialize(
     sizeof(struct metil_object)
   );
 
+  metil_object_initialize(
+    scene->objects[iterator_id]
+  );
+
+  scene->objects[iterator_id]->index_pipeline_render = c938_pipeline_index_text;
+
   scene->textures[
     textures_scene_menu_main_title
   ] = metil_text_mesh_with_texture_initialize(
-    metal_kit_device,
+    metal_device,
     &scene->objects[iterator_id]->mesh,
     "c938",
     metil_font_reference_monospace,
@@ -112,7 +115,7 @@ void scene_menu_main_initialize(
 
   metil_object_buffers_initialize(
     scene->objects[iterator_id],
-    metal_kit_device
+    metal_device
   );
 
   scene->objects[iterator_id]->position.y = 0.5f - (scene->objects[iterator_id]->mesh.size.y / 4.0f);
@@ -131,10 +134,16 @@ void scene_menu_main_initialize(
     sizeof(struct metil_object)
   );
 
+  metil_object_initialize(
+    scene->objects[iterator_id]
+  );
+
+  scene->objects[iterator_id]->index_pipeline_render = c938_pipeline_index_text;
+
   scene->textures[
     textures_scene_menu_main_menu_enter
   ] = metil_text_mesh_with_texture_initialize(
-    metal_kit_device,
+    metal_device,
     &scene->objects[iterator_id]->mesh,
     "enter",
     metil_font_reference_monospace,
@@ -143,7 +152,7 @@ void scene_menu_main_initialize(
 
   metil_object_buffers_initialize(
     scene->objects[iterator_id],
-    metal_kit_device
+    metal_device
   );
 
   scene->objects[iterator_id]->position.y = -scene->objects[iterator_id]->mesh.size.y * 6.0;
@@ -161,10 +170,16 @@ void scene_menu_main_initialize(
     sizeof(struct metil_object)
   );
 
+  metil_object_initialize(
+    scene->objects[iterator_id]
+  );
+
+  scene->objects[iterator_id]->index_pipeline_render = c938_pipeline_index_text;
+
   scene->textures[
     textures_scene_menu_main_menu_exit
   ] = metil_text_mesh_with_texture_initialize(
-    metal_kit_device,
+    metal_device,
     &scene->objects[iterator_id]->mesh,
     "exit",
     metil_font_reference_monospace,
@@ -173,7 +188,7 @@ void scene_menu_main_initialize(
 
   metil_object_buffers_initialize(
     scene->objects[iterator_id],
-    metal_kit_device
+    metal_device
   );
 
   scene->objects[iterator_id]->position.y = -scene->objects[iterator_id]->mesh.size.y * 10.0f;
