@@ -1,6 +1,8 @@
 # c938
 
-<img width="3932" height="2490" alt="c938" src="https://github.com/user-attachments/assets/6d98c6c6-aa5e-4a10-91da-6f79c34c9b99" />
+<img width="1966" height="1250" alt="c938_menu" src="https://github.com/user-attachments/assets/904747ef-70e6-404c-9829-f5505c9dce2f" />
+<img width="1966" height="1250" alt="c938_gameplay_1" src="https://github.com/user-attachments/assets/93b87be7-5cd5-49cb-bb2e-3f997f612638" />
+<img width="1966" height="1250" alt="c938_gameplay_2" src="https://github.com/user-attachments/assets/6d20a91a-12a9-451e-a9eb-e4ffc598b814" />
 
 ## requirements
 
