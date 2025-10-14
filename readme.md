@@ -28,11 +28,14 @@
 - - `audio:volume`: `float`
 - - `rendering_properties:brightness`: `float`
 - - `rendering_properties:brightness_text`: `float`
+- - `rendering_properties:fps_display`: `int`
 
 ### example
 
 ```
-audio:volume->{0.27};
+audio:volume->{0.27f};
+rendering_properties:brightness->{0.8f};
+rendering_properties:fps_display->{1};
 ```
 
 ## development
