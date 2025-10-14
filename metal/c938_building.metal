@@ -39,24 +39,18 @@ struct data_vertex {
     positions[id_vertex]
   );
 
+  unsigned short int id_vertex_moded = (
+    id_vertex % 4
+  );
+
   data_vertex.position_texture.x = (
-    id_vertex == 4 ||
-    id_vertex == 6 ||
-
-    id_vertex == 0 ||
-    id_vertex == 1
-  ) ? 0 : 1;
-
-  data_vertex.position_texture.y = (
-    id_vertex == 6 ||
-    id_vertex == 7 ||
-
-    id_vertex == 1 ||
-    id_vertex == 3
-  ) ? 0 : 1;
+    id_vertex_moded == 0 ||
+    id_vertex_moded == 3
+  ) ? 0.0f : 1.0f;
+  data_vertex.position_texture.y = ((id_vertex + 2) / 4) % 2;
 
   data_vertex.brightness = (
-    id_vertex > 3 && data_object->mode_texture == mode_texture_building
+    id_vertex > 3
     ? 1.0f
     : 0.125f
   ) * data_frame->brightness;

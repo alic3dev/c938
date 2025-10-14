@@ -50,7 +50,7 @@ void scene_gameplay_initialize(
   scene->poll = scene_gameplay_poll;
   scene->destroy = scene_gameplay_destroy;
 
-  scene->length_objects = 205;
+  scene->length_objects = scene_gameplay_length_objects_default;
   scene->objects = realloc(
     scene->objects,
     sizeof(struct metil_object*) *
@@ -217,11 +217,15 @@ void scene_gameplay_initialize(
   scene->objects[scene->length_objects - 3]->position.y = -0.7f;
   scene->objects[scene->length_objects - 3]->position.z = 0.0f;
 
-  scene_gameplay_populate(scene);
+  scene_gameplay_populate(
+    scene,
+    scene->length_objects
+  );
 }
 
 void scene_gameplay_populate(
-  struct metil_scene* scene
+  struct metil_scene* scene,
+  unsigned short int length_objects
 ) {
   scene->player.rotation.x = 0.0f;
   scene->player.rotation.y = 0.0f;
@@ -257,12 +261,55 @@ void scene_gameplay_populate(
     }
   }
 
-  scene->length_objects = 205;
-  scene->objects = realloc(
-    scene->objects,
-    sizeof(struct metil_object*) *
-    scene->length_objects
-  );
+  if (
+    scene->length_objects != length_objects
+  ) {
+    if (
+      scene->length_objects < length_objects
+    ) {
+      scene->objects = realloc(
+        scene->objects,
+        sizeof(struct metil_object*) *
+        length_objects
+      );
+    }
+
+    scene->objects[
+      length_objects - 1
+    ] = (
+      scene->objects[
+        scene->length_objects - 1
+      ]
+    );
+
+    scene->objects[
+      length_objects - 2
+    ] = (
+      scene->objects[
+        scene->length_objects - 2
+      ]
+    );
+
+    scene->objects[
+      length_objects - 3
+    ] = (
+      scene->objects[
+        scene->length_objects - 3
+      ]
+    );
+
+    if (
+      scene->length_objects > length_objects
+    ) {
+      scene->objects = realloc(
+        scene->objects,
+        sizeof(struct metil_object*) *
+        length_objects
+      );
+    }
+
+    scene->length_objects = length_objects;
+  }
 
   generate_buildings(
     scene->metal_device,
@@ -291,11 +338,20 @@ void scene_gameplay_poll(
   );
 
   if (
-    player_data->on_ground == 2 ||
+    player_data->on_ground == 2
+  ) {
+    scene_gameplay_populate(
+      scene,
+      scene->length_objects * 0.9f
+    );
+
+    return;
+  } else if (
     scene->player.position.y <= 10.0f
   ) {
     scene_gameplay_populate(
-      scene
+      scene,
+      scene_gameplay_length_objects_default
     );
 
     return;
