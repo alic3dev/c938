@@ -36,7 +36,6 @@ struct data_vertex {
     data_object->view_model_matrix_projection *
     positions[id_vertex]
   );
-  data_vertex.brightness = data_frame->brightness;
 
   data_vertex.brightness = (
     data_object->noise == 1

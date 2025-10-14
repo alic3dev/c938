@@ -38,7 +38,6 @@ struct data_vertex {
     data_object->view_model_matrix_projection *
     positions[id_vertex]
   );
-  data_vertex.brightness = data_frame->brightness;
 
   data_vertex.position_texture.x = (
     id_vertex == 4 ||
@@ -60,7 +59,7 @@ struct data_vertex {
     id_vertex > 3 && data_object->mode_texture == mode_texture_building
     ? 1.0f
     : 0.125f
-  );
+  ) * data_frame->brightness;
 
   data_vertex.color = float4(
     data_object->color.x,

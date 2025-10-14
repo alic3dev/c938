@@ -37,7 +37,7 @@ struct data_vertex {
     positions[id_vertex]
   );
 
-  data_vertex.brightness = 1.0f;//data_frame->brightness;
+  data_vertex.brightness = data_frame->brightness;
 
   if (
     id_vertex == 0
