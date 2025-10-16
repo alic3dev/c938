@@ -128,6 +128,18 @@ void c938_renderer_on_initialize(
     ]
   ];
 
+  c938_pipeline_index_crosshair = [
+    metil_renderer_interface->renderer
+    pipeline_add: [
+      metil_library.library
+      newFunctionWithName: @"c938_crosshair_fragment"
+    ]
+    function_vertex: [
+      metil_library.library
+      newFunctionWithName: @"c938_crosshair_vertex"
+    ]
+  ];
+
   scene_menu_main_initialize(
     &metil_scene_controller.scene,
     metil_renderer_interface->metal_device

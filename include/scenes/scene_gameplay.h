@@ -6,7 +6,8 @@
 #include <CoreAudio/CoreAudio.h>
 #include <MetalKit/MetalKit.h>
 
-#define scene_gameplay_length_objects_default 205
+#define scene_gameplay_length_buildings_default 200
+#define scene_gameplay_length_objects_default scene_gameplay_length_buildings_default + 6
 
 enum textures_scene_gameplay {
   textures_scene_gameplay_player = 0

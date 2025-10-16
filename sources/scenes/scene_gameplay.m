@@ -5,6 +5,7 @@
 #include <mesh/ground/mesh_ground.h>
 #include <mesh/mesh_player.h>
 #include <mode_texture.h>
+#include <objects/object_crosshair.h>
 #include <pipeline_index.h>
 #include <player.h>
 #include <player_data.h>
@@ -57,19 +58,15 @@ void scene_gameplay_initialize(
     scene->length_objects
   );
 
+  for (
+    unsigned char index_object = 0;
+    index_object < scene->length_objects;
+    ++index_object
+  ) {
+    scene->objects[index_object] = (void*)0;
+  }
+
   scene->objects[0] = malloc(
-    sizeof(struct metil_object)
-  );
-
-  scene->objects[scene->length_objects - 1] = malloc(
-    sizeof(struct metil_object)
-  );
-
-  scene->objects[scene->length_objects - 2] = malloc(
-    sizeof(struct metil_object)
-  );
-
-  scene->objects[scene->length_objects - 3] = malloc(
     sizeof(struct metil_object)
   );
 
@@ -77,30 +74,34 @@ void scene_gameplay_initialize(
     scene->objects[0]
   );
 
-  metil_object_initialize(
-    scene->objects[scene->length_objects - 1]
-  );
-
-  metil_object_initialize(
-    scene->objects[scene->length_objects - 2]
-  );
-
-  metil_object_initialize(
-    scene->objects[scene->length_objects - 3]
-  );
-
   scene->objects[0]->index_pipeline_render = c938_pipeline_index_player;
-  scene->objects[scene->length_objects - 1]->index_pipeline_render = c938_pipeline_index_hud_item;
-  scene->objects[scene->length_objects - 2]->index_pipeline_render = c938_pipeline_index_hud_item;
-  scene->objects[scene->length_objects - 3]->index_pipeline_render = c938_pipeline_index_hud_item;
 
   for (
-    unsigned char index_object = 1;
-    index_object < scene->length_objects - 3;
+    unsigned char index_object = scene->length_objects - 4;
+    index_object < scene->length_objects;
     ++index_object
   ) {
-    scene->objects[index_object] = (void*)0;
+    scene->objects[index_object] = malloc(
+      sizeof(struct metil_object)
+    );
+
+    if (
+      index_object != scene->length_objects - 4
+    ) {
+      metil_object_initialize(
+        scene->objects[index_object]
+      );
+
+      scene->objects[index_object]->index_pipeline_render = c938_pipeline_index_hud_item;
+    }
   }
+
+  object_crosshair_initialize(
+    scene->objects[
+      scene->length_objects - 4
+    ],
+    scene->metal_device
+  );
 
   scene->length_textures = 10;
   scene->textures = malloc(
@@ -158,8 +159,6 @@ void scene_gameplay_initialize(
     &scene->objects[scene->length_objects - 1]->mesh  
   );
 
-  scene->objects[scene->length_objects - 1]->mesh.positioning = metil_mesh_positioning_static;
-
   metil_object_buffers_initialize(
     scene->objects[scene->length_objects - 1],
     metal_device
@@ -179,8 +178,6 @@ void scene_gameplay_initialize(
     &scene->objects[scene->length_objects - 2]->mesh  
   );
 
-  scene->objects[scene->length_objects - 2]->mesh.positioning = metil_mesh_positioning_static;
-
   metil_object_buffers_initialize(
     scene->objects[scene->length_objects - 2],
     metal_device
@@ -199,8 +196,6 @@ void scene_gameplay_initialize(
   mesh_hud_item_initialize(
     &scene->objects[scene->length_objects - 3]->mesh  
   );
-
-  scene->objects[scene->length_objects - 3]->mesh.positioning = metil_mesh_positioning_static;
 
   metil_object_buffers_initialize(
     scene->objects[scene->length_objects - 3],
@@ -250,7 +245,7 @@ void scene_gameplay_populate(
   if (scene->objects[1] != (void*)0) {
     for (
       unsigned short int index_object = 1;
-      index_object < scene->length_objects - 3;
+      index_object < scene->length_objects - 4;
       ++index_object
     ) {
       metil_object_destroy(
@@ -274,29 +269,33 @@ void scene_gameplay_populate(
       );
     }
 
-    scene->objects[
-      length_objects - 1
-    ] = (
-      scene->objects[
-        scene->length_objects - 1
-      ]
-    );
+    struct metil_object* objects[4];
 
-    scene->objects[
-      length_objects - 2
-    ] = (
-      scene->objects[
-        scene->length_objects - 2
-      ]
-    );
+    for (
+      unsigned char index_object = 0;
+      index_object < 4;
+      ++index_object
+    ) {
+      objects[
+        index_object
+      ] = scene->objects[
+        scene->length_objects - index_object - 1
+      ];
+    }
 
-    scene->objects[
-      length_objects - 3
-    ] = (
+    for (
+      unsigned char index_object = 0;
+      index_object < 4;
+      ++index_object
+    ) {
       scene->objects[
-        scene->length_objects - 3
-      ]
-    );
+        length_objects - index_object - 1
+      ] = (
+        objects[
+          index_object
+        ]
+      );
+    }
 
     if (
       scene->length_objects > length_objects
@@ -314,7 +313,7 @@ void scene_gameplay_populate(
   generate_buildings(
     scene->metal_device,
     scene->objects + 1,
-    scene->length_objects - 4,
+    scene->length_objects - 5,
     scene->textures + 1,
     scene->length_textures - 1,
     1
@@ -326,7 +325,7 @@ void scene_gameplay_populate(
 
   scene->objects[0]->position.y = scene->player.position.y;
 
-  player_data->length_objects = scene->length_objects - 5;
+  player_data->length_objects = scene->length_objects - 6;
   player_data->objects = scene->objects + 2;
 }
 
@@ -340,9 +339,17 @@ void scene_gameplay_poll(
   if (
     player_data->on_ground == 2
   ) {
+    unsigned short int length_objects_reduced = (
+      scene->length_objects * 0.9f
+    );
+
+    if (length_objects_reduced < 10) {
+      length_objects_reduced = 10;
+    }
+
     scene_gameplay_populate(
       scene,
-      scene->length_objects * 0.9f
+      length_objects_reduced
     );
 
     return;
