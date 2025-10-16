@@ -3,5 +3,7 @@ metalar
 objects
 output
 textures
+!sources/objects
+!include/objects
 !sources/textures
 !include/textures
