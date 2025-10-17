@@ -109,8 +109,7 @@ void scene_menu_main_initialize(
     metal_device,
     &scene->objects[iterator_id]->mesh,
     "c938",
-    metil_font_reference_monospace,
-    0.001f
+    &metil_text_render_parameters_default
   );
 
   metil_object_buffers_initialize(
@@ -146,8 +145,7 @@ void scene_menu_main_initialize(
     metal_device,
     &scene->objects[iterator_id]->mesh,
     "enter",
-    metil_font_reference_monospace,
-    0.001f
+    &metil_text_render_parameters_default
   );
 
   metil_object_buffers_initialize(
@@ -182,8 +180,7 @@ void scene_menu_main_initialize(
     metal_device,
     &scene->objects[iterator_id]->mesh,
     "exit",
-    metil_font_reference_monospace,
-    0.001f
+    &metil_text_render_parameters_default
   );
 
   metil_object_buffers_initialize(
