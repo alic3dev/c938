@@ -147,9 +147,12 @@ void scene_gameplay_initialize(
     scene->metal_device
   );
 
-  scene->objects[0]->texture = scene->textures[
-    textures_scene_gameplay_player
-  ];
+  metil_object_texture_add(
+    scene->objects[0],
+    scene->textures[
+      textures_scene_gameplay_player
+    ]
+  );
 
   struct metil_renderer_data_object* data = scene->objects[0]->data.contents;
   data->id = 0;

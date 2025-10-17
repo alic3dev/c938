@@ -54,9 +54,12 @@ void generate_buildings(
     metal_device
   );
 
-  objects[0]->texture = textures[
-    0
-  ];
+  metil_object_texture_add(
+    objects[0],
+    textures[
+      0
+    ]
+  );
 
   unsigned short int iterator_id = offset_id;
 
@@ -90,15 +93,14 @@ void generate_buildings(
       }
     }
 
-    if (index_object == 2) {
-      objects[index_object]->texture = textures[
-        ((rand() % 5) + 4) % length_textures
-      ];
-    } else {
-      objects[index_object]->texture = textures[
-        (rand() % length_textures) % 4
-      ];
-    }
+    metil_object_texture_add(
+      objects[index_object],
+      textures[
+        index_object == 2
+        ? ((rand() % 5) + 4) % length_textures
+        : (rand() % length_textures) % 4
+      ]
+    );
 
     metil_object_buffers_initialize(
       objects[index_object],

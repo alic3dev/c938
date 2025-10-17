@@ -34,24 +34,10 @@ void c938_renderer_on_initialize(
   struct metil_renderer_interface* metil_renderer_interface,
   void* data
 ) {
-  metil_library.library = [
-    metil_renderer_interface->metal_device
-    newDefaultLibrary
-  ];
-
-  metil_library.function_vertex = [
-    metil_library.library
-    newFunctionWithName: @"c938_vertex"
-  ];
-
-  metil_library.function_fragment = [
-    metil_library.library
-    newFunctionWithName: @"c938_fragment"
-  ];
-
-  metil_library_fps_display_initialize(
+  metil_library_initialize(
     metil_renderer_interface->metal_device,
-    (void*)0
+    @"c938_fragment",
+    @"c938_vertex"
   );
 
   metil_renderer_interface->rendering_properties->color_clear.x = (

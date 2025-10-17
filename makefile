@@ -65,6 +65,9 @@ else
 	file_metil_library=${directory_metil_library}/metil.o
 endif
 
+file_metil_metalar_fps_display=${directory_metil_library}/metil_fps_display.metalar
+file_metil_metalar_wireframe=${directory_metil_library}/metil_wireframe.metalar
+
 file_info_plist=Info.plist
 file_metalar=${directory_metalar}/${name}.metalar
 file_output=${directory_app_contents_macos}/${name}
@@ -165,7 +168,7 @@ ${directory_app_contents_resources_textures}/%: ${directory_textures}/%
 
 ${file_output_metal}: ${file_metalar}
 	mkdir -p ${directory_app_contents_resources}
-	${metallib} ${metal_flags_output} ${file_metalar} ${directory_metil_library}/metil_fps_display.metalar -o ${file_output_metal}
+	${metallib} ${metal_flags_output} ${file_metalar} ${file_metil_metalar_fps_display} ${file_metil_metalar_wireframe}  -o ${file_output_metal}
 
 ${file_metalar}: ${files_air}
 	mkdir -p ${directory_metalar}
