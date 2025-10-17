@@ -119,9 +119,12 @@ void scene_menu_main_initialize(
 
   scene->objects[iterator_id]->position.y = 0.5f - (scene->objects[iterator_id]->mesh.size.y / 4.0f);
 
-  scene->objects[iterator_id]->texture = scene->textures[
-    textures_scene_menu_main_title
-  ];
+  metil_object_texture_add(
+    scene->objects[iterator_id],
+    scene->textures[
+      textures_scene_menu_main_title
+    ]
+  );
 
   struct metil_renderer_data_object* data_object = scene->objects[iterator_id]->data.contents;
   
@@ -154,10 +157,13 @@ void scene_menu_main_initialize(
   );
 
   scene->objects[iterator_id]->position.y = -scene->objects[iterator_id]->mesh.size.y * 6.0;
-  
-  scene->objects[iterator_id]->texture = scene->textures[
-    textures_scene_menu_main_menu_enter
-  ];
+
+  metil_object_texture_add(
+    scene->objects[iterator_id],
+    scene->textures[
+      textures_scene_menu_main_menu_enter
+    ]
+  );
 
   data_object = scene->objects[iterator_id]->data.contents;
 
@@ -191,10 +197,13 @@ void scene_menu_main_initialize(
   scene->objects[iterator_id]->position.y = -scene->objects[iterator_id]->mesh.size.y * 10.0f;
 
   data_object = scene->objects[iterator_id]->data.contents;
-
-  scene->objects[iterator_id]->texture = scene->textures[
-    textures_scene_menu_main_menu_exit
-  ];
+  
+  metil_object_texture_add(
+    scene->objects[iterator_id],
+    scene->textures[
+      textures_scene_menu_main_menu_exit
+    ]
+  );
 
   data_object->id = iterator_id++;
   data_object->mode_texture = mode_texture_text;
