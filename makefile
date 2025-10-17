@@ -10,8 +10,18 @@ ifeq (${debug}, 1)
 	directory_objects=${directory_objects_base}/debug
 	directory_output=${directory_output_base}/debug
 else
+ifeq (${release}, 1)
 	directory_output=${directory_output_base}/release
+else
+	directory_output=${directory_output_base}/development
 endif
+endif
+
+version_target_cer0=0
+version_target_clic3=0
+version_target_interrupt_handler=0
+version_target_math_c=0
+version_target_metil=0
 
 directory_include=include
 directory_objects_c=${directory_objects}/c
@@ -22,24 +32,29 @@ directory_textures=textures
 
 directory_cer0=../cer0
 directory_cer0_include=${directory_cer0}/include
-directory_cer0_library=${directory_cer0}/library
 
 directory_clic3=../clic3
 directory_clic3_include=${directory_clic3}/include
-directory_clic3_library=${directory_clic3}/library
 
 directory_interrupt_handler=../interrupt_handler
 directory_interrupt_handler_include=${directory_interrupt_handler}/include
-directory_interrupt_handler_library=${directory_interrupt_handler}/library
 
 directory_math_c=../math_c
-directory_math_c_library=${directory_math_c}/library
 
 directory_metil=../metil
 directory_metil_include=${directory_metil}/include
+
 ifeq (${debug}, 1)
+	directory_cer0_library=${directory_cer0}/library_debug
+	directory_clic3_library=${directory_clic3}/library_debug
+	directory_interrupt_handler_library=${directory_interrupt_handler}/library_debug
+	directory_math_c_library=${directory_math_c}/library_debug
 	directory_metil_library=${directory_metil}/library_debug
 else
+	directory_cer0_library=${directory_cer0}/library
+	directory_clic3_library=${directory_clic3}/library
+	directory_interrupt_handler_library=${directory_interrupt_handler}/library
+	directory_math_c_library=${directory_math_c}/library
 	directory_metil_library=${directory_metil}/library
 endif
 
@@ -55,14 +70,26 @@ directory_app_contents_resources_textures=${directory_app_contents_resources}/te
 
 directory_macos_sdk=${shell xcrun --show-sdk-path}
 
-file_cer0_library=${directory_cer0_library}/cer0.o
-file_clic3_library=${directory_clic3_library}/clic3.o
-file_interrupt_handler_library=${directory_interrupt_handler_library}/interrupt_handler.o
-file_math_c_library=${directory_math_c_library}/math_c.o
 ifeq (${debug}, 1)
-	file_metil_library=${directory_metil_library}/metil_debug.o
+	file_cer0_library=${directory_cer0_library}/cer0_debug.${version_target_cer0}.dylib
+	file_clic3_library=${directory_clic3_library}/clic3_debug.${version_target_clic3}.dylib
+	file_interrupt_handler_library=${directory_interrupt_handler_library}/interrupt_handler_debug.${version_target_interrupt_handler}.dylib
+	file_math_c_library=${directory_math_c_library}/math_c_debug.${version_target_math_c}.dylib
+	file_metil_library=${directory_metil_library}/metil_debug.${version_target_metil}.dylib
 else
+ifeq (${release}, 1)
+	file_cer0_library=${directory_cer0_library}/cer0.o
+	file_clic3_library=${directory_clic3_library}/clic3.o
+	file_interrupt_handler_library=${directory_interrupt_handler_library}/interrupt_handler.o
+	file_math_c_library=${directory_math_c_library}/math_c.o
 	file_metil_library=${directory_metil_library}/metil.o
+else
+	file_cer0_library=${directory_cer0_library}/cer0.${version_target_cer0}.dylib
+	file_clic3_library=${directory_clic3_library}/clic3.${version_target_clic3}.dylib
+	file_interrupt_handler_library=${directory_interrupt_handler_library}/interrupt_handler.${version_target_interrupt_handler}.dylib
+	file_math_c_library=${directory_math_c_library}/math_c.${version_target_math_c}.dylib
+	file_metil_library=${directory_metil_library}/metil.${version_target_metil}.dylib
+endif
 endif
 
 file_metil_metalar_fps_display=${directory_metil_library}/metil_fps_display.metalar
@@ -150,8 +177,8 @@ metal_flags_output=
 
 all: ${name}
 
-run: .always
-	${file_output}
+run:
+	cd ${dir ${file_output}} && ./${shell basename ${file_output}}
 
 ${name}: ${file_output}
 
@@ -160,6 +187,21 @@ ${file_output}: ${files_objects_c} ${files_objects_objc} ${file_output_metal} ${
 	${cc} ${c_flags_output} ${files_objects_c} ${files_objects_objc} ${files_libraries} -o ${file_output}
 ifneq (${debug}, 1)
 	${strip} ${strip_flags} ${file_output}
+endif
+ifneq (${release}, 1)
+ifeq (${debug}, 1)
+	ln -s ../../../../../${file_cer0_library} ${directory_app_contents_macos}/cer0_debug.${version_target_cer0}.dylib
+	ln -s ../../../../../${file_clic3_library} ${directory_app_contents_macos}/clic3_debug.${version_target_clic3}.dylib
+	ln -s ../../../../../${file_interrupt_handler_library} ${directory_app_contents_macos}/interrupt_handler_debug.${version_target_interrupt_handler}.dylib
+	ln -s ../../../../../${file_math_c_library} ${directory_app_contents_macos}/math_c_debug.${version_target_math_c}.dylib
+	ln -s ../../../../../${file_metil_library} ${directory_app_contents_macos}/metil_debug.${version_target_metil}.dylib
+else
+	ln -s ../../../../../${file_cer0_library} ${directory_app_contents_macos}/cer0.${version_target_cer0}.dylib
+	ln -s ../../../../../${file_clic3_library} ${directory_app_contents_macos}/clic3.${version_target_clic3}.dylib
+	ln -s ../../../../../${file_interrupt_handler_library} ${directory_app_contents_macos}/interrupt_handler.${version_target_interrupt_handler}.dylib
+	ln -s ../../../../../${file_math_c_library} ${directory_app_contents_macos}/math_c.${version_target_math_c}.dylib
+	ln -s ../../../../../${file_metil_library} ${directory_app_contents_macos}/metil.${version_target_metil}.dylib
+endif
 endif
 
 ${directory_app_contents_resources_textures}/%: ${directory_textures}/%
@@ -220,5 +262,3 @@ clean_objects:
 
 clean_output:
 	-rm -r ${directory_output_base}
-
-.always:
