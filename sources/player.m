@@ -466,24 +466,55 @@ void player_poll_input(
     )
   };
 
+  struct clic3_vector2_float size_half_player = {
+    .x = player->size.x / 2.0f,
+    .y = player->size.z / 2.0f
+  };
+
   for (
     unsigned int index_object = 0;
     index_object < player_data->length_objects;
     ++index_object
   ) {
-    if (
-      position_updated.x >= player_data->objects[index_object]->position.x - player->size.x - player_data->objects[index_object]->mesh.size.x / 2.0f &&
-      position_updated.x <= player_data->objects[index_object]->position.x + player->size.x + player_data->objects[index_object]->mesh.size.x / 2.0f &&
-      position_updated.z >= player_data->objects[index_object]->position.z - player->size.z - player_data->objects[index_object]->mesh.size.z / 2.0f &&
-      position_updated.z <= player_data->objects[index_object]->position.z + player->size.z + player_data->objects[index_object]->mesh.size.z / 2.0f &&
-      position_updated.y <= player_data->objects[index_object]->position.y + player_data->objects[index_object]->mesh.size.y &&
-      position_updated.y >= player_data->objects[index_object]->position.y + player->size.y
-    ) {
-      // TODO: This should be updated to use line intersections with applied rotations
+    struct clic3_vector2_float size_half_object = {
+      .x = player_data->objects[index_object]->mesh.size.x / 2.0f,
+      .y = player_data->objects[index_object]->mesh.size.z / 2.0f
+    };
 
+    struct clic3_vector2_float position_minimum_object = {
+      .x = player_data->objects[index_object]->position.x - size_half_object.x,
+      .y = player_data->objects[index_object]->position.z - size_half_object.y
+    };
+
+    struct clic3_vector2_float position_maximum_object = {
+      .x = player_data->objects[index_object]->position.x + size_half_object.x,
+      .y = player_data->objects[index_object]->position.z + size_half_object.y
+    };
+
+    if (
+      position_updated.x >= position_minimum_object.x - player->size.x &&
+      position_updated.x <= position_maximum_object.x + player->size.x &&
+      position_updated.z >= position_minimum_object.y - player->size.z &&
+      position_updated.z <= position_maximum_object.y + player->size.z &&
+      position_updated.y <= (
+        player_data->objects[index_object]->position.y +
+        player_data->objects[index_object]->mesh.size.y
+      ) &&
+      position_updated.y >= (
+        player_data->objects[index_object]->position.y +
+        player->size.y
+      )
+    ) {
+      // todo: this should be updated to use line intersections with applied rotations
       if (
-        position_updated.y <= player_data->objects[index_object]->position.y + player_data->objects[index_object]->mesh.size.y &&
-        player->position.y >= player_data->objects[index_object]->position.y + player_data->objects[index_object]->mesh.size.y
+        position_updated.y <= (
+          player_data->objects[index_object]->position.y +
+          player_data->objects[index_object]->mesh.size.y
+        ) &&
+        player->position.y >= (
+          player_data->objects[index_object]->position.y +
+          player_data->objects[index_object]->mesh.size.y
+        )
       ) {
         player_data->on_ground = index_object + 1;
         position_updated.y = player_data->objects[index_object]->position.y + player_data->objects[index_object]->mesh.size.y;
@@ -498,20 +529,20 @@ void player_poll_input(
         continue;
       }
 
-      // TODO: Needs Y collision detection besides from top to bottom
+      // todo: needs y collision detection besides from top to bottom
 
       if (
-        player->position.x < player_data->objects[index_object]->position.x - player->size.x / 2.0f - player_data->objects[index_object]->mesh.size.x / 2.0f &&
-        player->position.x > player_data->objects[index_object]->position.x + player->size.x / 2.0f + player_data->objects[index_object]->mesh.size.x / 2.0f &&
-        position_updated.z < player_data->objects[index_object]->position.z - player->size.z / 2.0f - player_data->objects[index_object]->mesh.size.z / 2.0f &&
-        position_updated.z > player_data->objects[index_object]->position.z + player->size.z / 2.0f + player_data->objects[index_object]->mesh.size.z / 2.0f  
+        player->position.x < position_minimum_object.x - size_half_player.x &&
+        player->position.x > position_maximum_object.x + size_half_player.x &&
+        position_updated.z < position_minimum_object.y - size_half_player.y &&
+        position_updated.z > position_maximum_object.y + size_half_player.y
       ) {
         position_updated.x = player->position.x;
       } else if (
-        position_updated.x < player_data->objects[index_object]->position.x - player->size.x / 2.0f - player_data->objects[index_object]->mesh.size.x / 2.0f &&
-        position_updated.x > player_data->objects[index_object]->position.x + player->size.x / 2.0f + player_data->objects[index_object]->mesh.size.x / 2.0f &&
-        player->position.z < player_data->objects[index_object]->position.z - player->size.z / 2.0f - player_data->objects[index_object]->mesh.size.z / 2.0f &&
-        player->position.z > player_data->objects[index_object]->position.z + player->size.z / 2.0f + player_data->objects[index_object]->mesh.size.z / 2.0f  
+        position_updated.x < position_minimum_object.x - size_half_player.x &&
+        position_updated.x > position_maximum_object.x + size_half_player.x &&
+        player->position.z < position_minimum_object.y - size_half_player.y &&
+        player->position.z > position_maximum_object.y + size_half_player.y
       ) {
         position_updated.z = player->position.z;
       } else {
