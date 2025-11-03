@@ -1,7 +1,6 @@
 #include <generate/generate_buildings.h>
 
 #include <mesh/mesh_building.h>
-#include <mode_texture.h>
 #include <pipeline_index.h>
 
 #include <metil_object.h>
@@ -65,7 +64,6 @@ void generate_buildings(
 
   struct metil_renderer_data_object* data = objects[0]->data.contents;
   data->id = iterator_id++;
-  data->mode_texture = mode_texture_ground;
 
   for (
     unsigned char index_object = 1;
@@ -109,7 +107,6 @@ void generate_buildings(
 
     data = objects[index_object]->data.contents;
     data->id = iterator_id++;
-    data->mode_texture = mode_texture_building;
 
     if (index_object == 2) {
       data->color.x = 1.0f;
