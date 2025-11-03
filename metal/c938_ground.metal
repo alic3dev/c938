@@ -1,5 +1,3 @@
-#include <mode_texture.h>
-
 #include <metil_rendering/metil_renderer_data_frame.h>
 #include <metil_rendering/metil_renderer_data_object.h>
 #include <metil_rendering/metil_renderer_vertex_index_parameter.h>
@@ -55,10 +53,8 @@ struct data_vertex {
   ) ? 0 : 1;
 
   data_vertex.brightness = (
-    id_vertex > 3 && data_object->mode_texture == mode_texture_building
-    ? 1.0f
-    : 0.125f
-  ) * data_frame->brightness;
+    0.125f * data_frame->brightness
+  );
 
   data_vertex.distance = (
     metal::fabs((data_object->position.x + positions[id_vertex].x) - data_frame->position_player.x) + 

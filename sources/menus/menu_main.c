@@ -6,7 +6,9 @@
 void menu_main_initialize(
   struct metil_menu* menu
 ) {
-  metil_menu_initialize(menu);
+  metil_menu_initialize(
+    menu
+  );
 
   metil_menu_item_add(
     menu,

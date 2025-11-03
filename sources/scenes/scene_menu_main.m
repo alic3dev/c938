@@ -2,7 +2,6 @@
 
 #include <generate/generate_buildings.h>
 #include <menus/menu_main.h>
-#include <mode_texture.h>
 #include <pipeline_index.h>
 #include <scenes/scene_id.h>
 #include <textures/textures_buildings.h>
@@ -129,7 +128,6 @@ void scene_menu_main_initialize(
   struct metil_renderer_data_object* data_object = scene->objects[iterator_id]->data.contents;
   
   data_object->id = iterator_id++;
-  data_object->mode_texture = mode_texture_text;
   data_object->noise = 0;
 
   scene->objects[iterator_id] = malloc(
@@ -168,7 +166,6 @@ void scene_menu_main_initialize(
   data_object = scene->objects[iterator_id]->data.contents;
 
   data_object->id = iterator_id++;
-  data_object->mode_texture = mode_texture_text;
 
   scene->objects[iterator_id] = malloc(
     sizeof(struct metil_object)
@@ -206,7 +203,6 @@ void scene_menu_main_initialize(
   );
 
   data_object->id = iterator_id++;
-  data_object->mode_texture = mode_texture_text;
 
   scene->player.position.y = (
     1600.0f
@@ -276,7 +272,9 @@ void scene_menu_main_poll(
       );
     } else {
       float brightness = (
-        (float) (scene_menu_main_time_scene_transition - time_delta) / (float) scene_menu_main_time_scene_transition
+        (float) (
+          scene_menu_main_time_scene_transition - time_delta
+        ) / (float) scene_menu_main_time_scene_transition
       );
 
       scene->rendering_properties.brightness = brightness;
