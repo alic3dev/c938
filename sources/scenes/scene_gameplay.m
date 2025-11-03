@@ -4,7 +4,6 @@
 #include <mesh/mesh_hud_item.h>
 #include <mesh/ground/mesh_ground.h>
 #include <mesh/mesh_player.h>
-#include <mode_texture.h>
 #include <objects/object_crosshair.h>
 #include <pipeline_index.h>
 #include <player.h>
@@ -156,7 +155,6 @@ void scene_gameplay_initialize(
 
   struct metil_renderer_data_object* data = scene->objects[0]->data.contents;
   data->id = 0;
-  data->mode_texture = mode_texture_player;
 
   mesh_hud_item_initialize(
     &scene->objects[scene->length_objects - 1]->mesh  
@@ -169,7 +167,6 @@ void scene_gameplay_initialize(
 
   data = scene->objects[scene->length_objects - 1]->data.contents;
   data->id = scene->length_objects - 1;
-  data->mode_texture = mode_texture_hud_item;
 
   data->noise = 2000;
 
@@ -188,7 +185,6 @@ void scene_gameplay_initialize(
 
   data = scene->objects[scene->length_objects - 2]->data.contents;
   data->id = scene->length_objects - 2;
-  data->mode_texture = mode_texture_hud_item;
 
   data->noise = 1.0f;
 
@@ -207,7 +203,6 @@ void scene_gameplay_initialize(
 
   data = scene->objects[scene->length_objects - 3]->data.contents;
   data->id = scene->length_objects - 3;
-  data->mode_texture = mode_texture_hud_item;
 
   data->noise = 2000;
 
