@@ -22,6 +22,7 @@ version_target_clic3=0
 version_target_interrupt_handler=0
 version_target_math_c=0
 version_target_metil=0
+version_target_rand=0
 
 directory_include=include
 directory_objects_c=${directory_objects}/c
@@ -44,18 +45,23 @@ directory_math_c=../math_c
 directory_metil=../metil
 directory_metil_include=${directory_metil}/include
 
+directory_rand=../rand
+directory_rand_include=${directory_rand}/include
+
 ifeq (${debug}, 1)
 	directory_cer0_library=${directory_cer0}/library_debug
 	directory_clic3_library=${directory_clic3}/library_debug
 	directory_interrupt_handler_library=${directory_interrupt_handler}/library_debug
 	directory_math_c_library=${directory_math_c}/library_debug
 	directory_metil_library=${directory_metil}/library_debug
+	directory_rand_library=${directory_rand}/library_debug
 else
 	directory_cer0_library=${directory_cer0}/library
 	directory_clic3_library=${directory_clic3}/library
 	directory_interrupt_handler_library=${directory_interrupt_handler}/library
 	directory_math_c_library=${directory_math_c}/library
 	directory_metil_library=${directory_metil}/library
+	directory_rand_library=${directory_rand}/library
 endif
 
 directory_metal=metal
@@ -83,12 +89,14 @@ ifeq (${release}, 1)
 	file_interrupt_handler_library=${directory_interrupt_handler_library}/interrupt_handler.o
 	file_math_c_library=${directory_math_c_library}/math_c.o
 	file_metil_library=${directory_metil_library}/metil.o
+	file_rand_library=${directory_metil_library}/rand.o
 else
 	file_cer0_library=${directory_cer0_library}/cer0.${version_target_cer0}.dylib
 	file_clic3_library=${directory_clic3_library}/clic3.${version_target_clic3}.dylib
 	file_interrupt_handler_library=${directory_interrupt_handler_library}/interrupt_handler.${version_target_interrupt_handler}.dylib
 	file_math_c_library=${directory_math_c_library}/math_c.${version_target_math_c}.dylib
 	file_metil_library=${directory_metil_library}/metil.${version_target_metil}.dylib
+	file_rand_library=${directory_rand_library}/rand.${version_target_rand}.dylib
 endif
 endif
 
@@ -101,7 +109,7 @@ file_output=${directory_app_contents_macos}/${name}
 file_output_info_plist=${directory_app_contents}/Info.plist
 file_output_metal=${directory_app_contents_resources}/default.metallib
 
-files_libraries=${file_cer0_library} ${file_clic3_library} ${file_interrupt_handler_library} ${file_math_c_library} ${file_metil_library}
+files_libraries=${file_cer0_library} ${file_clic3_library} ${file_interrupt_handler_library} ${file_math_c_library} ${file_metil_library} ${file_rand_library}
 
 files_sources_c=${shell find ${directory_sources} -name "*.c"}
 files_sources_objc=${shell find ${directory_sources} -name "*.m"}
@@ -139,7 +147,7 @@ target_platform_metal=air64-apple-macos${target_macos_version_metal}
 frameworks=Metal MetalKit GameController CoreAudio CoreGraphics CoreText
 
 cc=clang
-c_flags_includes=-I${directory_include} -I${directory_cer0_include} -I${directory_clic3_include} -I${directory_interrupt_handler_include} -I${directory_metil_include}
+c_flags_includes=-I${directory_include} -I${directory_cer0_include} -I${directory_clic3_include} -I${directory_interrupt_handler_include} -I${directory_metil_include} -I${directory_rand_include}
 c_flags_platform=-target ${target_platform} -isysroot ${directory_macos_sdk}
 
 c_flags_objc_debug=-O0 -g -v
@@ -195,12 +203,14 @@ ifeq (${debug}, 1)
 	if [[ ! -f ${directory_app_contents_macos}/interrupt_handler_debug.${version_target_interrupt_handler}.dylib ]]; then ln -s ../../../../../${file_interrupt_handler_library} ${directory_app_contents_macos}/interrupt_handler_debug.${version_target_interrupt_handler}.dylib; fi
 	if [[ ! -f ${directory_app_contents_macos}/math_c_debug.${version_target_math_c}.dylib ]]; then ln -s ../../../../../${file_math_c_library} ${directory_app_contents_macos}/math_c_debug.${version_target_math_c}.dylib; fi
 	if [[ ! -f ${directory_app_contents_macos}/metil_debug.${version_target_metil}.dylib ]]; then ln -s ../../../../../${file_metil_library} ${directory_app_contents_macos}/metil_debug.${version_target_metil}.dylib; fi
+	if [[ ! -f ${directory_app_contents_macos}/rand_debug.${version_target_rand}.dylib ]]; then ln -s ../../../../../${file_rand_library} ${directory_app_contents_macos}/rand_debug.${version_target_rand}.dylib; fi
 else
 	if [[ ! -f ${directory_app_contents_macos}/cer0.${version_target_cer0}.dylib ]]; then ln -s ../../../../../${file_cer0_library} ${directory_app_contents_macos}/cer0.${version_target_cer0}.dylib; fi
 	if [[ ! -f ${directory_app_contents_macos}/clic3.${version_target_clic3}.dylib ]]; then ln -s ../../../../../${file_clic3_library} ${directory_app_contents_macos}/clic3.${version_target_clic3}.dylib; fi
 	if [[ ! -f ${directory_app_contents_macos}/interrupt_handler.${version_target_interrupt_handler}.dylib ]]; then ln -s ../../../../../${file_interrupt_handler_library} ${directory_app_contents_macos}/interrupt_handler.${version_target_interrupt_handler}.dylib; fi
 	if [[ ! -f ${directory_app_contents_macos}/math_c.${version_target_math_c}.dylib ]]; then ln -s ../../../../../${file_math_c_library} ${directory_app_contents_macos}/math_c.${version_target_math_c}.dylib; fi
 	if [[ ! -f ${directory_app_contents_macos}/metil.${version_target_metil}.dylib ]]; then ln -s ../../../../../${file_metil_library} ${directory_app_contents_macos}/metil.${version_target_metil}.dylib; fi
+	if [[ ! -f ${directory_app_contents_macos}/rand.${version_target_rand}.dylib ]]; then ln -s ../../../../../${file_rand_library} ${directory_app_contents_macos}/rand.${version_target_rand}.dylib; fi
 endif
 endif
 

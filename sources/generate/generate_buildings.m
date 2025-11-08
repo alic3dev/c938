@@ -6,6 +6,13 @@
 #include <metil_object.h>
 #include <metil_rendering/metil_renderer_data_object.h>
 
+#include <rand_functions.h>
+#include <rand_initialize.h>
+#include <rand_parameters.h>
+#include <rand_result.h>
+#include <rand_source.h>
+#include <rand_source_type.h>
+
 #include <Metal/MTLDevice.h>
 #include <Metal/MTLTexture.h>
 
@@ -65,16 +72,39 @@ void generate_buildings(
   struct metil_renderer_data_object* data = objects[0]->data.contents;
   data->id = iterator_id++;
 
+  struct rand_parameters rand_parameters;
+  struct rand_source rand_source;
+  struct rand_result rand_result;
+
+  rand_initialize(
+    &rand_parameters,
+    &rand_result,
+    &rand_source,
+    30,
+    rand_mode_bytes,
+    rand_source_type_divisive
+  );
+
+  unsigned char offset_index_bytes = 0;
+
   for (
     unsigned char index_object = 1;
     index_object < length_objects;
     ++index_object
   ) {
+    offset_index_bytes = 0;
+
+    rand_get(
+      &rand_source,
+      &rand_result,
+      &rand_parameters
+    );
+
     mesh_building_initialize(
       &objects[index_object]->mesh,
-      83.0f + (rand() % 67),
-      1000.0f + (rand() % 500),
-      83.0f + (rand() % 67)
+      83.0f + ((rand_result.bytes[0] * rand_result.bytes[1]) % 67),
+      1000.0f + ((rand_result.bytes[2] * rand_result.bytes[3]) % 500),
+      83.0f + ((rand_result.bytes[4] * rand_result.bytes[5]) % 67)
     );
 
     objects[index_object]->position.y = 0.0f;
@@ -86,8 +116,30 @@ void generate_buildings(
         objects[index_object]->position.z - objects[index_object]->mesh.size.z / 2.0f <= objects[1]->mesh.size.z / 2.0f &&
         objects[index_object]->position.z + objects[index_object]->mesh.size.z / 2.0f >= -objects[1]->mesh.size.z / 2.0f
       ) {
-        objects[index_object]->position.x = -size / 2 + (rand() % size);
-        objects[index_object]->position.z = -size / 2 + (rand() % size);
+        objects[index_object]->position.x = (
+          -size / 2 + (
+            (rand_result.bytes[10 + offset_index_bytes] * rand_result.bytes[11 + offset_index_bytes]) % size
+          )
+        );
+        objects[index_object]->position.z = (
+          -size / 2 + (
+            (rand_result.bytes[12 + offset_index_bytes] * rand_result.bytes[13 + offset_index_bytes]) % size
+          )
+        );
+
+        offset_index_bytes = (
+          offset_index_bytes + 4
+        );
+
+        if (offset_index_bytes == 16) {
+          offset_index_bytes = 0;
+
+          rand_get(
+            &rand_source,
+            &rand_result,
+            &rand_parameters
+          );
+        }
       }
     }
 
@@ -95,8 +147,8 @@ void generate_buildings(
       objects[index_object],
       textures[
         index_object == 2
-        ? ((rand() % 5) + 4) % length_textures
-        : (rand() % length_textures) % 4
+        ? (((rand_result.bytes[6] * rand_result.bytes[7]) % 5) + 4) % length_textures
+        : ((rand_result.bytes[8] * rand_result.bytes[9]) % length_textures) % 4
       ]
     );
 
