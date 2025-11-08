@@ -44,7 +44,11 @@ struct data_vertex {
   data_vertex.position_texture.x = (
     id_vertex_moded == 0 ||
     id_vertex_moded == 3
-  ) ? 0.0f : 1.0f;
+  ) ? (
+    0.0f
+  ) : (
+    1.0f
+  );
   data_vertex.position_texture.y = ((id_vertex + 2) / 4) % 2;
 
   data_vertex.brightness = (
@@ -73,26 +77,25 @@ struct data_vertex {
   data_vertex data_vertex [[stage_in]],
   metal::texture2d<half> texture [[texture(0)]]
 ) {
+  float brightness = (
+    data_vertex.brightness * 
+    metal::fmin(
+      metal::fmax(
+        1.0f - (data_vertex.distance / 1000.0f),
+        0.5f
+      ),
+      1.0f
+    )
+  );
+
   constexpr metal::sampler sampler_texture(
-    metal::filter::linear,
-    metal::mip_filter::linear
+    metal::coord::normalized
   );
 
   float4 color_texture = float4(
     texture.sample(
       sampler_texture,
       data_vertex.position_texture
-    )
-  );
-
-  float brightness = (
-    data_vertex.brightness * 
-    metal::fmin(
-      metal::fmax(
-        1.0f - (data_vertex.distance / 1000.0f),
-        0.25f
-      ),
-      1.0f
     )
   );
 
