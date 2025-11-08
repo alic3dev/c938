@@ -101,7 +101,7 @@ void scene_gameplay_initialize(
     scene->metal_device
   );
 
-  scene->length_textures = 10;
+  scene->length_textures = 1;
   scene->textures = malloc(
     sizeof(id<MTLTexture>) *
     scene->length_textures
@@ -112,26 +112,9 @@ void scene_gameplay_initialize(
     initWithDevice: metal_device
   ];
 
-  scene->textures[
-    textures_scene_gameplay_player
-  ] = [texture_loader
-    newTextureWithContentsOfURL: [NSURL
-      fileURLWithPath:@"concrete_3.png"
-      isDirectory: 0
-      relativeToURL: [NSURL
-        fileURLWithPath:[NSString
-          stringWithUTF8String: metil_paths.directory_textures
-        ]
-        isDirectory: 1
-      ]
-    ]
-    options: (void*)0
-    error: (void*)0
-  ];
-
   textures_buildings_load(
     texture_loader,
-    scene->textures + 1
+    scene->textures
   );
 
   [texture_loader release];
@@ -311,8 +294,7 @@ void scene_gameplay_populate(
     scene->metal_device,
     scene->objects + 1,
     scene->length_objects - 5,
-    scene->textures + 1,
-    scene->length_textures - 1,
+    scene->textures[0],
     1
   );
 

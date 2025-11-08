@@ -64,7 +64,7 @@ void scene_menu_main_initialize(
     scene->length_objects
   );
 
-  scene->length_textures = 13;
+  scene->length_textures = 4;
   scene->textures = malloc(
     sizeof(id<MTLTexture>) *
     scene->length_textures
@@ -85,8 +85,7 @@ void scene_menu_main_initialize(
     scene->metal_device,
     scene->objects,
     scene->length_objects - 3,
-    scene->textures + 3,
-    scene->length_textures - 3,
+    scene->textures[3],
     iterator_id
   );
 
