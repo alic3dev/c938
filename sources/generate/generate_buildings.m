@@ -20,8 +20,7 @@ void generate_buildings(
   id<MTLDevice> metal_device,
   struct metil_object** objects,
   unsigned short int length_objects,
-  id<MTLTexture>* textures,
-  unsigned short int length_textures,
+  id<MTLTexture> texture,
   unsigned short int offset_id
 ) {
   signed int size = 2500;
@@ -62,9 +61,7 @@ void generate_buildings(
 
   metil_object_texture_add(
     objects[0],
-    textures[
-      0
-    ]
+    texture
   );
 
   unsigned short int iterator_id = offset_id;
@@ -145,11 +142,7 @@ void generate_buildings(
 
     metil_object_texture_add(
       objects[index_object],
-      textures[
-        index_object == 2
-        ? (((rand_result.bytes[6] * rand_result.bytes[7]) % 5) + 4) % length_textures
-        : ((rand_result.bytes[8] * rand_result.bytes[9]) % length_textures) % 4
-      ]
+      texture
     );
 
     metil_object_buffers_initialize(
