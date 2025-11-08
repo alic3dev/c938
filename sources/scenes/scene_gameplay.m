@@ -2,7 +2,6 @@
 
 #include <generate/generate_buildings.h>
 #include <mesh/mesh_hud_item.h>
-#include <mesh/ground/mesh_ground.h>
 #include <mesh/mesh_player.h>
 #include <objects/object_crosshair.h>
 #include <pipeline_index.h>
