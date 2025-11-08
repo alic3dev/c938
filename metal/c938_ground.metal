@@ -53,13 +53,11 @@ struct data_vertex {
   ) ? 0 : 1;
 
   data_vertex.brightness = (
-    0.125f * data_frame->brightness
+    data_frame->brightness
   );
 
   data_vertex.distance = (
-    metal::fabs((data_object->position.x + positions[id_vertex].x) - data_frame->position_player.x) + 
-    metal::fabs((data_object->position.y + positions[id_vertex].y) - data_frame->position_player.y) + 
-    metal::fabs((data_object->position.z + positions[id_vertex].z) - data_frame->position_player.z)
+    metal::fabs((data_object->position.y + positions[id_vertex].y) - data_frame->position_player.y)
   );
 
   return data_vertex;
@@ -82,11 +80,7 @@ struct data_vertex {
   );
 
   float brightness = (
-    data_vertex.brightness * 
-    metal::fmax(
-      1.0f - (data_vertex.distance / 1000.0f),
-      0.25f
-    )
+    data_vertex.brightness * 0.125f
   );
 
   return float4(
