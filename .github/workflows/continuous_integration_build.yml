@@ -11,36 +11,36 @@ jobs:
       - name: git_initialization
         run: git config --global init.defaultBranch core
       - name: continuous_integration:repository->checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           path: c938
       - name: checkout_cer0
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: alic3dev/cer0
           path: cer0
       - name: checkout_clic3
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: alic3dev/clic3
           path: clic3
       - name: checkout_interrupt_handler
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: alic3dev/interrupt_handler
           path: interrupt_handler
       - name: checkout_math_c
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: alic3dev/math_c
           path: math_c
       - name: checkout_metil
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: alic3dev/metil
           path: metil
       - name: checkout_rand
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: alic3dev/rand
           path: rand
