@@ -23,13 +23,14 @@ void scene_gameplay_initialize(
   struct metil_scene* scene,
   id<MTLDevice> metal_device
 ) {
-  metil_audio_io_proc_add(
-    scene_gameplay_io_proc
+  metil_scene_initialize_with_renderables(
+    scene,
+    metal_device,
+    scene_gameplay_length_renderables_default
   );
 
-  metil_scene_initialize(
-    scene,
-    metal_device
+  metil_audio_io_proc_add(
+    scene_gameplay_io_proc
   );
 
   scene->player.poll = player_poll;
@@ -43,61 +44,57 @@ void scene_gameplay_initialize(
 
   scene->player.data = player_data;
 
-  scene->type = metil_scene_type_game;
-  scene->id = scene_id_gameplay;
-
   scene->poll = scene_gameplay_poll;
   scene->destroy = scene_gameplay_destroy;
 
-  scene->length_objects = scene_gameplay_length_objects_default;
-  scene->objects = realloc(
-    scene->objects,
-    sizeof(struct metil_object*) *
-    scene->length_objects
-  );
-
   for (
-    unsigned char index_object = 0;
-    index_object < scene->length_objects;
-    ++index_object
+    unsigned char index_renderable = 0;
+    index_renderable < scene->length_renderables;
+    ++index_renderable
   ) {
-    scene->objects[index_object] = (void*)0;
+    metil_renderable_initialize_at_index(
+      scene->renderables,
+      index_renderable,
+      metil_renderable_type_object
+    );
   }
 
-  scene->objects[0] = malloc(
-    sizeof(struct metil_object)
+  struct metil_object* object = (
+    scene->renderables[
+      0
+    ].renderable
   );
 
-  metil_object_initialize(
-    scene->objects[0]
+  object->index_pipeline_render = (
+    c938_pipeline_index_player
   );
-
-  scene->objects[0]->index_pipeline_render = c938_pipeline_index_player;
 
   for (
-    unsigned char index_object = scene->length_objects - 4;
-    index_object < scene->length_objects;
-    ++index_object
+    unsigned char index_renderable = scene->length_renderables - 4;
+    index_renderable < scene->length_renderables;
+    ++index_renderable
   ) {
-    scene->objects[index_object] = malloc(
-      sizeof(struct metil_object)
-    );
+    object = scene->renderables[
+      index_renderable
+    ].renderable;
 
     if (
-      index_object != scene->length_objects - 4
+      index_renderable != scene->length_renderables - 4
     ) {
-      metil_object_initialize(
-        scene->objects[index_object]
+      object->index_pipeline_render = (
+        c938_pipeline_index_hud_item
       );
-
-      scene->objects[index_object]->index_pipeline_render = c938_pipeline_index_hud_item;
     }
   }
 
+  object = (
+    scene->renderables[
+      scene->length_renderables - 4
+    ].renderable
+  );
+
   object_crosshair_initialize(
-    scene->objects[
-      scene->length_objects - 4
-    ],
+    object,
     scene->metal_device
   );
 
@@ -119,88 +116,119 @@ void scene_gameplay_initialize(
 
   [texture_loader release];
 
+  object = scene->renderables[0].renderable;
+
   mesh_player_initialize(
-    &scene->objects[0]->mesh
+    &object->mesh
   );
 
   metil_object_buffers_initialize(
-    scene->objects[0],
+    object,
     scene->metal_device
   );
 
   metil_object_texture_add(
-    scene->objects[0],
+    object,
     scene->textures[
-      textures_scene_gameplay_player
+      0
     ]
   );
 
-  struct metil_renderer_data_object* data = scene->objects[0]->data.contents;
+  struct metil_renderer_data_object* data = (
+    object->data.contents
+  );
+
   data->id = 0;
 
+  object = (
+    scene->renderables[
+      scene->length_renderables -
+      1
+    ].renderable
+  );
+
   mesh_hud_item_initialize(
-    &scene->objects[scene->length_objects - 1]->mesh  
+    &object->mesh  
   );
 
   metil_object_buffers_initialize(
-    scene->objects[scene->length_objects - 1],
+    object,
     metal_device
   );
 
-  data = scene->objects[scene->length_objects - 1]->data.contents;
-  data->id = scene->length_objects - 1;
+  data = object->data.contents;
+
+  data->id = (
+    scene->length_renderables - 1
+  );
 
   data->noise = 2000;
 
-  scene->objects[scene->length_objects - 1]->position.x = -0.9f;
-  scene->objects[scene->length_objects - 1]->position.y = -0.9f;
-  scene->objects[scene->length_objects - 1]->position.z = 0.0f;
+  object->position.x = -0.9f;
+  object->position.y = -0.9f;
+  object->position.z = 0.0f;
+
+  object = (
+    scene->renderables[
+      scene->length_renderables - 2
+    ].renderable
+  );
 
   mesh_hud_item_initialize(
-    &scene->objects[scene->length_objects - 2]->mesh  
+    &object->mesh  
   );
 
   metil_object_buffers_initialize(
-    scene->objects[scene->length_objects - 2],
+    object,
     metal_device
   );
 
-  data = scene->objects[scene->length_objects - 2]->data.contents;
-  data->id = scene->length_objects - 2;
+  data = object->data.contents;
+  data->id = scene->length_renderables - 2;
 
   data->noise = 1.0f;
 
-  scene->objects[scene->length_objects - 2]->position.x = -0.9f;
-  scene->objects[scene->length_objects - 2]->position.y = -0.8f;
-  scene->objects[scene->length_objects - 2]->position.z = 0.0f;
+  object->position.x = -0.9f;
+  object->position.y = -0.8f;
+  object->position.z = 0.0f;
+
+  object = (
+    scene->renderables[
+      scene->length_renderables - 3
+    ].renderable
+  );
 
   mesh_hud_item_initialize(
-    &scene->objects[scene->length_objects - 3]->mesh  
+    &object->mesh
   );
 
   metil_object_buffers_initialize(
-    scene->objects[scene->length_objects - 3],
+    object,
     metal_device
   );
 
-  data = scene->objects[scene->length_objects - 3]->data.contents;
-  data->id = scene->length_objects - 3;
+  data = object->data.contents;
+
+  data->id = (
+    scene->length_renderables -
+    3
+  );
 
   data->noise = 2000;
 
-  scene->objects[scene->length_objects - 3]->position.x = -0.9f;
-  scene->objects[scene->length_objects - 3]->position.y = -0.7f;
-  scene->objects[scene->length_objects - 3]->position.z = 0.0f;
+  object->position.x = -0.9f;
+  object->position.y = -0.7f;
+  object->position.z = 0.0f;
 
   scene_gameplay_populate(
     scene,
-    scene->length_objects
+    scene->length_renderables
   );
 }
 
 void scene_gameplay_populate(
   struct metil_scene* scene,
-  unsigned short int length_objects
+  unsigned short int length_renderables
 ) {
   scene->player.rotation.x = 0.0f;
   scene->player.rotation.y = 0.0f;
@@ -222,90 +250,122 @@ void scene_gameplay_populate(
 
   unsigned short int iterator_id = 1;
 
-  if (scene->objects[1] != (void*)0) {
+  if (
+    scene->renderables[1].renderable != (void*)0
+  ) {
     for (
-      unsigned short int index_object = 1;
-      index_object < scene->length_objects - 4;
-      ++index_object
+      unsigned short int index_renderable = 1;
+      index_renderable < scene->length_renderables - 4;
+      ++index_renderable
     ) {
       metil_object_destroy(
-        scene->objects[index_object]
+        scene->renderables[
+          index_renderable
+        ].renderable
       );
 
-      free(scene->objects[index_object]);
+      free(
+        scene->renderables[
+          index_renderable
+        ].renderable
+      );
     }
   }
 
   if (
-    scene->length_objects != length_objects
+    scene->length_renderables != length_renderables
   ) {
     if (
-      scene->length_objects < length_objects
+      scene->length_renderables < length_renderables
     ) {
-      scene->objects = realloc(
-        scene->objects,
+      scene->renderables = realloc(
+        scene->renderables,
         sizeof(struct metil_object*) *
-        length_objects
+        length_renderables
       );
     }
 
     struct metil_object* objects[4];
 
     for (
-      unsigned char index_object = 0;
-      index_object < 4;
-      ++index_object
+      unsigned char index_renderable = 0;
+      index_renderable < 4;
+      ++index_renderable
     ) {
       objects[
-        index_object
-      ] = scene->objects[
-        scene->length_objects - index_object - 1
-      ];
+        index_renderable
+      ] = scene->renderables[
+        scene->length_renderables -
+        index_renderable -
+        1
+      ].renderable;
     }
 
     for (
-      unsigned char index_object = 0;
-      index_object < 4;
-      ++index_object
+      unsigned char index_renderable = 0;
+      index_renderable < 4;
+      ++index_renderable
     ) {
-      scene->objects[
-        length_objects - index_object - 1
-      ] = (
+      scene->renderables[
+        length_renderables -
+        index_renderable -
+        1
+      ].renderable = (
         objects[
-          index_object
+          index_renderable
         ]
       );
     }
 
     if (
-      scene->length_objects > length_objects
+      scene->length_renderables > length_renderables
     ) {
-      scene->objects = realloc(
-        scene->objects,
+      scene->renderables = realloc(
+        scene->renderables,
         sizeof(struct metil_object*) *
-        length_objects
+        length_renderables
       );
     }
 
-    scene->length_objects = length_objects;
+    scene->length_renderables = length_renderables;
   }
 
   generate_buildings(
     scene->metal_device,
-    scene->objects + 1,
-    scene->length_objects - 5,
+    scene->renderables + 1,
+    scene->length_renderables - 5,
     scene->textures[0],
     1
   );
 
-  scene->player.position.x = scene->objects[2]->position.x;
-  scene->player.position.y = scene->objects[2]->position.y + scene->objects[2]->mesh.size.y;
-  scene->player.position.z = scene->objects[2]->position.z;
+  struct metil_object* object = (
+    scene->renderables[
+      2
+    ].renderable
+  );
 
-  scene->objects[0]->position.y = scene->player.position.y;
+  scene->player.position.x = object->position.x;
+  scene->player.position.y = (
+    object->position.y +
+    object->mesh.size.y
+  );
+  scene->player.position.z = object->position.z;
 
-  player_data->length_objects = scene->length_objects - 6;
-  player_data->objects = scene->objects + 2;
+  object = (
+    scene->renderables[
+      0
+    ].renderable
+  );
+
+  object->position.y = scene->player.position.y;
+
+  player_data->length_renderables = (
+    scene->length_renderables - 6
+  );
+
+  player_data->renderables = (
+    scene->renderables + 2
+  );
 }
 
 void scene_gameplay_poll(
@@ -318,17 +378,19 @@ void scene_gameplay_poll(
   if (
     player_data->on_ground == 2
   ) {
-    unsigned short int length_objects_reduced = (
-      scene->length_objects * 0.9f
+    unsigned short int length_renderables_reduced = (
+      scene->length_renderables * 0.9f
     );
 
-    if (length_objects_reduced < 10) {
-      length_objects_reduced = 10;
+    if (
+      length_renderables_reduced < 10
+    ) {
+      length_renderables_reduced = 10;
     }
 
     scene_gameplay_populate(
       scene,
-      length_objects_reduced
+      length_renderables_reduced
     );
 
     return;
@@ -337,43 +399,83 @@ void scene_gameplay_poll(
   ) {
     scene_gameplay_populate(
       scene,
-      scene_gameplay_length_objects_default
+      scene_gameplay_length_renderables_default
     );
 
     return;
   }
 
-  metil_scene_poll_default(scene);
-
-  scene->objects[0]->position.x = (
-    scene->player.position.x
+  metil_scene_poll_default(
+    scene
   );
 
-  scene->objects[0]->position.y = (
-    scene->player.position.y
+  struct metil_object* object = (
+    scene->renderables[
+      0
+    ].renderable
   );
 
-  scene->objects[0]->position.z = (
-    scene->player.position.z
+  object->position.x = scene->player.position.x;
+  object->position.y = scene->player.position.y;
+  object->position.z = scene->player.position.z;
+
+  object = (
+    scene->renderables[
+      scene->length_renderables -
+      1
+    ].renderable
   );
 
-  struct metil_renderer_data_object* data = scene->objects[scene->length_objects - 1]->data.contents;
+  struct metil_renderer_data_object* data = (
+    object->data.contents
+  );
 
   if (
     player_data->is_boosted == 1
   ) {
-    unsigned long int delta_time_boost = scene->time_input - player_data->time_boost;
+    unsigned long int delta_time_boost = (
+      scene->time_input -
+      player_data->time_boost
+    );
 
-    data->noise = delta_time_boost > 2000 ? 2000 : delta_time_boost;
+    data->noise = (
+      delta_time_boost > 2000
+      ? 2000
+      : delta_time_boost
+    );
   } else {
     data->noise = 2000;
   }
 
-  data = scene->objects[scene->length_objects - 2]->data.contents;
-  data->noise = player_data->is_jumping != 0 ? 0 : 2000;
+  object = (
+    scene->renderables[
+      scene->length_renderables -
+      2
+    ].renderable
+  );
 
-  data = scene->objects[scene->length_objects - 3]->data.contents;
-  data->noise = player_data->is_jumping_secondary != 0 ? 0 : 2000;
+  data = object->data.contents;
+
+  data->noise = (
+    player_data->is_jumping != 0
+    ? 0
+    : 2000
+  );
+
+  object = (
+    scene->renderables[
+      scene->length_renderables -
+      3
+    ].renderable
+  );
+
+  data = object->data.contents;
+
+  data->noise = (
+    player_data->is_jumping_secondary != 0
+    ? 0
+    : 2000
+  );
 }
 
 void scene_gameplay_destroy(
@@ -383,7 +485,9 @@ void scene_gameplay_destroy(
     scene_gameplay_io_proc
   );
 
-  metil_scene_destroy_default(scene);
+  metil_scene_destroy_default(
+    scene
+  );
 }
 
 OSStatus scene_gameplay_io_proc(
@@ -400,23 +504,46 @@ OSStatus scene_gameplay_io_proc(
     index_buffer < list_buffer_audio_out->mNumberBuffers;
     ++index_buffer
   ) {
-    AudioBuffer audio_buffer_current = list_buffer_audio_out->mBuffers[index_buffer];
+    AudioBuffer audio_buffer_current = (
+      list_buffer_audio_out->mBuffers[
+        index_buffer
+      ]
+    );
 
     float* buffer_out = audio_buffer_current.mData;
-    unsigned long int size_buffer_out = audio_buffer_current.mDataByteSize / sizeof(float);
-    unsigned long int count_channel_out = audio_buffer_current.mNumberChannels;
+
+    unsigned long int size_buffer_out = (
+      audio_buffer_current.mDataByteSize /
+      sizeof(float)
+    );
+
+    unsigned long int count_channel_out = (
+      audio_buffer_current.mNumberChannels
+    );
     
     for (
       unsigned long int index_buffer_out = 0;
       index_buffer_out < size_buffer_out;
       ++index_buffer_out
     ) {
-      unsigned long int channel = index_buffer_out % count_channel_out;
+      unsigned long int channel = (
+        index_buffer_out %
+        count_channel_out
+      );
 
-      if (channel == 0) {
-        buffer_out[index_buffer_out] = 0.0f;
+      if (
+        channel == 0
+      ) {
+        buffer_out[
+          index_buffer_out
+        ] = 0.0f;
       } else {
-        buffer_out[index_buffer_out] = buffer_out[index_buffer_out - channel];
+        buffer_out[
+          index_buffer_out
+        ] = buffer_out[
+          index_buffer_out -
+          channel
+        ];
       }
     }
   }

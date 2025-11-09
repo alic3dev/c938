@@ -21,9 +21,13 @@ void object_crosshair_initialize(
     &object->mesh
   );
 
-  object->type_primitive = MTLPrimitiveTypeLine;
+  object->type_primitive = (
+    MTLPrimitiveTypeLine
+  );
 
-  object->index_pipeline_render = c938_pipeline_index_crosshair;
+  object->index_pipeline_render = (
+    c938_pipeline_index_crosshair
+  );
 
   metil_object_buffers_initialize(
     object,
@@ -34,7 +38,10 @@ void object_crosshair_initialize(
   object->position.y = 0.0f;
   object->position.z = 0.0f;
 
-  struct metil_renderer_data_object* data = object->data.contents;
+  struct metil_renderer_data_object* data = (
+    object->data.contents
+  );
+
   data->color.x = 1.0f;
   data->color.y = 1.0f;
   data->color.z = 1.0f;

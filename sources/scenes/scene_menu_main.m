@@ -15,6 +15,7 @@
 #include <metil_object.h>
 #include <metil_paths/paths.h>
 #include <metil_rendering/metil_renderer_data_object.h>
+#include <metil_rendering/metil_renderer_data_menu_item.h>
 #include <metil_scenes/scene.h>
 #include <metil_scenes/scene_controller.h>
 #include <metil_text/text.h>
@@ -31,9 +32,10 @@ void scene_menu_main_initialize(
     scene_menu_main_io_proc
   );
 
-  metil_scene_initialize(
+  metil_scene_initialize_with_renderables(
     scene,
-    metal_device
+    metal_device,
+    103
   );
 
   scene->poll = scene_menu_main_poll;
@@ -41,10 +43,12 @@ void scene_menu_main_initialize(
   scene->destroy = scene_menu_main_destroy;
 
   scene->data = malloc(
-    sizeof(struct metil_scene_menu_main_data)
+    sizeof(struct scene_menu_main_data)
   );
 
-  struct metil_scene_menu_main_data* data = (struct metil_scene_menu_main_data*) scene->data;
+  struct scene_menu_main_data* data = (
+    (struct scene_menu_main_data*) scene->data
+  );
 
   data->angle = 0.0f;
 
@@ -54,23 +58,16 @@ void scene_menu_main_initialize(
     &data->menu
   );
 
-  scene->type = metil_scene_type_menu;
-  scene->id = scene_id_menu_main;
-
-  scene->length_objects = 103;
-  scene->objects = realloc(
-    scene->objects,
-    sizeof(struct metil_object*) *
-    scene->length_objects
-  );
-
   scene->length_textures = 4;
   scene->textures = malloc(
     sizeof(id<MTLTexture>) *
     scene->length_textures
   );
 
-  MTKTextureLoader* texture_loader = [[MTKTextureLoader alloc] initWithDevice: metal_device];
+  MTKTextureLoader* texture_loader = [
+    [MTKTextureLoader alloc]
+    initWithDevice: metal_device
+  ];
 
   textures_buildings_load(
     texture_loader,
@@ -83,119 +80,153 @@ void scene_menu_main_initialize(
 
   generate_buildings(
     scene->metal_device,
-    scene->objects,
-    scene->length_objects - 3,
+    scene->renderables,
+    scene->length_renderables - 3,
     scene->textures[3],
     iterator_id
   );
 
-  iterator_id = scene->length_objects - 3;
-
-  scene->objects[iterator_id] = malloc(
-    sizeof(struct metil_object)
+  iterator_id = (
+    scene->length_renderables -
+    3
+  );
+  
+  metil_renderable_initialize_at_index(
+    scene->renderables,
+    iterator_id,
+    metil_renderable_type_object
   );
 
-  metil_object_initialize(
-    scene->objects[iterator_id]
+  struct metil_object* object = (
+    scene->renderables[
+      iterator_id
+    ].renderable
   );
 
-  scene->objects[iterator_id]->index_pipeline_render = c938_pipeline_index_text;
+  object->index_pipeline_render = (
+    c938_pipeline_index_text
+  );
 
   scene->textures[
     textures_scene_menu_main_title
   ] = metil_text_mesh_with_texture_initialize(
     metal_device,
-    &scene->objects[iterator_id]->mesh,
+    &object->mesh,
     "c938",
     &metil_text_render_parameters_default
   );
 
-  metil_object_buffers_initialize(
-    scene->objects[iterator_id],
-    metal_device
+  metil_object_buffers_initialize_with_data_size(
+    object,
+    metal_device,
+    sizeof(struct metil_renderer_data_menu_item)
   );
 
-  scene->objects[iterator_id]->position.y = 0.5f - (scene->objects[iterator_id]->mesh.size.y / 4.0f);
+  object->position.y = (
+    0.5f - (
+      object->mesh.size.y /
+      4.0f
+    )
+  );
 
   metil_object_texture_add(
-    scene->objects[iterator_id],
+    object,
     scene->textures[
       textures_scene_menu_main_title
     ]
   );
 
-  struct metil_renderer_data_object* data_object = scene->objects[iterator_id]->data.contents;
+  struct metil_renderer_data_object* data_object = (
+    object->data.contents
+  );
   
   data_object->id = iterator_id++;
   data_object->noise = 0;
 
-  scene->objects[iterator_id] = malloc(
-    sizeof(struct metil_object)
+  metil_renderable_initialize_at_index(
+    scene->renderables,
+    iterator_id,
+    metil_renderable_type_object
   );
 
-  metil_object_initialize(
-    scene->objects[iterator_id]
+  object = (
+    scene->renderables[
+      iterator_id
+    ].renderable
   );
 
-  scene->objects[iterator_id]->index_pipeline_render = c938_pipeline_index_text;
+  object->index_pipeline_render = (
+    c938_pipeline_index_text
+  );
 
   scene->textures[
     textures_scene_menu_main_menu_enter
   ] = metil_text_mesh_with_texture_initialize(
     metal_device,
-    &scene->objects[iterator_id]->mesh,
+    &object->mesh,
     "enter",
     &metil_text_render_parameters_default
   );
 
   metil_object_buffers_initialize(
-    scene->objects[iterator_id],
+    object,
     metal_device
   );
 
-  scene->objects[iterator_id]->position.y = -scene->objects[iterator_id]->mesh.size.y * 6.0;
+  object->position.y = (
+    object->mesh.size.y *
+    -6.0
+  );
 
   metil_object_texture_add(
-    scene->objects[iterator_id],
+    object,
     scene->textures[
       textures_scene_menu_main_menu_enter
     ]
   );
 
-  data_object = scene->objects[iterator_id]->data.contents;
-
+  data_object = object->data.contents;
   data_object->id = iterator_id++;
 
-  scene->objects[iterator_id] = malloc(
-    sizeof(struct metil_object)
+  metil_renderable_initialize_at_index(
+    scene->renderables,
+    iterator_id,
+    metil_renderable_type_object
   );
 
-  metil_object_initialize(
-    scene->objects[iterator_id]
+  object = (
+    scene->renderables[
+      iterator_id
+    ].renderable
   );
 
-  scene->objects[iterator_id]->index_pipeline_render = c938_pipeline_index_text;
+  object->index_pipeline_render = (
+    c938_pipeline_index_text
+  );
 
   scene->textures[
     textures_scene_menu_main_menu_exit
   ] = metil_text_mesh_with_texture_initialize(
     metal_device,
-    &scene->objects[iterator_id]->mesh,
+    &object->mesh,
     "exit",
     &metil_text_render_parameters_default
   );
 
   metil_object_buffers_initialize(
-    scene->objects[iterator_id],
+    object,
     metal_device
   );
 
-  scene->objects[iterator_id]->position.y = -scene->objects[iterator_id]->mesh.size.y * 10.0f;
+  object->position.y = (
+    object->mesh.size.y *
+    -10.0f
+  );
 
-  data_object = scene->objects[iterator_id]->data.contents;
+  data_object = object->data.contents;
   
   metil_object_texture_add(
-    scene->objects[iterator_id],
+    object,
     scene->textures[
       textures_scene_menu_main_menu_exit
     ]
@@ -217,10 +248,18 @@ void scene_menu_main_initialize(
 void scene_menu_main_poll(
   struct metil_scene* scene
 ) {
-  struct metil_scene_menu_main_data* data = (struct metil_scene_menu_main_data*) scene->data;
+  struct scene_menu_main_data* data = (
+    (struct scene_menu_main_data*) scene->data
+  );
 
-  data->angle = (
-    fmod(data->angle + scene->time_delta / 20000.0f, M_PI * 2.0f)
+  data->angle = fmod((
+      data->angle +
+      scene->time_delta /
+      20000.0f
+    ), (
+      M_PI *
+      2.0f
+    )
   );
 
   scene->player.position.x = cos(
@@ -231,23 +270,49 @@ void scene_menu_main_poll(
     data->angle
   ) * 1500.0f;
 
-  scene->player.rotation.y = -data->angle - M_PI / 2.0f;
+  scene->player.rotation.y = ((
+      data->angle *
+      -1.0f
+    ) - (
+      M_PI / 2.0f
+    )
+  );
 
   struct metil_menu* menu = &data->menu;
 
   switch (menu->index_current) {
     case 0: {
-      struct metil_renderer_data_object* data_object = scene->objects[scene->length_objects - 2]->data.contents;
-      data_object->noise = 1;
-      data_object = scene->objects[scene->length_objects - 1]->data.contents;
-      data_object->noise = 0;
+      struct metil_renderer_data_menu_item* data_object = (
+        (
+          (struct metil_object*) scene->renderables[
+            scene->length_renderables - 2
+          ].renderable
+        )->data.contents
+      );
+      data_object->selected = 1;
+
+      data_object = (
+        (struct metil_object*) scene->renderables[
+          scene->length_renderables - 1
+        ].renderable
+      )->data.contents;
+      data_object->selected = 0;
       break;
     }
     case 1: {
-      struct metil_renderer_data_object* data_object = scene->objects[scene->length_objects - 1]->data.contents;
-      data_object->noise = 1;
-      data_object = scene->objects[scene->length_objects - 2]->data.contents;
-      data_object->noise = 0;
+      struct metil_renderer_data_menu_item* data_object = (
+        ((struct metil_object*) scene->renderables[
+          scene->length_renderables - 1
+        ].renderable)->data.contents
+      );
+      data_object->selected = 1;
+
+      data_object = (
+        (struct metil_object*) scene->renderables[
+          scene->length_renderables - 2
+        ].renderable
+      )->data.contents;
+      data_object->selected = 0;
       break;
     }
   }
@@ -303,8 +368,10 @@ void scene_menu_main_poll(
 void scene_menu_main_poll_input(
   struct metil_scene* scene
 ) {
-  struct metil_menu* menu = &(
-    ((struct metil_scene_menu_main_data*) scene->data)->menu
+  struct metil_menu* menu = (
+    &(
+      (struct scene_menu_main_data*) scene->data
+    )->menu
   );
 
   metil_menu_poll_input(
@@ -320,7 +387,9 @@ void scene_menu_main_destroy(
   );
 
   metil_menu_destroy(
-    &((struct metil_scene_menu_main_data*) scene->data)->menu
+    &(
+      (struct scene_menu_main_data*) scene->data
+    )->menu
   );
 
   metil_scene_destroy_default(scene);
@@ -340,23 +409,44 @@ OSStatus scene_menu_main_io_proc(
     index_buffer < list_buffer_audio_out->mNumberBuffers;
     ++index_buffer
   ) {
-    AudioBuffer audio_buffer_current = list_buffer_audio_out->mBuffers[index_buffer];
+    AudioBuffer audio_buffer_current = list_buffer_audio_out->mBuffers[
+      index_buffer
+    ];
 
     float* buffer_out = audio_buffer_current.mData;
-    unsigned long int size_buffer_out = audio_buffer_current.mDataByteSize / sizeof(float);
-    unsigned long int count_channel_out = audio_buffer_current.mNumberChannels;
+
+    unsigned long int size_buffer_out = (
+      audio_buffer_current.mDataByteSize /
+      sizeof(float)
+    );
+
+    unsigned long int count_channel_out = (
+      audio_buffer_current.mNumberChannels
+    );
     
     for (
       unsigned long int index_buffer_out = 0;
       index_buffer_out < size_buffer_out;
       ++index_buffer_out
     ) {
-      unsigned long int channel = index_buffer_out % count_channel_out;
+      unsigned long int channel = (
+        index_buffer_out %
+        count_channel_out
+      );
 
-      if (index_buffer == 0) {
-        buffer_out[index_buffer_out] = 0.0f;
+      if (
+        index_buffer == 0
+      ) {
+        buffer_out[
+          index_buffer_out
+        ] = 0.0f;
       } else {
-        buffer_out[index_buffer_out] = buffer_out[index_buffer_out - channel];
+        buffer_out[
+          index_buffer_out
+        ] = buffer_out[
+          index_buffer_out -
+          channel
+        ];
       }
     }
   }

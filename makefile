@@ -21,7 +21,7 @@ version_target_cer0=0
 version_target_clic3=0
 version_target_interrupt_handler=0
 version_target_math_c=0
-version_target_metil=0
+version_target_metil=1
 version_target_rand=0
 
 directory_include=include

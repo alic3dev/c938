@@ -1,13 +1,13 @@
 #ifndef __player_data_h
 #define __player_data_h
 
-#include <metil_object.h>
+#include <metil_rendering/metil_renderable.h>
 
 #include <clic3_vector.h>
 
 struct player_data {
-  struct metil_object** objects;
-  unsigned short int length_objects;
+  struct metil_renderable* renderables;
+  unsigned short int length_renderables;
 
   unsigned long int time_boost;
   unsigned long int time_jump;

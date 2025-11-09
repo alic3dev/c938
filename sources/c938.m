@@ -126,7 +126,7 @@ void c938_renderer_on_initialize(
     ]
   ];
 
-  scene_menu_main_initialize(
+  scene_gameplay_initialize(
     &metil_scene_controller.scene,
     metil_renderer_interface->metal_device
   );

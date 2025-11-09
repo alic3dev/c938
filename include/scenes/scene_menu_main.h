@@ -15,7 +15,7 @@ enum textures_scene_menu_main {
   textures_scene_menu_main_menu_exit = 2
 };
 
-struct metil_scene_menu_main_data {
+struct scene_menu_main_data {
   struct metil_menu menu;
   unsigned long int time_started;
   float angle;

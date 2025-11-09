@@ -6,9 +6,11 @@
 #include <metil_input/cursor.h>
 #include <metil_input/keycodes.h>
 #include <metil_input/map.h>
+#include <metil_object.h>
 #include <metil_player.h>
 
 #include <math.h>
+#include <stdlib.h>
 
 const float player_speed_movement_default = 100.0f;
 
@@ -471,24 +473,30 @@ void player_poll_input(
     .y = player->size.z / 2.0f
   };
 
+  struct metil_object* object = (void*)0;
+
   for (
-    unsigned int index_object = 0;
-    index_object < player_data->length_objects;
-    ++index_object
+    unsigned int index_renderable = 0;
+    index_renderable < player_data->length_renderables;
+    ++index_renderable
   ) {
+    object = player_data->renderables[
+      index_renderable
+    ].renderable;
+
     struct clic3_vector2_float size_half_object = {
-      .x = player_data->objects[index_object]->mesh.size.x / 2.0f,
-      .y = player_data->objects[index_object]->mesh.size.z / 2.0f
+      .x = object->mesh.size.x / 2.0f,
+      .y = object->mesh.size.z / 2.0f
     };
 
     struct clic3_vector2_float position_minimum_object = {
-      .x = player_data->objects[index_object]->position.x - size_half_object.x,
-      .y = player_data->objects[index_object]->position.z - size_half_object.y
+      .x = object->position.x - size_half_object.x,
+      .y = object->position.z - size_half_object.y
     };
 
     struct clic3_vector2_float position_maximum_object = {
-      .x = player_data->objects[index_object]->position.x + size_half_object.x,
-      .y = player_data->objects[index_object]->position.z + size_half_object.y
+      .x = object->position.x + size_half_object.x,
+      .y = object->position.z + size_half_object.y
     };
 
     if (
@@ -497,27 +505,30 @@ void player_poll_input(
       position_updated.z >= position_minimum_object.y - player->size.z &&
       position_updated.z <= position_maximum_object.y + player->size.z &&
       position_updated.y <= (
-        player_data->objects[index_object]->position.y +
-        player_data->objects[index_object]->mesh.size.y
+        object->position.y +
+        object->mesh.size.y
       ) &&
       position_updated.y >= (
-        player_data->objects[index_object]->position.y +
+        object->position.y +
         player->size.y
       )
     ) {
       // todo: this should be updated to use line intersections with applied rotations
       if (
         position_updated.y <= (
-          player_data->objects[index_object]->position.y +
-          player_data->objects[index_object]->mesh.size.y
+          object->position.y +
+          object->mesh.size.y
         ) &&
         player->position.y >= (
-          player_data->objects[index_object]->position.y +
-          player_data->objects[index_object]->mesh.size.y
+          object->position.y +
+          object->mesh.size.y
         )
       ) {
-        player_data->on_ground = index_object + 1;
-        position_updated.y = player_data->objects[index_object]->position.y + player_data->objects[index_object]->mesh.size.y;
+        player_data->on_ground = index_renderable + 1;
+        position_updated.y = (
+          object->position.y +
+          object->mesh.size.y
+        );
 
         if (
           position_updated.x == player->position.x &&
@@ -528,8 +539,6 @@ void player_poll_input(
 
         continue;
       }
-
-      // todo: needs y collision detection besides from top to bottom
 
       if (
         player->position.x < position_minimum_object.x - size_half_player.x &&
@@ -549,7 +558,9 @@ void player_poll_input(
         position_updated.x = player->position.x;
         position_updated.z = player->position.z;
 
-        if (player_data->on_ground != 0) {
+        if (
+          player_data->on_ground != 0
+        ) {
           break;
         }
       }
@@ -560,8 +571,12 @@ void player_poll_input(
   player->position.y = position_updated.y;
   player->position.z = position_updated.z;
 
-  if (player_data->on_ground == 0) {
-    if (player->velocity.y > -1000.0f) {
+  if (
+    player_data->on_ground == 0
+  ) {
+    if (
+      player->velocity.y > -1000.0f
+    ) {
       player->velocity.y = (
         player->velocity.y - (
           player_speed_movement_default

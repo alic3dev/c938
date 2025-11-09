@@ -1,16 +1,18 @@
 #ifndef __scenes_scene_gameplay_h
 #define __scenes_scene_gameplay_h
 
+#include <metil_menus/menu.h>
 #include <metil_scenes/scene.h>
 
 #include <CoreAudio/CoreAudio.h>
 #include <MetalKit/MetalKit.h>
 
 #define scene_gameplay_length_buildings_default 200
-#define scene_gameplay_length_objects_default scene_gameplay_length_buildings_default + 6
+#define scene_gameplay_length_renderables_default scene_gameplay_length_buildings_default + 6
 
-enum textures_scene_gameplay {
-  textures_scene_gameplay_player = 0
+struct scene_gameplay_data {
+  struct metil_menu menu;
+  unsigned char visible_menu;
 };
 
 void scene_gameplay_initialize(
