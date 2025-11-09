@@ -82,6 +82,7 @@ ifeq (${debug}, 1)
 	file_interrupt_handler_library=${directory_interrupt_handler_library}/interrupt_handler_debug.${version_target_interrupt_handler}.dylib
 	file_math_c_library=${directory_math_c_library}/math_c_debug.${version_target_math_c}.dylib
 	file_metil_library=${directory_metil_library}/metil_debug.${version_target_metil}.dylib
+	file_rand_library=${directory_rand_library}/rand_debug.${version_target_rand}.dylib
 else
 ifeq (${release}, 1)
 	file_cer0_library=${directory_cer0_library}/cer0.o
@@ -89,7 +90,7 @@ ifeq (${release}, 1)
 	file_interrupt_handler_library=${directory_interrupt_handler_library}/interrupt_handler.o
 	file_math_c_library=${directory_math_c_library}/math_c.o
 	file_metil_library=${directory_metil_library}/metil.o
-	file_rand_library=${directory_metil_library}/rand.o
+	file_rand_library=${directory_rand_library}/rand.o
 else
 	file_cer0_library=${directory_cer0_library}/cer0.${version_target_cer0}.dylib
 	file_clic3_library=${directory_clic3_library}/clic3.${version_target_clic3}.dylib
