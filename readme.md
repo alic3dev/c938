@@ -48,16 +48,16 @@ rendering_properties:fps_display->{1};
 - - [`math_c`](https://github.com/alic3dev/math_c)
 - - [`metil`](https://github.com/alic3dev/metil)
 
-### assets
+### content
 
 ```zsh
-make pull_assets
+make pull_content
 ```
 
 #### redownload
 
 ```zsh
-make pull_assets_all
+make pull_content_all
 ```
 
 ### build
