@@ -53,7 +53,7 @@ jobs:
       - name: make_math_c
         run: cd math_c && make
       - name: make_metil
-        run: cd metil && make
+        run: cd metil && git checkout metil_1_0_0 && make
       - name: make_rand
         run: cd rand && make
       - name: make_c938
