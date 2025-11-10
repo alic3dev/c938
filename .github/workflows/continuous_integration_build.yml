@@ -3,7 +3,7 @@ on:
   push:
     branches: ["core"]
   pull_request:
-    branches: ["core"]
+    branches: ["*"]
 env:
   enabled_caching: 1
   enabled_caching_cer0: 1
