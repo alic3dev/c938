@@ -5,7 +5,7 @@ on:
   pull_request:
     branches: ["core"]
 env:
-  enabled_caching: 1
+  enabled_caching: 0
   enabled_caching_cer0: 1
   enabled_caching_clic3: 1
   enabled_caching_interrupt_handler: 1
