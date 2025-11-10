@@ -5,6 +5,13 @@ on:
   pull_request:
     branches: ["core"]
 env:
+  enabled_caching: 1
+  enabled_caching_cer0: 1
+  enabled_caching_clic3: 1
+  enabled_caching_interrupt_handler: 1
+  enabled_caching_math_c: 1
+  enabled_caching_metil: 1
+  enabled_caching_rand: 1
   key_cache_cer0: cache_cer0_0_0_0
   key_cache_clic3: cache_clic3_0_0_0
   key_cache_interrupt_handler: cache_interrupt_handler_0_0_0
@@ -23,36 +30,60 @@ jobs:
           path: c938
       - name: cache_restore_cer0
         id: cache_restore_cer0
+        if: ${{
+          enabled_caching == 1 &&
+          enabled_caching_cer0 == 1
+        }}
         uses: actions/cache/restore@v4
         with:
           path: cer0
           key: ${{ env.key_cache_cer0 }}
       - name: cache_restore_clic3
         id: cache_restore_clic3
+        if: ${{
+          enabled_caching == 1 &&
+          enabled_caching_clic3 == 1
+        }}
         uses: actions/cache/restore@v4
         with:
           path: clic3
           key: ${{ env.key_cache_clic3 }}
       - name: cache_restore_interrupt_handler
         id: cache_restore_interrupt_handler
+        if: ${{
+          enabled_caching == 1 &&
+          enabled_caching_interrupt_handler == 1
+        }}
         uses: actions/cache/restore@v4
         with:
           path: interrupt_handler
           key: ${{ env.key_cache_interrupt_handler }}
       - name: cache_restore_math_c
         id: cache_restore_math_c
+        if: ${{
+          enabled_caching == 1 &&
+          enabled_caching_math_c == 1
+        }}
         uses: actions/cache/restore@v4
         with:
           path: math_c
           key: ${{ env.key_cache_math_c }}
       - name: cache_restore_metil
         id: cache_restore_metil
+        if: ${{
+          enabled_caching == 1 &&
+          enabled_caching_metil == 1
+        }}
         uses: actions/cache/restore@v4
         with:
           path: metil
           key: ${{ env.key_cache_metil }}
       - name: cache_restore_rand
         id: cache_restore_rand
+        if: ${{
+          enabled_caching == 1 &&
+          enabled_caching_rand == 1
+        }}
         uses: actions/cache/restore@v4
         with:
           path: rand
@@ -115,7 +146,11 @@ jobs:
         run: cd c938 && make disable_metal_fast_options=1
       - name: cache_save_cer0
         id: cache_save_cer0
-        if: steps.cache_restore_cer0.outputs.cache-hit != 'true'
+        if: ${{
+          enabled_caching == 1 &&
+          enabled_caching_cer0 == 1 &&
+          steps.cache_restore_cer0.outputs.cache-hit != 'true'
+        }}
         uses: actions/cache/save@v4
         with:
           path: |
@@ -123,7 +158,11 @@ jobs:
           key: ${{ env.key_cache_cer0 }}
       - name: cache_save_clic3
         id: cache_save_clic3
-        if: steps.cache_restore_clic3.outputs.cache-hit != 'true'
+        if: ${{
+          enabled_caching == 1 &&
+          enabled_caching_clic3 == 1 &&
+          steps.cache_restore_clic3.outputs.cache-hit != 'true'
+        }}
         uses: actions/cache/save@v4
         with:
           path: |
@@ -131,7 +170,11 @@ jobs:
           key: ${{ env.key_cache_clic3 }}
       - name: cache_save_interrupt_handler
         id: cache_save_interrupt_handler
-        if: steps.cache_restore_interrupt_handler.outputs.cache-hit != 'true'
+        if: ${{
+          enabled_caching == 1 &&
+          enabled_caching_interrupt_handler == 1 &&
+          steps.cache_restore_interrupt_handler.outputs.cache-hit != 'true'
+        }}
         uses: actions/cache/save@v4
         with:
           path: |
@@ -139,7 +182,11 @@ jobs:
           key: ${{ env.key_cache_interrupt_handler }}
       - name: cache_save_math_c
         id: cache_save_math_c
-        if: steps.cache_restore_math_c.outputs.cache-hit != 'true'
+        if: ${{
+          enabled_caching == 1 &&
+          enabled_caching_math_c == 1 &&
+          steps.cache_restore_math_c.outputs.cache-hit != 'true'
+        }}
         uses: actions/cache/save@v4
         with:
           path: |
@@ -147,7 +194,11 @@ jobs:
           key: ${{ env.key_cache_math_c }}
       - name: cache_save_metil
         id: cache_save_metil
-        if: steps.cache_restore_metil.outputs.cache-hit != 'true'
+        if: ${{
+          enabled_caching == 1 &&
+          enabled_caching_metil == 1 &&
+          steps.cache_restore_metil.outputs.cache-hit != 'true'
+        }}
         uses: actions/cache/save@v4
         with:
           path: |
@@ -155,7 +206,11 @@ jobs:
           key: ${{ env.key_cache_metil }}
       - name: cache_save_rand
         id: cache_save_rand
-        if: steps.cache_restore_rand.outputs.cache-hit != 'true'
+        if: ${{
+          enabled_caching == 1 &&
+          enabled_caching_rand == 1 &&
+          steps.cache_restore_rand.outputs.cache-hit != 'true'
+        }}
         uses: actions/cache/save@v4
         with:
           path: |
