@@ -32,8 +32,8 @@ jobs:
         id: cache_restore_cer0
         if: |
           ${{
-            enabled_caching == 1 &&
-            enabled_caching_cer0 == 1
+            env.enabled_caching == 1 &&
+            env.enabled_caching_cer0 == 1
           }}
         uses: actions/cache/restore@v4
         with:
@@ -43,8 +43,8 @@ jobs:
         id: cache_restore_clic3
         if: |
           ${{
-            enabled_caching == 1 &&
-            enabled_caching_clic3 == 1
+            env.enabled_caching == 1 &&
+            env.enabled_caching_clic3 == 1
           }}
         uses: actions/cache/restore@v4
         with:
@@ -54,8 +54,8 @@ jobs:
         id: cache_restore_interrupt_handler
         if: |
           ${{
-            enabled_caching == 1 &&
-            enabled_caching_interrupt_handler == 1
+            env.enabled_caching == 1 &&
+            env.enabled_caching_interrupt_handler == 1
           }}
         uses: actions/cache/restore@v4
         with:
@@ -65,8 +65,8 @@ jobs:
         id: cache_restore_math_c
         if: |
           ${{
-            enabled_caching == 1 &&
-            enabled_caching_math_c == 1
+            env.enabled_caching == 1 &&
+            env.enabled_caching_math_c == 1
           }}
         uses: actions/cache/restore@v4
         with:
@@ -76,8 +76,8 @@ jobs:
         id: cache_restore_metil
         if: |
           ${{
-            enabled_caching == 1 &&
-            enabled_caching_metil == 1
+            env.enabled_caching == 1 &&
+            env.enabled_caching_metil == 1
           }}
         uses: actions/cache/restore@v4
         with:
@@ -87,8 +87,8 @@ jobs:
         id: cache_restore_rand
         if: |
           ${{
-            enabled_caching == 1 &&
-            enabled_caching_rand == 1
+            env.enabled_caching == 1 &&
+            env.enabled_caching_rand == 1
           }}
         uses: actions/cache/restore@v4
         with:
@@ -154,8 +154,8 @@ jobs:
         id: cache_save_cer0
         if: |
           ${{
-            enabled_caching == 1 &&
-            enabled_caching_cer0 == 1 &&
+            env.enabled_caching == 1 &&
+            env.enabled_caching_cer0 == 1 &&
             steps.cache_restore_cer0.outputs.cache-hit != 'true'
           }}
         uses: actions/cache/save@v4
@@ -166,8 +166,8 @@ jobs:
         id: cache_save_clic3
         if: |
           ${{
-            enabled_caching == 1 &&
-            enabled_caching_clic3 == 1 &&
+            env.enabled_caching == 1 &&
+            env.enabled_caching_clic3 == 1 &&
             steps.cache_restore_clic3.outputs.cache-hit != 'true'
           }}
         uses: actions/cache/save@v4
@@ -178,8 +178,8 @@ jobs:
         id: cache_save_interrupt_handler
         if: |
           ${{
-            enabled_caching == 1 &&
-            enabled_caching_interrupt_handler == 1 &&
+            env.enabled_caching == 1 &&
+            env.enabled_caching_interrupt_handler == 1 &&
             steps.cache_restore_interrupt_handler.outputs.cache-hit != 'true'
           }}
         uses: actions/cache/save@v4
@@ -190,8 +190,8 @@ jobs:
         id: cache_save_math_c
         if: |
           ${{
-            enabled_caching == 1 &&
-            enabled_caching_math_c == 1 &&
+            env.enabled_caching == 1 &&
+            env.enabled_caching_math_c == 1 &&
             steps.cache_restore_math_c.outputs.cache-hit != 'true'
           }}
         uses: actions/cache/save@v4
@@ -202,8 +202,8 @@ jobs:
         id: cache_save_metil
         if: |
           ${{
-            enabled_caching == 1 &&
-            enabled_caching_metil == 1 &&
+            env.enabled_caching == 1 &&
+            env.enabled_caching_metil == 1 &&
             steps.cache_restore_metil.outputs.cache-hit != 'true'
           }}
         uses: actions/cache/save@v4
@@ -214,8 +214,8 @@ jobs:
         id: cache_save_rand
         if: |
           ${{
-            enabled_caching == 1 &&
-            enabled_caching_rand == 1 &&
+            env.enabled_caching == 1 &&
+            env.enabled_caching_rand == 1 &&
             steps.cache_restore_rand.outputs.cache-hit != 'true'
           }}
         uses: actions/cache/save@v4
