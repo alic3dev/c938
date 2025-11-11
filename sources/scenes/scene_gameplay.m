@@ -99,7 +99,8 @@ void scene_gameplay_initialize(
   );
 
   scene->length_textures = 1;
-  scene->textures = malloc(
+  scene->textures = realloc(
+    scene->textures,
     sizeof(id<MTLTexture>) *
     scene->length_textures
   );
