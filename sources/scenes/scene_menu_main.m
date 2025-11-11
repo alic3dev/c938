@@ -59,7 +59,8 @@ void scene_menu_main_initialize(
   );
 
   scene->length_textures = 4;
-  scene->textures = malloc(
+  scene->textures = realloc(
+    scene->textures,
     sizeof(id<MTLTexture>) *
     scene->length_textures
   );
