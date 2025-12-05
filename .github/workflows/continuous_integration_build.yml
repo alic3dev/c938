@@ -18,6 +18,8 @@ env:
   key_cache_math_c: cache_math_c_0_0_0
   key_cache_metil: cache_metil_1_0_0
   key_cache_rand: cache_rand_0_0_0
+  target_device_version_macos: 15.5
+  target_standard_metal: metal3.2
 jobs:
   continuous_integration_build:
     runs-on: macos-latest
@@ -72,38 +74,38 @@ jobs:
           key: ${{ env.key_cache_rand }}
       - name: checkout_cer0
         if: steps.cache_restore_cer0.outputs.cache-hit != 'true'
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: alic3dev/cer0
           path: cer0
       - name: checkout_clic3
         if: steps.cache_restore_clic3.outputs.cache-hit != 'true'
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: alic3dev/clic3
           path: clic3
       - name: checkout_interrupt_handler
         if: steps.cache_restore_interrupt_handler.outputs.cache-hit != 'true'
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: alic3dev/interrupt_handler
           path: interrupt_handler
       - name: checkout_math_c
         if: steps.cache_restore_math_c.outputs.cache-hit != 'true'
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: alic3dev/math_c
           path: math_c
       - name: checkout_metil
         if: steps.cache_restore_metil.outputs.cache-hit != 'true'
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: alic3dev/metil
           ref: metil_1_0_0
           path: metil
       - name: checkout_rand
         if: steps.cache_restore_rand.outputs.cache-hit != 'true'
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: alic3dev/rand
           path: rand
