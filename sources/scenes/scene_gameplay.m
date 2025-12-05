@@ -30,9 +30,11 @@ void scene_gameplay_initialize(
     scene_gameplay_length_renderables_default
   );
 
+  #if !target_os_ios
   metil_audio_io_proc_add(
     scene_gameplay_io_proc
   );
+  #endif
 
   scene->player.poll = player_poll;
   scene->player.poll_input = player_poll_input;
@@ -424,15 +426,18 @@ void scene_gameplay_poll(
 void scene_gameplay_destroy(
   struct metil_scene* scene
 ) {
+  #if !target_os_ios
   metil_audio_io_proc_remove(
     scene_gameplay_io_proc
   );
+  #endif
 
   metil_scene_destroy_default(
     scene
   );
 }
 
+#if !target_os_ios
 OSStatus scene_gameplay_io_proc(
   AudioObjectID id_audio_object,
   const AudioTimeStamp* time_stamp_audio,
@@ -493,3 +498,4 @@ OSStatus scene_gameplay_io_proc(
 
   return 0;
 }
+#endif

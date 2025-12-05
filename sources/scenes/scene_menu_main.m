@@ -21,7 +21,12 @@
 #include <metil_scenes/scene_controller.h>
 #include <metil_text/text.h>
 
+#if !target_os_ios
+#include <AppKit/AppKit.h>
 #include <CoreAudio/CoreAudio.h>
+#else
+#include <UIKit/UIKit.h>
+#endif
 
 const unsigned long int scene_menu_main_time_scene_transition = 333;
 
@@ -29,9 +34,11 @@ void scene_menu_main_initialize(
   struct metil_scene* scene,
   id<MTLDevice> metal_device
 ) {
+  #if !target_os_ios
   metil_audio_io_proc_add(
     scene_menu_main_io_proc
   );
+  #endif
 
   metil_scene_initialize_with_renderables(
     scene,
@@ -366,8 +373,12 @@ void scene_menu_main_poll(
         break;
       case 1:
         metil_debug_log("EXITING\n");
-        
+
+        #if target_os_ios
+        [[UIApplication sharedApplication] terminate: 0];
+        #else
         [[NSApplication sharedApplication] terminate: 0];
+        #endif
         break;
     }
   }
@@ -390,9 +401,11 @@ void scene_menu_main_poll_input(
 void scene_menu_main_destroy(
   struct metil_scene* scene
 ) {
+  #if !target_os_ios
   metil_audio_io_proc_remove(
     scene_menu_main_io_proc
   );
+  #endif
 
   metil_menu_destroy(
     &(
@@ -403,6 +416,7 @@ void scene_menu_main_destroy(
   metil_scene_destroy_default(scene);
 }
 
+#if !target_os_ios
 OSStatus scene_menu_main_io_proc(
   AudioObjectID id_audio_object,
   const AudioTimeStamp* time_stamp_audio,
@@ -461,3 +475,4 @@ OSStatus scene_menu_main_io_proc(
 
   return 0;
 }
+#endif
