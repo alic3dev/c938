@@ -111,24 +111,24 @@ jobs:
           path: rand
       - name: make_clic3
         if: steps.cache_restore_clic3.outputs.cache-hit != 'true'
-        run: cd clic3 && make clic3_dylib
+        run: cd clic3 && make clic3_dylib target_device_version=${{ env.target_device_version_macos }}
       - name: make_cer0
         if: steps.cache_restore_cer0.outputs.cache-hit != 'true'
-        run: cd cer0 && make cer0_dylib
+        run: cd cer0 && make cer0_dylib target_device_version=${{ env.target_device_version_macos }}
       - name: make_interrupt_handler
         if: steps.cache_restore_interrupt_handler.outputs.cache-hit != 'true'
-        run: cd interrupt_handler && make interrupt_handler_dylib
+        run: cd interrupt_handler && make interrupt_handler_dylib target_device_version=${{ env.target_device_version_macos }}
       - name: make_math_c
         if: steps.cache_restore_math_c.outputs.cache-hit != 'true'
-        run: cd math_c && make math_c_dylib
+        run: cd math_c && make math_c_dylib target_device_version=${{ env.target_device_version_macos }}
       - name: make_metil
         if: steps.cache_restore_metil.outputs.cache-hit != 'true'
-        run: cd metil && make metil
+        run: cd metil && make metil target_device_version=${{ env.target_device_version_macos }} target_standard_metal=${{ env.target_standard_metal }}
       - name: make_rand
         if: steps.cache_restore_rand.outputs.cache-hit != 'true'
-        run: cd rand && make rand_dylib
+        run: cd rand && make rand_dylib target_device_version=${{ env.target_device_version_macos }}
       - name: make_c938
-        run: cd c938 && make disable_metal_fast_options=1
+        run: cd c938 && make disable_metal_fast_options=1 target_device_version=${{ env.target_device_version_macos }} target_standard_metal=${{ env.target_standard_metal }}
       - name: cache_save_cer0
         id: cache_save_cer0
         if: ${{ env.enabled_caching == '1' && env.enabled_caching_cer0 == '1' && steps.cache_restore_cer0.outputs.cache-hit != 'true' }}
