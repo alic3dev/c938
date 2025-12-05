@@ -4,7 +4,9 @@
 #include <metil_menus/menu.h>
 #include <metil_scenes/scene.h>
 
+#if !target_os_ios
 #include <CoreAudio/CoreAudio.h>
+#endif
 #include <MetalKit/MetalKit.h>
 
 #define scene_gameplay_length_buildings_default 200
@@ -33,6 +35,7 @@ void scene_gameplay_destroy(
   struct metil_scene*
 );
 
+#if !target_os_ios
 OSStatus scene_gameplay_io_proc(
   AudioObjectID,
   const AudioTimeStamp*,
@@ -42,5 +45,6 @@ OSStatus scene_gameplay_io_proc(
   const AudioTimeStamp*,
   void*
 );
+#endif
 
 #endif

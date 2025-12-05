@@ -5,7 +5,11 @@
 
 int main(
   int,
+  #if target_os_ios
+  char* _Nonnull * _Nonnull
+  #else
   const char* _Nonnull * _Nonnull
+  #endif
 );
 
 void c938_renderer_on_initialize(

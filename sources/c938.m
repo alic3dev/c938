@@ -1,5 +1,6 @@
 #include <c938.h>
 
+#include <application/c938_application_delegate.h>
 #include <pipeline_index.h>
 #include <player.h>
 #include <scenes/scene_id.h>
@@ -18,16 +19,36 @@
 
 int main(
   int length_parameters,
+  #if target_os_ios
+  char** parameters
+  #else
   const char** parameters
+  #endif
 ) {
   metil_player_speed_movement_default = player_speed_movement_default;
 
+  #if target_os_ios
+  metil_initialize(
+    length_parameters,
+    parameters,
+    "c938",
+    c938_renderer_on_initialize
+  );
+
+  return UIApplicationMain(
+    length_parameters,
+    parameters,
+    (void*)0,
+    NSStringFromClass([c938_application_delegate class])
+  );
+  #else
   return metil_initialize(
     length_parameters,
     parameters,
     "c938",
     c938_renderer_on_initialize
   );
+  #endif
 }
 
 void c938_renderer_on_initialize(
