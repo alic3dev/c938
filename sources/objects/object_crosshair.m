@@ -21,6 +21,8 @@ void object_crosshair_initialize(
     &object->mesh
   );
 
+  object->positioning = metil_positioning_static;
+
   object->type_primitive = (
     MTLPrimitiveTypeLine
   );

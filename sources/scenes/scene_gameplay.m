@@ -14,6 +14,7 @@
 #include <metil_debug/log.h>
 #include <metil_object.h>
 #include <metil_paths/paths.h>
+#include <metil_positioning.h>
 #include <metil_rendering/metil_renderer_data_object.h>
 #include <metil_scenes/scene.h>
 
@@ -78,25 +79,8 @@ void scene_gameplay_initialize(
       index_renderable
     ].renderable;
 
-    if (
-      index_renderable != scene->length_renderables - 4
-    ) {
-      object->index_pipeline_render = (
-        c938_pipeline_index_hud_item
-      );
-    }
-  }
 
-  object = (
-    scene->renderables[
-      scene->length_renderables - 4
-    ].renderable
-  );
-
-  object_crosshair_initialize(
-    object,
-    scene->metal_device
-  );
+    object->positioning = metil_positioning_static;
 
   scene->length_textures = 1;
   scene->textures = realloc(
@@ -122,6 +106,8 @@ void scene_gameplay_initialize(
   mesh_player_initialize(
     &object->mesh
   );
+
+  object->positioning = metil_positioning_player;
 
   metil_object_buffers_initialize(
     object,

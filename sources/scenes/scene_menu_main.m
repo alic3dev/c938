@@ -14,6 +14,7 @@
 #include <metil_mesh/mesh_text.h>
 #include <metil_object.h>
 #include <metil_paths/paths.h>
+#include <metil_positioning.h>
 #include <metil_rendering/metil_renderer_data_object.h>
 #include <metil_rendering/metil_renderer_data_menu_item.h>
 #include <metil_scenes/scene.h>
@@ -117,6 +118,8 @@ void scene_menu_main_initialize(
     &metil_text_render_parameters_default
   );
 
+  object->positioning = metil_positioning_static;
+
   metil_object_buffers_initialize_with_data_size(
     object,
     metal_device,
@@ -169,6 +172,8 @@ void scene_menu_main_initialize(
     &metil_text_render_parameters_default
   );
 
+  object->positioning = metil_positioning_static;
+
   metil_object_buffers_initialize(
     object,
     metal_device
@@ -213,6 +218,8 @@ void scene_menu_main_initialize(
     "exit",
     &metil_text_render_parameters_default
   );
+
+  object->positioning = metil_positioning_static;
 
   metil_object_buffers_initialize(
     object,
