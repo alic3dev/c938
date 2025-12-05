@@ -71,16 +71,29 @@ void scene_gameplay_initialize(
   );
 
   for (
-    unsigned char index_renderable = scene->length_renderables - 4;
-    index_renderable < scene->length_renderables;
+    unsigned char index_renderable = 1;
+    index_renderable < 4;
     ++index_renderable
   ) {
     object = scene->renderables[
       index_renderable
     ].renderable;
 
+    mesh_hud_item_initialize(
+      &object->mesh
+    );
+
+    metil_object_buffers_initialize(
+      object,
+      metal_device
+    );
 
     object->positioning = metil_positioning_static;
+
+    object->index_pipeline_render = (
+      c938_pipeline_index_hud_item
+    );
+  }
 
   scene->length_textures = 1;
   scene->textures = realloc(
@@ -129,25 +142,13 @@ void scene_gameplay_initialize(
 
   object = (
     scene->renderables[
-      scene->length_renderables -
       1
     ].renderable
   );
 
-  mesh_hud_item_initialize(
-    &object->mesh  
-  );
-
-  metil_object_buffers_initialize(
-    object,
-    metal_device
-  );
-
   data = object->data.contents;
 
-  data->id = (
-    scene->length_renderables - 1
-  );
+  data->id = 1;
 
   data->noise = 2000;
 
@@ -157,21 +158,12 @@ void scene_gameplay_initialize(
 
   object = (
     scene->renderables[
-      scene->length_renderables - 2
+      2
     ].renderable
   );
 
-  mesh_hud_item_initialize(
-    &object->mesh  
-  );
-
-  metil_object_buffers_initialize(
-    object,
-    metal_device
-  );
-
   data = object->data.contents;
-  data->id = scene->length_renderables - 2;
+  data->id = 2;
 
   data->noise = 1.0f;
 
@@ -181,31 +173,30 @@ void scene_gameplay_initialize(
 
   object = (
     scene->renderables[
-      scene->length_renderables - 3
+      3
     ].renderable
-  );
-
-  mesh_hud_item_initialize(
-    &object->mesh
-  );
-
-  metil_object_buffers_initialize(
-    object,
-    metal_device
   );
 
   data = object->data.contents;
 
-  data->id = (
-    scene->length_renderables -
-    3
-  );
+  data->id = 3;
 
   data->noise = 2000;
 
   object->position.x = -0.9f;
   object->position.y = -0.7f;
   object->position.z = 0.0f;
+
+  object = (
+    scene->renderables[
+      4
+    ].renderable
+  );
+
+  object_crosshair_initialize(
+    object,
+    scene->metal_device
+  );
 
   scene_gameplay_populate(
     scene,
@@ -235,14 +226,14 @@ void scene_gameplay_populate(
     player_data
   );
 
-  unsigned short int iterator_id = 1;
+  unsigned short int iterator_id = 5;
 
   if (
-    scene->renderables[1].renderable != (void*)0
+    scene->renderables[5].renderable != (void*)0
   ) {
     for (
-      unsigned short int index_renderable = 1;
-      index_renderable < scene->length_renderables - 4;
+      unsigned short int index_renderable = 5;
+      index_renderable < scene->length_renderables;
       ++index_renderable
     ) {
       metil_object_destroy(
@@ -272,38 +263,6 @@ void scene_gameplay_populate(
       );
     }
 
-    struct metil_object* objects[4];
-
-    for (
-      unsigned char index_renderable = 0;
-      index_renderable < 4;
-      ++index_renderable
-    ) {
-      objects[
-        index_renderable
-      ] = scene->renderables[
-        scene->length_renderables -
-        index_renderable -
-        1
-      ].renderable;
-    }
-
-    for (
-      unsigned char index_renderable = 0;
-      index_renderable < 4;
-      ++index_renderable
-    ) {
-      scene->renderables[
-        length_renderables -
-        index_renderable -
-        1
-      ].renderable = (
-        objects[
-          index_renderable
-        ]
-      );
-    }
-
     if (
       scene->length_renderables > length_renderables
     ) {
@@ -319,15 +278,15 @@ void scene_gameplay_populate(
 
   generate_buildings(
     scene->metal_device,
-    scene->renderables + 1,
-    scene->length_renderables - 5,
+    scene->renderables + 5,
+    scene->length_renderables,
     scene->textures[0],
-    1
+    5
   );
 
   struct metil_object* object = (
     scene->renderables[
-      2
+      6
     ].renderable
   );
 
@@ -351,7 +310,7 @@ void scene_gameplay_populate(
   );
 
   player_data->renderables = (
-    scene->renderables + 2
+    scene->renderables + 6
   );
 }
 
@@ -408,7 +367,6 @@ void scene_gameplay_poll(
 
   object = (
     scene->renderables[
-      scene->length_renderables -
       1
     ].renderable
   );
@@ -436,7 +394,6 @@ void scene_gameplay_poll(
 
   object = (
     scene->renderables[
-      scene->length_renderables -
       2
     ].renderable
   );
@@ -451,7 +408,6 @@ void scene_gameplay_poll(
 
   object = (
     scene->renderables[
-      scene->length_renderables -
       3
     ].renderable
   );
