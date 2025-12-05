@@ -18,6 +18,8 @@ env:
   key_cache_math_c: cache_math_c_0_0_0
   key_cache_metil: cache_metil_1_0_0
   key_cache_rand: cache_rand_0_0_0
+  target_device_version_macos: 15.5
+  target_standard_metal: metal3.2
 jobs:
   continuous_integration_build:
     runs-on: macos-latest
@@ -72,61 +74,61 @@ jobs:
           key: ${{ env.key_cache_rand }}
       - name: checkout_cer0
         if: steps.cache_restore_cer0.outputs.cache-hit != 'true'
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: alic3dev/cer0
           path: cer0
       - name: checkout_clic3
         if: steps.cache_restore_clic3.outputs.cache-hit != 'true'
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: alic3dev/clic3
           path: clic3
       - name: checkout_interrupt_handler
         if: steps.cache_restore_interrupt_handler.outputs.cache-hit != 'true'
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: alic3dev/interrupt_handler
           path: interrupt_handler
       - name: checkout_math_c
         if: steps.cache_restore_math_c.outputs.cache-hit != 'true'
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: alic3dev/math_c
           path: math_c
       - name: checkout_metil
         if: steps.cache_restore_metil.outputs.cache-hit != 'true'
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: alic3dev/metil
           ref: metil_1_0_0
           path: metil
       - name: checkout_rand
         if: steps.cache_restore_rand.outputs.cache-hit != 'true'
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: alic3dev/rand
           path: rand
       - name: make_clic3
         if: steps.cache_restore_clic3.outputs.cache-hit != 'true'
-        run: cd clic3 && make clic3_dylib
+        run: cd clic3 && make clic3_dylib target_device_version=${{ env.target_device_version_macos }}
       - name: make_cer0
         if: steps.cache_restore_cer0.outputs.cache-hit != 'true'
-        run: cd cer0 && make cer0_dylib
+        run: cd cer0 && make cer0_dylib target_device_version=${{ env.target_device_version_macos }}
       - name: make_interrupt_handler
         if: steps.cache_restore_interrupt_handler.outputs.cache-hit != 'true'
-        run: cd interrupt_handler && make interrupt_handler_dylib
+        run: cd interrupt_handler && make interrupt_handler_dylib target_device_version=${{ env.target_device_version_macos }}
       - name: make_math_c
         if: steps.cache_restore_math_c.outputs.cache-hit != 'true'
-        run: cd math_c && make math_c_dylib
+        run: cd math_c && make math_c_dylib target_device_version=${{ env.target_device_version_macos }}
       - name: make_metil
         if: steps.cache_restore_metil.outputs.cache-hit != 'true'
-        run: cd metil && make metil
+        run: cd metil && make metil target_device_version=${{ env.target_device_version_macos }} target_standard_metal=${{ env.target_standard_metal }}
       - name: make_rand
         if: steps.cache_restore_rand.outputs.cache-hit != 'true'
-        run: cd rand && make rand_dylib
+        run: cd rand && make rand_dylib target_device_version=${{ env.target_device_version_macos }}
       - name: make_c938
-        run: cd c938 && make disable_metal_fast_options=1
+        run: cd c938 && make disable_metal_fast_options=1 target_device_version=${{ env.target_device_version_macos }} target_standard_metal=${{ env.target_standard_metal }}
       - name: cache_save_cer0
         id: cache_save_cer0
         if: ${{ env.enabled_caching == '1' && env.enabled_caching_cer0 == '1' && steps.cache_restore_cer0.outputs.cache-hit != 'true' }}

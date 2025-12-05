@@ -28,8 +28,6 @@ void mesh_player_initialize(
     (mesh->length_vertices - 1) * 3
   );
 
-  mesh->positioning = metil_mesh_positioning_player;
-
   mesh->indices = realloc(
     mesh->indices,
     sizeof(unsigned int) *
