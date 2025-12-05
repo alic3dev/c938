@@ -258,7 +258,7 @@ void scene_gameplay_populate(
     ) {
       scene->renderables = realloc(
         scene->renderables,
-        sizeof(struct metil_object*) *
+        sizeof(struct metil_renderable*) *
         length_renderables
       );
     }
@@ -268,7 +268,7 @@ void scene_gameplay_populate(
     ) {
       scene->renderables = realloc(
         scene->renderables,
-        sizeof(struct metil_object*) *
+        sizeof(struct metil_renderable*) *
         length_renderables
       );
     }
