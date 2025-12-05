@@ -201,8 +201,8 @@ void generate_buildings(
     if (
       index_renderable == 2
     ) {
-      data->color.x = 1.0f;
-      data->color.y = 1.0f;
+      data->color.x = 0.0f;
+      data->color.y = 0.0f;
       data->color.z = 1.0f;
       data->color.w = 1.0f;
     } else {
