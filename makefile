@@ -51,8 +51,12 @@ endif
 endif
 
 directory_metal=metal
-directory_metalar=metalar
-directory_air=air
+
+directory_air_base=air
+directory_metalar_base=metalar
+
+directory_air=${directory_air_base}/${target_os}
+directory_metalar=${directory_metalar_base}/${target_os}
 
 ifeq (${target_os},macos)
 directory_app=${directory_output}/${name}.app
@@ -411,15 +415,18 @@ ${prefix_content_texture_always}/%:
 
 clean_all: clean
 
-clean: clean_air clean_objects clean_output
+clean: clean_air clean_metalar clean_objects clean_output
 
 clean_air:
-	-rm -r ${directory_air}
+	-rm -r ${directory_air} 2> /dev/null
+
+clean_metalar:
+	-rm -r ${directory_metalar_base} 2> /dev/null
 
 clean_objects:
-	-rm -r ${directory_objects_base}
+	-rm -r ${directory_objects_base} 2> /dev/null
 
 clean_output:
-	-rm -r ${directory_output_base}
+	-rm -r ${directory_output_base} 2> /dev/null
 
 .always:
