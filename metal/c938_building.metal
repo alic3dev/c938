@@ -73,30 +73,6 @@ struct data_vertex {
   return data_vertex;
 }
 
-
-#if target_os_ios
-[[fragment]] float4 c938_building_fragment(
-  data_vertex data_vertex [[stage_in]]
-) {
-  float brightness = (
-    data_vertex.brightness * 
-    metal::fmin(
-      metal::fmax(
-        1.0f - (data_vertex.distance / 1000.0f),
-        0.5f
-      ),
-      1.0f
-    )
-  );
-
-  return float4(
-    data_vertex.color.r * brightness,
-    data_vertex.color.g * brightness,
-    data_vertex.color.b * brightness,
-    data_vertex.color.a
-  );
-}
-#else
 [[fragment]] float4 c938_building_fragment(
   data_vertex data_vertex [[stage_in]],
   metal::texture2d<half> texture [[texture(0)]]
@@ -130,4 +106,3 @@ struct data_vertex {
     color_texture[3] * data_vertex.color.a
   );
 }
-#endif

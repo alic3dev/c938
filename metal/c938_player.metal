@@ -57,18 +57,6 @@ struct data_vertex {
   return data_vertex;
 }
 
-#if target_os_ios
-[[fragment]] float4 c938_player_fragment(
-  data_vertex data_vertex [[stage_in]]
-) {
-  return float4(
-    data_vertex.brightness * 0.7f + 0.15f,
-    data_vertex.brightness * 0.5f,
-    data_vertex.brightness * 0.7f + 0.3f,
-    1.0f
-  );
-}
-#else
 [[fragment]] float4 c938_player_fragment(
   data_vertex data_vertex [[stage_in]],
   metal::texture2d<half> texture [[texture(0)]]
@@ -92,4 +80,3 @@ struct data_vertex {
     color_texture[3]
   );
 }
-#endif
