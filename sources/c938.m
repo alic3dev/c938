@@ -25,6 +25,9 @@ int main(
   const char** parameters
   #endif
 ) {
+  metil_configuration_default_rendering_properties_brightness = 0.05f;
+  metil_configuration_default_rendering_properties_brightness_text = 0.5f;
+
   metil_player_speed_movement_default = player_speed_movement_default;
 
   #if target_os_ios
