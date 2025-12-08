@@ -10,8 +10,7 @@ void generate_buildings(
   id<MTLDevice>,
   struct metil_renderable*,
   unsigned short int,
-  id<MTLTexture>,
-  unsigned short int
+  id<MTLTexture>
 );
 
 #endif

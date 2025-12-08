@@ -21,8 +21,7 @@ void generate_buildings(
   id<MTLDevice> metal_device,
   struct metil_renderable* renderables,
   unsigned short int length_renderables,
-  id<MTLTexture> texture,
-  unsigned short int offset_id
+  id<MTLTexture> texture
 ) {
   signed int size = 2500;
 
@@ -76,12 +75,9 @@ void generate_buildings(
     texture
   );
 
-  unsigned short int iterator_id = offset_id;
-
   struct metil_renderer_data_object* data = (
     object->data.contents
   );
-  data->id = iterator_id++;
 
   struct rand_parameters rand_parameters;
   struct rand_source rand_source;
@@ -196,7 +192,6 @@ void generate_buildings(
     );
 
     data = object->data.contents;
-    data->id = iterator_id++;
 
     if (
       index_renderable == 2

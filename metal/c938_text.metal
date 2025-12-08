@@ -37,7 +37,7 @@ struct data_vertex {
 
   data_vertex.brightness = (
     data_object->noise == 1
-    ? data_frame->brightness_text / 4.0f
+    ? data_frame->brightness_text * 0.01f
     : data_frame->brightness_text
   );
 
