@@ -16,17 +16,18 @@
 #include <metil_paths/paths.h>
 #include <metil_positioning.h>
 #include <metil_rendering/metil_renderer_data_object.h>
+#include <metil_rendering/metil_renderer_interface.h>
 #include <metil_scenes/scene.h>
 
 #include <stdlib.h>
 
 void scene_gameplay_initialize(
   struct metil_scene* scene,
-  id<MTLDevice> metal_device
+  struct metil_renderer_interface* renderer_interface
 ) {
   metil_scene_initialize_with_renderables(
     scene,
-    metal_device,
+    renderer_interface,
     scene_gameplay_length_renderables_default
   );
 
@@ -87,7 +88,7 @@ void scene_gameplay_initialize(
 
     metil_object_buffers_initialize(
       object,
-      metal_device
+      scene->renderer_interface->metal_device
     );
 
     object->positioning = metil_positioning_static;
@@ -106,7 +107,7 @@ void scene_gameplay_initialize(
 
   MTKTextureLoader* texture_loader = [
     [MTKTextureLoader alloc]
-    initWithDevice: metal_device
+    initWithDevice: scene->renderer_interface->metal_device
   ];
 
   textures_buildings_load(
@@ -126,7 +127,7 @@ void scene_gameplay_initialize(
 
   metil_object_buffers_initialize(
     object,
-    scene->metal_device
+    scene->renderer_interface->metal_device
   );
 
   metil_object_texture_add(
@@ -140,8 +141,6 @@ void scene_gameplay_initialize(
     object->data.contents
   );
 
-  data->id = 0;
-
   object = (
     scene->renderables[
       1
@@ -149,8 +148,6 @@ void scene_gameplay_initialize(
   );
 
   data = object->data.contents;
-
-  data->id = 1;
 
   data->noise = 2000;
 
@@ -165,7 +162,6 @@ void scene_gameplay_initialize(
   );
 
   data = object->data.contents;
-  data->id = 2;
 
   data->noise = 1.0f;
 
@@ -181,8 +177,6 @@ void scene_gameplay_initialize(
 
   data = object->data.contents;
 
-  data->id = 3;
-
   data->noise = 2000;
 
   object->position.x = -0.9f;
@@ -197,7 +191,7 @@ void scene_gameplay_initialize(
 
   object_crosshair_initialize(
     object,
-    scene->metal_device
+    scene->renderer_interface->metal_device
   );
 
   scene_gameplay_populate(
@@ -279,11 +273,10 @@ void scene_gameplay_populate(
   }
 
   generate_buildings(
-    scene->metal_device,
+    scene->renderer_interface->metal_device,
     scene->renderables + 5,
     scene->length_renderables,
-    scene->textures[0],
-    5
+    scene->textures[0]
   );
 
   struct metil_object* object = (

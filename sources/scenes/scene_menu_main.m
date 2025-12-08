@@ -16,7 +16,7 @@
 #include <metil_paths/paths.h>
 #include <metil_positioning.h>
 #include <metil_rendering/metil_renderer_data_object.h>
-#include <metil_rendering/metil_renderer_data_menu_item.h>
+#include <metil_rendering/metil_renderer_interface.h>
 #include <metil_scenes/scene.h>
 #include <metil_scenes/scene_controller.h>
 #include <metil_text/text.h>
@@ -32,7 +32,7 @@ const unsigned long int scene_menu_main_time_scene_transition = 333;
 
 void scene_menu_main_initialize(
   struct metil_scene* scene,
-  id<MTLDevice> metal_device
+  struct metil_renderer_interface* renderer_interface
 ) {
   #if !target_os_ios
   metil_audio_io_proc_add(
@@ -42,7 +42,7 @@ void scene_menu_main_initialize(
 
   metil_scene_initialize_with_renderables(
     scene,
-    metal_device,
+    renderer_interface,
     103
   );
 
@@ -75,7 +75,7 @@ void scene_menu_main_initialize(
 
   MTKTextureLoader* texture_loader = [
     [MTKTextureLoader alloc]
-    initWithDevice: metal_device
+    initWithDevice: scene->renderer_interface->metal_device
   ];
 
   textures_buildings_load(
@@ -88,11 +88,10 @@ void scene_menu_main_initialize(
   unsigned short int iterator_id = 0;
 
   generate_buildings(
-    scene->metal_device,
+    scene->renderer_interface->metal_device,
     scene->renderables,
     scene->length_renderables - 3,
-    scene->textures[3],
-    iterator_id
+    scene->textures[3]
   );
 
   iterator_id = (
@@ -119,7 +118,7 @@ void scene_menu_main_initialize(
   scene->textures[
     textures_scene_menu_main_title
   ] = metil_text_mesh_with_texture_initialize(
-    metal_device,
+    scene->renderer_interface->metal_device,
     &object->mesh,
     "c938",
     &metil_text_render_parameters_default
@@ -127,10 +126,9 @@ void scene_menu_main_initialize(
 
   object->positioning = metil_positioning_static;
 
-  metil_object_buffers_initialize_with_data_size(
+  metil_object_buffers_initialize(
     object,
-    metal_device,
-    sizeof(struct metil_renderer_data_menu_item)
+    scene->renderer_interface->metal_device
   );
 
   object->position.y = (
@@ -147,16 +145,13 @@ void scene_menu_main_initialize(
     ]
   );
 
-  struct metil_renderer_data_object* data_object = (
+  struct metil_renderer_data_menu_item* data_object = (
     object->data.contents
   );
-  
-  data_object->id = iterator_id++;
-  data_object->noise = 0;
 
   metil_renderable_initialize_at_index(
     scene->renderables,
-    iterator_id,
+    ++iterator_id,
     metil_renderable_type_object
   );
 
@@ -173,7 +168,7 @@ void scene_menu_main_initialize(
   scene->textures[
     textures_scene_menu_main_menu_enter
   ] = metil_text_mesh_with_texture_initialize(
-    metal_device,
+    scene->renderer_interface->metal_device,
     &object->mesh,
     "enter",
     &metil_text_render_parameters_default
@@ -183,7 +178,7 @@ void scene_menu_main_initialize(
 
   metil_object_buffers_initialize(
     object,
-    metal_device
+    scene->renderer_interface->metal_device
   );
 
   object->position.y = (
@@ -199,11 +194,10 @@ void scene_menu_main_initialize(
   );
 
   data_object = object->data.contents;
-  data_object->id = iterator_id++;
 
   metil_renderable_initialize_at_index(
     scene->renderables,
-    iterator_id,
+    ++iterator_id,
     metil_renderable_type_object
   );
 
@@ -220,7 +214,7 @@ void scene_menu_main_initialize(
   scene->textures[
     textures_scene_menu_main_menu_exit
   ] = metil_text_mesh_with_texture_initialize(
-    metal_device,
+    scene->renderer_interface->metal_device,
     &object->mesh,
     "exit",
     &metil_text_render_parameters_default
@@ -230,7 +224,7 @@ void scene_menu_main_initialize(
 
   metil_object_buffers_initialize(
     object,
-    metal_device
+    scene->renderer_interface->metal_device
   );
 
   object->position.y = (
@@ -246,8 +240,6 @@ void scene_menu_main_initialize(
       textures_scene_menu_main_menu_exit
     ]
   );
-
-  data_object->id = iterator_id++;
 
   scene->player.position.y = (
     1600.0f
@@ -297,37 +289,37 @@ void scene_menu_main_poll(
 
   switch (menu->index_current) {
     case 0: {
-      struct metil_renderer_data_menu_item* data_object = (
+      struct metil_renderer_data_object* data_object = (
         (
           (struct metil_object*) scene->renderables[
             scene->length_renderables - 2
           ].renderable
         )->data.contents
       );
-      data_object->selected = 1;
+      data_object->noise = 1;
 
       data_object = (
         (struct metil_object*) scene->renderables[
           scene->length_renderables - 1
         ].renderable
       )->data.contents;
-      data_object->selected = 0;
+      data_object->noise = 0;
       break;
     }
     case 1: {
-      struct metil_renderer_data_menu_item* data_object = (
+      struct metil_renderer_data_object* data_object = (
         ((struct metil_object*) scene->renderables[
           scene->length_renderables - 1
         ].renderable)->data.contents
       );
-      data_object->selected = 1;
+      data_object->noise = 1;
 
       data_object = (
         (struct metil_object*) scene->renderables[
           scene->length_renderables - 2
         ].renderable
       )->data.contents;
-      data_object->selected = 0;
+      data_object->noise = 0;
       break;
     }
   }

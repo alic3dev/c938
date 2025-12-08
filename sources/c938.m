@@ -152,7 +152,7 @@ void c938_renderer_on_initialize(
 
   scene_menu_main_initialize(
     &metil_scene_controller.scene,
-    metil_renderer_interface->metal_device
+    metil_renderer_interface
   );
 
   metil_scene_controller_on_scene_change_add(
@@ -166,7 +166,7 @@ void c938_on_scene_change(
   void* data
 ) {
   struct metil_renderer_interface* metil_renderer_interface = (
-    (struct metil_renderer_interface*) data
+    data
   );
 
   metil_scene_destroy(
@@ -180,13 +180,13 @@ void c938_on_scene_change(
     case scene_id_menu_main:
       scene_menu_main_initialize(
         &metil_scene_controller.scene,
-        metil_renderer_interface->metal_device
+        metil_renderer_interface
       );
       break;
     case scene_id_gameplay:
       scene_gameplay_initialize(
         &metil_scene_controller.scene,
-        metil_renderer_interface->metal_device
+        metil_renderer_interface
       );
       break;
   }
