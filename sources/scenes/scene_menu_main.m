@@ -277,17 +277,17 @@ void scene_menu_main_poll(
     )
   );
 
-  scene->player.position.x = cos(
+  scene->player.position.x = -cos(
     data->angle
   ) * 1500.0f;
   
-  scene->player.position.z = sin(
+  scene->player.position.z = -sin(
     data->angle
   ) * 1500.0f;
 
   scene->player.rotation.y = ((
       data->angle *
-      -1.0f
+      1.0f
     ) - (
       M_PI / 2.0f
     )

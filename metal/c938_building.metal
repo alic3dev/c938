@@ -64,10 +64,22 @@ struct data_vertex {
     data_object->color.w
   );
 
-  data_vertex.distance = (
-    metal::fabs((data_object->position.x + positions[id_vertex].x) - data_frame->position_player.x) + 
-    metal::fabs((data_object->position.y + positions[id_vertex].y) - data_frame->position_player.y) + 
-    metal::fabs((data_object->position.z + positions[id_vertex].z) - data_frame->position_player.z)
+  data_vertex.distance = metal::distance(
+    metal::float4(
+      metal::float4(
+        data_object->position.x,
+        data_object->position.y,
+        data_object->position.z,
+        1.0f
+      ) +
+      positions[id_vertex]
+    ),
+    metal::float4(
+      data_frame->position_player.x,
+      data_frame->position_player.y,
+      data_frame->position_player.z,
+      1.0f
+    )
   );
 
   return data_vertex;
