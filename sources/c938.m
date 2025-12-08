@@ -65,15 +65,15 @@ void c938_renderer_on_initialize(
   );
 
   metil_renderer_interface->rendering_properties->color_clear.x = (
-    0.0724f * metil_configuration.rendering_properties.brightness
+    0.8724f * metil_configuration.rendering_properties.brightness
   );
   
   metil_renderer_interface->rendering_properties->color_clear.y = (
-    0.0824f * metil_configuration.rendering_properties.brightness
+    0.8824f * metil_configuration.rendering_properties.brightness
   );
 
   metil_renderer_interface->rendering_properties->color_clear.z = (
-    0.1049f * metil_configuration.rendering_properties.brightness
+    0.9049f * metil_configuration.rendering_properties.brightness
   );
 
   metil_renderer_interface->rendering_properties->color_clear.w = 1.0f;
