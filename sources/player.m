@@ -155,7 +155,7 @@ void player_poll_input(
     metil_input_cursor.locked == 1
   ) {
     player->rotation.y = (
-      player->rotation.y + (
+      player->rotation.y - (
         metil_input_cursor.delta.x / 50.0f *
         player->speed_rotation
       )
@@ -178,7 +178,7 @@ void player_poll_input(
       metil_controller_state.right_stick.x <= -0.1f
     ) {
       player->rotation.y = (
-        player->rotation.y + (
+        player->rotation.y - (
           metil_controller_state.right_stick.x *
           player->speed_rotation
         )
@@ -213,7 +213,12 @@ void player_poll_input(
     (M_PI * 2.0f)
   );
   
-  float ratio_axis = player->rotation.y / (M_PI * 2.0f);
+  float ratio_axis = -(
+    player->rotation.y / (
+      M_PI *
+      2.0f
+    )
+  );
 
   if (
     ratio_axis >= 0.0f &&
