@@ -251,11 +251,6 @@ else
 	c_flags_output:=${c_flags_output} -O3
 endif
 
-ifeq (${target_device},mac)
-c_flags_c:=${c_flags_c}
-c_flags_objc:=${c_flags_objc}
-endif
-
 ifeq (${target_device},iphone)
 c_flags_c:=${c_flags_c} -Dtarget_os_ios
 c_flags_objc:=${c_flags_objc} -Dtarget_os_ios
