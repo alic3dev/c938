@@ -41,7 +41,7 @@ rendering_properties:fps_display->{1};
 
 ### prerequisites
 
-- [`alic3`](https://github.com/alic3dev):libraries
+- [`alic3dev`](https://github.com/alic3dev)
 - - [`cer0`](https://github.com/alic3dev/cer0)
 - - [`clic3`](https://github.com/alic3dev/clic3)
 - - [`interrupt_handler`](https://github.com/alic3dev/interrupt_handler)
@@ -68,10 +68,16 @@ make
 
 #### options
 
-- `release=1`:uses_static_libraries_instead_of_dylibs
+- `codesigning_id`:which_identity_to_use_for_codesigning
 - `debug=1`:adds->{`debugging_symbols`}:disables->{`optimizations`};
+- `device_identifier`:which_device_to_install_to_or_run_on
 - `disable_metal_fast_options=1`:disables->{`metal`::`fast_modes `};
-- `target_macos_version`:sets_the_target_version.for->{`macos`|`metal`};
+- `provisioning_profile_identifier`:which_provisioning_profile_identifier_to_use_for_signing_entitlements
+- `release=1`:uses_static_libraries_instead_of_dylibs
+- `target_device`:sets_the_target_device_platform->{values::[`mac`|`iphone`]}
+- `target_device_version`:sets_the_target_version.for->{`macos`|`metal`};
+- `target_metal_standard`:sets_the_target_metal_standard::(will_use->{`metal4.0`}_if_not_set)
+- `target_metal_version`:sets_the_target_metal_version::(will_use->{`target_device_version`}_if_not_set)
 
 ```zsh
 parameter=value make
