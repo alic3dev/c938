@@ -418,7 +418,7 @@ clean_all: clean
 clean: clean_air clean_metalar clean_objects clean_output
 
 clean_air:
-	-rm -r ${directory_air} 2> /dev/null
+	-rm -r ${directory_air_base} 2> /dev/null
 
 clean_metalar:
 	-rm -r ${directory_metalar_base} 2> /dev/null
