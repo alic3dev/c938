@@ -252,13 +252,13 @@ else
 endif
 
 ifeq (${target_device},mac)
-c_flags_c:=${c_flags_c} -DTARGET_MACOS
-c_flags_objc:=${c_flags_objc} -DTARGET_MACOS
+c_flags_c:=${c_flags_c}
+c_flags_objc:=${c_flags_objc}
 endif
 
 ifeq (${target_device},iphone)
-c_flags_c:=${c_flags_c} -DTARGET_IOS -Dtarget_device=1 -Dtarget_os_ios -Dcer0_audio_disabled
-c_flags_objc:=${c_flags_objc} -DTARGET_IOS -Dtarget_device=1 -Dtarget_os_ios -Dcer0_audio_disabled
+c_flags_c:=${c_flags_c} -Dtarget_os_ios
+c_flags_objc:=${c_flags_objc} -Dtarget_os_ios
 endif
 
 strip=strip
