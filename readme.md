@@ -1,7 +1,9 @@
 # c938
 
-<img width="1966" height="1250" alt="menu" src="https://github.com/user-attachments/assets/6b421c0b-a92c-454e-bb34-d4ae54464169" />
-<img width="1966" height="1250" alt="gameplay" src="https://github.com/user-attachments/assets/29cf2462-5946-4613-8e99-76fc64576f98" />
+<img width="491" height="312" alt="c938_menu_1" src="https://github.com/user-attachments/assets/65df6b6e-6140-4ff0-946c-980eacebe654" />
+<img width="491" height="312" alt="c938_1" src="https://github.com/user-attachments/assets/b0502778-2dc4-4559-af8a-72c0fa4f62db" />
+<img width="491" height="312" alt="c938_2" src="https://github.com/user-attachments/assets/b0c14e6e-9b54-41e9-9c3e-c48a8444bb3c" />
+<img width="491" height="312" alt="c938_menu_2" src="https://github.com/user-attachments/assets/996cb52e-f338-43cb-bdab-05f786e6b75e" />
 
 ## requirements
 
@@ -41,7 +43,7 @@ rendering_properties:fps_display->{1};
 
 ### prerequisites
 
-- [`alic3`](https://github.com/alic3dev):libraries
+- [`alic3dev`](https://github.com/alic3dev)
 - - [`cer0`](https://github.com/alic3dev/cer0)
 - - [`clic3`](https://github.com/alic3dev/clic3)
 - - [`interrupt_handler`](https://github.com/alic3dev/interrupt_handler)
@@ -68,10 +70,16 @@ make
 
 #### options
 
-- `release=1`:uses_static_libraries_instead_of_dylibs
+- `codesigning_id`:which_identity_to_use_for_codesigning
 - `debug=1`:adds->{`debugging_symbols`}:disables->{`optimizations`};
+- `device_identifier`:which_device_to_install_to_or_run_on
 - `disable_metal_fast_options=1`:disables->{`metal`::`fast_modes `};
-- `target_macos_version`:sets_the_target_version.for->{`macos`|`metal`};
+- `provisioning_profile_identifier`:which_provisioning_profile_identifier_to_use_for_signing_entitlements
+- `release=1`:uses_static_libraries_instead_of_dylibs
+- `target_device`:sets_the_target_device_platform->{values::[`mac`|`iphone`]}
+- `target_device_version`:sets_the_target_version.for->{`macos`|`metal`};
+- `target_metal_standard`:sets_the_target_metal_standard::(will_use->{`metal4.0`}_if_not_set)
+- `target_metal_version`:sets_the_target_metal_version::(will_use->{`target_device_version`}_if_not_set)
 
 ```zsh
 parameter=value make

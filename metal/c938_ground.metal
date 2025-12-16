@@ -36,24 +36,11 @@ struct data_vertex {
     positions[id_vertex]
   );
 
-  data_vertex.position_texture.x = (
-    id_vertex == 4 ||
-    id_vertex == 6 ||
-
-    id_vertex == 0 ||
-    id_vertex == 1
-  ) ? 0 : 1;
-
-  data_vertex.position_texture.y = (
-    id_vertex == 6 ||
-    id_vertex == 7 ||
-
-    id_vertex == 1 ||
-    id_vertex == 3
-  ) ? 0 : 1;
+  data_vertex.position_texture.x = positions[id_vertex].z;
+  data_vertex.position_texture.y = positions[id_vertex].x;
 
   data_vertex.brightness = (
-    data_frame->brightness
+    data_frame->brightness * 0.5f
   );
 
   data_vertex.distance = (
@@ -68,25 +55,22 @@ struct data_vertex {
   metal::texture2d<half> texture [[texture(0)]]
 ) {
   constexpr metal::sampler sampler_texture(
-    metal::filter::linear,
-    metal::mip_filter::linear
+    metal::t_address::repeat,
+    metal::r_address::repeat,
+    metal::s_address::repeat
   );
 
   float4 color_texture = float4(
     texture.sample(
       sampler_texture,
-      data_vertex.position_texture
+      data_vertex.position_texture / 1000.0f
     )
   );
 
-  float brightness = (
-    data_vertex.brightness * 0.125f
-  );
-
   return float4(
-    color_texture[0] * brightness,
-    color_texture[1] * brightness,
-    color_texture[2] * brightness,
+    color_texture[0] * data_vertex.brightness,
+    color_texture[1] * data_vertex.brightness,
+    color_texture[2] * data_vertex.brightness,
     color_texture[3]
   );
 }

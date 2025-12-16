@@ -6,6 +6,10 @@
 #include <scenes/scene_menu_main.h>
 #include <scenes/scene_gameplay.h>
 
+#if target_os_ios
+#include <metil_application/metil_application.h>
+#include <metil_application/metil_application_delegate.h>
+#endif
 #include <metil_configuration/configuration.h>
 #include <metil_initialize.h>
 #include <metil_library.h>
@@ -18,16 +22,39 @@
 
 int main(
   int length_parameters,
+  #if target_os_ios
+  char** parameters
+  #else
   const char** parameters
+  #endif
 ) {
+  metil_configuration_default_rendering_properties_brightness = 1.0f;
+  metil_configuration_default_rendering_properties_brightness_text = 1.0f;
+
   metil_player_speed_movement_default = player_speed_movement_default;
 
+  #if target_os_ios
+  metil_initialize(
+    length_parameters,
+    parameters,
+    "c938",
+    c938_renderer_on_initialize
+  );
+
+  return UIApplicationMain(
+    length_parameters,
+    parameters,
+    NSStringFromClass([metil_application class]),
+    NSStringFromClass([metil_application_delegate class])
+  );
+  #else
   return metil_initialize(
     length_parameters,
     parameters,
     "c938",
     c938_renderer_on_initialize
   );
+  #endif
 }
 
 void c938_renderer_on_initialize(
@@ -41,15 +68,15 @@ void c938_renderer_on_initialize(
   );
 
   metil_renderer_interface->rendering_properties->color_clear.x = (
-    0.0724f * metil_configuration.rendering_properties.brightness
+    0.8724f * metil_configuration.rendering_properties.brightness
   );
   
   metil_renderer_interface->rendering_properties->color_clear.y = (
-    0.0824f * metil_configuration.rendering_properties.brightness
+    0.8824f * metil_configuration.rendering_properties.brightness
   );
 
   metil_renderer_interface->rendering_properties->color_clear.z = (
-    0.1049f * metil_configuration.rendering_properties.brightness
+    0.9049f * metil_configuration.rendering_properties.brightness
   );
 
   metil_renderer_interface->rendering_properties->color_clear.w = 1.0f;
@@ -128,7 +155,7 @@ void c938_renderer_on_initialize(
 
   scene_menu_main_initialize(
     &metil_scene_controller.scene,
-    metil_renderer_interface->metal_device
+    metil_renderer_interface
   );
 
   metil_scene_controller_on_scene_change_add(
@@ -142,7 +169,7 @@ void c938_on_scene_change(
   void* data
 ) {
   struct metil_renderer_interface* metil_renderer_interface = (
-    (struct metil_renderer_interface*) data
+    data
   );
 
   metil_scene_destroy(
@@ -156,13 +183,13 @@ void c938_on_scene_change(
     case scene_id_menu_main:
       scene_menu_main_initialize(
         &metil_scene_controller.scene,
-        metil_renderer_interface->metal_device
+        metil_renderer_interface
       );
       break;
     case scene_id_gameplay:
       scene_gameplay_initialize(
         &metil_scene_controller.scene,
-        metil_renderer_interface->metal_device
+        metil_renderer_interface
       );
       break;
   }

@@ -1,4 +1,4 @@
-name: continuous_integration_build
+name: continuous_integration_build_ios
 on:
   push:
     branches: ["core"]
@@ -12,16 +12,16 @@ env:
   enabled_caching_math_c: 1
   enabled_caching_metil: 0
   enabled_caching_rand: 1
-  key_cache_cer0: cache_cer0_0_0_0
-  key_cache_clic3: cache_clic3_0_0_0
-  key_cache_interrupt_handler: cache_interrupt_handler_0_0_0
-  key_cache_math_c: cache_math_c_0_0_0
-  key_cache_metil: cache_metil_1_0_0
-  key_cache_rand: cache_rand_0_0_0
-  target_device_version: 15.5
+  key_cache_cer0: cache_cer0_ios_0_0_0
+  key_cache_clic3: cache_clic3_ios_0_0_0
+  key_cache_interrupt_handler: cache_interrupt_handler_ios_0_0_0
+  key_cache_math_c: cache_math_c_ios_0_0_0
+  key_cache_metil: cache_metil_ios_1_0_0
+  key_cache_rand: cache_rand_ios_0_0_0
+  target_device_version: 18.5
   target_metal_standard: metal3.2
 jobs:
-  continuous_integration_build:
+  continuous_integration_build_ios:
     runs-on: macos-latest
     steps:
       - name: git_initialization
@@ -110,24 +110,24 @@ jobs:
           path: rand
       - name: make_clic3
         if: steps.cache_restore_clic3.outputs.cache-hit != 'true'
-        run: cd clic3 && make clic3_dylib target_device_version=${{ env.target_device_version }}
+        run: cd clic3 && make target_device=iphone target_device_version=${{ env.target_device_version }}
       - name: make_cer0
         if: steps.cache_restore_cer0.outputs.cache-hit != 'true'
-        run: cd cer0 && make cer0_dylib target_device_version=${{ env.target_device_version }}
+        run: cd cer0 && make target_device=iphone target_device_version=${{ env.target_device_version }}
       - name: make_interrupt_handler
         if: steps.cache_restore_interrupt_handler.outputs.cache-hit != 'true'
-        run: cd interrupt_handler && make interrupt_handler_dylib target_device_version=${{ env.target_device_version }}
+        run: cd interrupt_handler && make target_device=iphone target_device_version=${{ env.target_device_version }}
       - name: make_math_c
         if: steps.cache_restore_math_c.outputs.cache-hit != 'true'
-        run: cd math_c && make math_c_dylib target_device_version=${{ env.target_device_version }}
+        run: cd math_c && make target_device=iphone target_device_version=${{ env.target_device_version }}
       - name: make_metil
         if: steps.cache_restore_metil.outputs.cache-hit != 'true'
-        run: cd metil && make metil target_device_version=${{ env.target_device_version }} target_metal_standard=${{ env.target_metal_standard }}
+        run: cd metil && make target_device=iphone target_device_version=${{ env.target_device_version }} target_metal_standard=${{ env.target_metal_standard }}
       - name: make_rand
         if: steps.cache_restore_rand.outputs.cache-hit != 'true'
-        run: cd rand && make rand_dylib target_device_version=${{ env.target_device_version }}
+        run: cd rand && make target_device=iphone target_device_version=${{ env.target_device_version }}
       - name: make_c938
-        run: cd c938 && make disable_metal_fast_options=1 target_device_version=${{ env.target_device_version }} target_metal_standard=${{ env.target_metal_standard }}
+        run: cd c938 && make disable_metal_fast_options=1 target_device=iphone target_device_version=${{ env.target_device_version }} target_metal_standard=${{ env.target_metal_standard }}
       - name: cache_save_cer0
         id: cache_save_cer0
         if: ${{ env.enabled_caching == '1' && env.enabled_caching_cer0 == '1' && steps.cache_restore_cer0.outputs.cache-hit != 'true' }}

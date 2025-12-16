@@ -11,8 +11,6 @@ void mesh_hud_item_initialize(
 ) {
   metil_mesh_initialize(mesh);
 
-  mesh->positioning = metil_mesh_positioning_static;
-
   mesh->size.x = 0.2f;
   mesh->size.y = 0.05f;
   mesh->size.z = 0.0f;

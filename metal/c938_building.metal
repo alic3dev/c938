@@ -37,25 +37,17 @@ struct data_vertex {
     positions[id_vertex]
   );
 
-  unsigned short int id_vertex_moded = (
-    id_vertex % 4
-  );
+  data_vertex.position_texture.x = positions[id_vertex].x + positions[id_vertex].z;
+  data_vertex.position_texture.y = positions[id_vertex].y + positions[id_vertex].x;
 
-  data_vertex.position_texture.x = (
-    id_vertex_moded == 0 ||
-    id_vertex_moded == 3
-  ) ? (
-    0.0f
-  ) : (
-    1.0f
-  );
-  data_vertex.position_texture.y = ((id_vertex + 2) / 4) % 2;
-
-  data_vertex.brightness = (
-    id_vertex > 3
-    ? 1.0f
-    : 0.125f
-  ) * data_frame->brightness;
+  data_vertex.brightness = (positions[id_vertex].y > 0.0f ? (
+    data_frame->brightness *
+    positions[id_vertex].z > 0.0f
+    ? positions[id_vertex].x > 0.0f
+    ? 0.5f
+    : 0.6f
+    : 1.0f
+  ) : 0.5f);
 
   data_vertex.color = float4(
     data_object->color.x,
@@ -64,10 +56,22 @@ struct data_vertex {
     data_object->color.w
   );
 
-  data_vertex.distance = (
-    metal::fabs((data_object->position.x + positions[id_vertex].x) - data_frame->position_player.x) + 
-    metal::fabs((data_object->position.y + positions[id_vertex].y) - data_frame->position_player.y) + 
-    metal::fabs((data_object->position.z + positions[id_vertex].z) - data_frame->position_player.z)
+  data_vertex.distance = metal::distance(
+    metal::float4(
+      metal::float4(
+        data_object->position.x,
+        data_object->position.y,
+        data_object->position.z,
+        1.0f
+      ) +
+      positions[id_vertex]
+    ),
+    metal::float4(
+      data_frame->position_player.x,
+      data_frame->position_player.y,
+      data_frame->position_player.z,
+      1.0f
+    )
   );
 
   return data_vertex;
@@ -81,7 +85,7 @@ struct data_vertex {
     data_vertex.brightness * 
     metal::fmin(
       metal::fmax(
-        1.0f - (data_vertex.distance / 1000.0f),
+        1.0f - (data_vertex.distance / 10000.0f),
         0.5f
       ),
       1.0f
@@ -89,13 +93,15 @@ struct data_vertex {
   );
 
   constexpr metal::sampler sampler_texture(
-    metal::coord::normalized
+    metal::t_address::repeat,
+    metal::r_address::repeat,
+    metal::s_address::repeat
   );
 
   float4 color_texture = float4(
     texture.sample(
       sampler_texture,
-      data_vertex.position_texture
+      data_vertex.position_texture / 1000.0f
     )
   );
 
