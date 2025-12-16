@@ -1,12 +1,15 @@
 #include <c938.h>
 
-#include <application/c938_application_delegate.h>
 #include <pipeline_index.h>
 #include <player.h>
 #include <scenes/scene_id.h>
 #include <scenes/scene_menu_main.h>
 #include <scenes/scene_gameplay.h>
 
+#if target_os_ios
+#include <metil_application/metil_application.h>
+#include <metil_application/metil_application_delegate.h>
+#endif
 #include <metil_configuration/configuration.h>
 #include <metil_initialize.h>
 #include <metil_library.h>
@@ -41,8 +44,8 @@ int main(
   return UIApplicationMain(
     length_parameters,
     parameters,
-    (void*)0,
-    NSStringFromClass([c938_application_delegate class])
+    NSStringFromClass([metil_application class]),
+    NSStringFromClass([metil_application_delegate class])
   );
   #else
   return metil_initialize(

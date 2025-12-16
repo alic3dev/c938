@@ -19,6 +19,7 @@
 #include <metil_rendering/metil_renderer_interface.h>
 #include <metil_scenes/scene.h>
 #include <metil_scenes/scene_controller.h>
+#include <metil_termination.h>
 #include <metil_text/text.h>
 
 #if !target_os_ios
@@ -359,15 +360,16 @@ void scene_menu_main_poll(
 
     switch (menu->index_selected) {
       case 0:
-        metil_debug_log("STARTING\n");
+        metil_debug_log("scene_menu_main:starting\n");
 
         data->time_started = scene->time;
         break;
       case 1:
-        metil_debug_log("EXITING\n");
+        metil_debug_log("scene_menu_main:exiting\n");
 
         #if target_os_ios
-        [[UIApplication sharedApplication] terminate: 0];
+        metil_termination_terminate();
+        exit(0);
         #else
         [[NSApplication sharedApplication] terminate: 0];
         #endif
