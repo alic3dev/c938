@@ -10,7 +10,7 @@
 #include <scenes/scene_id.h>
 #include <textures/textures_buildings.h>
 
-#include <metil_audio/audio.h>
+#include <metil_audio/metil_audio_io_proc.h>
 #include <metil_debug/log.h>
 #include <metil_object.h>
 #include <metil_paths/paths.h>
