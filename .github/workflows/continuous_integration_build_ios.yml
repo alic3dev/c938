@@ -101,7 +101,6 @@ jobs:
         uses: actions/checkout@v5
         with:
           repository: alic3dev/metil
-          ref: metil_1_0_0
           path: metil
       - name: checkout_rand
         if: steps.cache_restore_rand.outputs.cache-hit != 'true'
