@@ -4,6 +4,7 @@
 #include <pipeline_index.h>
 
 #include <metil_object.h>
+#include <metil_positioning.h>
 #include <metil_rendering/metil_renderer_data_object.h>
 
 #include <Metal/MTLDevice.h>
