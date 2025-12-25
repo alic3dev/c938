@@ -289,19 +289,19 @@ ifneq (${debug}, 1)
 endif
 ifneq (${release}, 1)
 ifeq (${debug}, 1)
-	if [[ ! -f ${directory_app_contents_macos}/cer0_debug.${version_target_cer0}.dylib ]]; then ln -s ../../../../../${file_cer0_library} ${directory_app_contents_macos}/cer0_debug.${version_target_cer0}.dylib; fi
-	if [[ ! -f ${directory_app_contents_macos}/clic3_debug.${version_target_clic3}.dylib ]]; then ln -s ../../../../../${file_clic3_library} ${directory_app_contents_macos}/clic3_debug.${version_target_clic3}.dylib; fi
-	if [[ ! -f ${directory_app_contents_macos}/interrupt_handler_debug.${version_target_interrupt_handler}.dylib ]]; then ln -s ../../../../../${file_interrupt_handler_library} ${directory_app_contents_macos}/interrupt_handler_debug.${version_target_interrupt_handler}.dylib; fi
-	if [[ ! -f ${directory_app_contents_macos}/math_c_debug.${version_target_math_c}.dylib ]]; then ln -s ../../../../../${file_math_c_library} ${directory_app_contents_macos}/math_c_debug.${version_target_math_c}.dylib; fi
-	if [[ ! -f ${directory_app_contents_macos}/metil_debug.${version_target_metil}.dylib ]]; then ln -s ../../../../../${file_metil_library} ${directory_app_contents_macos}/metil_debug.${version_target_metil}.dylib; fi
-	if [[ ! -f ${directory_app_contents_macos}/rand_debug.${version_target_rand}.dylib ]]; then ln -s ../../../../../${file_rand_library} ${directory_app_contents_macos}/rand_debug.${version_target_rand}.dylib; fi
+	if [[ ! -f ${directory_app_contents_macos}/cer0_debug.${version_target_cer0}.dylib ]]; then ln -s ${shell realpath ${file_cer0_library}} ${directory_app_contents_macos}/cer0_debug.${version_target_cer0}.dylib; fi
+	if [[ ! -f ${directory_app_contents_macos}/clic3_debug.${version_target_clic3}.dylib ]]; then ln -s ${shell realpath ${file_clic3_library}} ${directory_app_contents_macos}/clic3_debug.${version_target_clic3}.dylib; fi
+	if [[ ! -f ${directory_app_contents_macos}/interrupt_handler_debug.${version_target_interrupt_handler}.dylib ]]; then ln -s ${shell realpath ${file_interrupt_handler_library}} ${directory_app_contents_macos}/interrupt_handler_debug.${version_target_interrupt_handler}.dylib; fi
+	if [[ ! -f ${directory_app_contents_macos}/math_c_debug.${version_target_math_c}.dylib ]]; then ln -s ${shell realpath ${file_math_c_library}} ${directory_app_contents_macos}/math_c_debug.${version_target_math_c}.dylib; fi
+	if [[ ! -f ${directory_app_contents_macos}/metil_debug.${version_target_metil}.dylib ]]; then ln -s ${shell realpath ${file_metil_library}} ${directory_app_contents_macos}/metil_debug.${version_target_metil}.dylib; fi
+	if [[ ! -f ${directory_app_contents_macos}/rand_debug.${version_target_rand}.dylib ]]; then ln -s ${shell realpath ${file_rand_library}} ${directory_app_contents_macos}/rand_debug.${version_target_rand}.dylib; fi
 else
-	if [[ ! -f ${directory_app_contents_macos}/cer0.${version_target_cer0}.dylib ]]; then ln -s ../../../../../${file_cer0_library} ${directory_app_contents_macos}/cer0.${version_target_cer0}.dylib; fi
-	if [[ ! -f ${directory_app_contents_macos}/clic3.${version_target_clic3}.dylib ]]; then ln -s ../../../../../${file_clic3_library} ${directory_app_contents_macos}/clic3.${version_target_clic3}.dylib; fi
-	if [[ ! -f ${directory_app_contents_macos}/interrupt_handler.${version_target_interrupt_handler}.dylib ]]; then ln -s ../../../../../${file_interrupt_handler_library} ${directory_app_contents_macos}/interrupt_handler.${version_target_interrupt_handler}.dylib; fi
-	if [[ ! -f ${directory_app_contents_macos}/math_c.${version_target_math_c}.dylib ]]; then ln -s ../../../../../${file_math_c_library} ${directory_app_contents_macos}/math_c.${version_target_math_c}.dylib; fi
-	if [[ ! -f ${directory_app_contents_macos}/metil.${version_target_metil}.dylib ]]; then ln -s ../../../../../${file_metil_library} ${directory_app_contents_macos}/metil.${version_target_metil}.dylib; fi
-	if [[ ! -f ${directory_app_contents_macos}/rand.${version_target_rand}.dylib ]]; then ln -s ../../../../../${file_rand_library} ${directory_app_contents_macos}/rand.${version_target_rand}.dylib; fi
+	if [[ ! -f ${directory_app_contents_macos}/cer0.${version_target_cer0}.dylib ]]; then ln -s ${shell realpath ${file_cer0_library}} ${directory_app_contents_macos}/cer0.${version_target_cer0}.dylib; fi
+	if [[ ! -f ${directory_app_contents_macos}/clic3.${version_target_clic3}.dylib ]]; then ln -s ${shell realpath ${file_clic3_library}} ${directory_app_contents_macos}/clic3.${version_target_clic3}.dylib; fi
+	if [[ ! -f ${directory_app_contents_macos}/interrupt_handler.${version_target_interrupt_handler}.dylib ]]; then ln -s ${shell realpath ${file_interrupt_handler_library}} ${directory_app_contents_macos}/interrupt_handler.${version_target_interrupt_handler}.dylib; fi
+	if [[ ! -f ${directory_app_contents_macos}/math_c.${version_target_math_c}.dylib ]]; then ln -s ${shell realpath ${file_math_c_library}} ${directory_app_contents_macos}/math_c.${version_target_math_c}.dylib; fi
+	if [[ ! -f ${directory_app_contents_macos}/metil.${version_target_metil}.dylib ]]; then ln -s ${shell realpath ${file_metil_library}} ${directory_app_contents_macos}/metil.${version_target_metil}.dylib; fi
+	if [[ ! -f ${directory_app_contents_macos}/rand.${version_target_rand}.dylib ]]; then ln -s ${shell realpath ${file_rand_library}} ${directory_app_contents_macos}/rand.${version_target_rand}.dylib; fi
 endif
 endif
 endif
