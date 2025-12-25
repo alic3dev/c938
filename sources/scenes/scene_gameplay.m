@@ -7,7 +7,6 @@
 #include <pipeline_index.h>
 #include <player.h>
 #include <player_data.h>
-#include <scenes/scene_id.h>
 #include <textures/textures_buildings.h>
 
 #include <metil_audio/metil_audio_io_proc.h>
@@ -29,7 +28,7 @@ void scene_gameplay_initialize(
   metil_scene_initialize_with_renderables(
     scene,
     renderer_interface,
-    6
+    7
   );
 
   #if !target_os_ios
@@ -43,8 +42,11 @@ void scene_gameplay_initialize(
   scene->player.destroy = player_destroy;
 
   static struct player_data* player_data;
+
   player_data = malloc(
-    sizeof(struct player_data)
+    sizeof(
+      struct player_data
+    )
   );
 
   scene->player.data = player_data;
@@ -53,26 +55,34 @@ void scene_gameplay_initialize(
   scene->destroy = scene_gameplay_destroy;
 
   for (
-    unsigned char index_renderable = 1;
+    unsigned char index_renderable = 0;
     index_renderable < scene->length_renderables;
     ++index_renderable
   ) {
-    metil_renderable_initialize_at_index(
-      scene->renderables,
-      index_renderable,
-      metil_renderable_type_object
-    );
+    switch (
+      index_renderable
+    ) {
+      case scene_gameplay_renderables_index_buildings:
+      case scene_gameplay_renderables_index_projectiles:
+        metil_renderable_initialize_at_index(
+          scene->renderables,
+          index_renderable,
+          metil_renderable_type_group
+        );
+        break;
+      default:
+        metil_renderable_initialize_at_index(
+          scene->renderables,
+          index_renderable,
+          metil_renderable_type_object
+        );
+        break;
+    }
   }
-
-  metil_renderable_initialize_at_index(
-    scene->renderables,
-    0,
-    metil_renderable_type_group
-  );
 
   struct metil_object* object = (
     scene->renderables[
-      1
+      scene_gameplay_renderables_index_player
     ].renderable
   );
 
@@ -81,8 +91,8 @@ void scene_gameplay_initialize(
   );
 
   for (
-    unsigned char index_renderable = 2;
-    index_renderable < 5;
+    unsigned char index_renderable = scene_gameplay_renderables_index_range_hud_start;
+    index_renderable < scene_gameplay_renderables_index_range_hud_end + 1;
     ++index_renderable
   ) {
     object = scene->renderables[
@@ -124,7 +134,9 @@ void scene_gameplay_initialize(
 
   [texture_loader release];
 
-  object = scene->renderables[1].renderable;
+  object = scene->renderables[
+    scene_gameplay_renderables_index_player
+  ].renderable;
 
   mesh_player_initialize(
     &object->mesh
@@ -140,7 +152,7 @@ void scene_gameplay_initialize(
   metil_object_texture_add(
     object,
     scene->textures[
-      0
+      scene_gameplay_textures_index_player
     ]
   );
 
@@ -150,7 +162,7 @@ void scene_gameplay_initialize(
 
   object = (
     scene->renderables[
-      2
+      scene_gameplay_renderables_index_hud_boosted
     ].renderable
   );
 
@@ -164,7 +176,7 @@ void scene_gameplay_initialize(
 
   object = (
     scene->renderables[
-      3
+      scene_gameplay_renderables_index_hud_jumping
     ].renderable
   );
 
@@ -178,7 +190,7 @@ void scene_gameplay_initialize(
 
   object = (
     scene->renderables[
-      4
+      scene_gameplay_renderables_index_hud_jumping_secondary
     ].renderable
   );
 
@@ -192,7 +204,7 @@ void scene_gameplay_initialize(
 
   object = (
     scene->renderables[
-      5
+      scene_gameplay_renderables_index_crosshair
     ].renderable
   );
 
@@ -215,7 +227,9 @@ void scene_gameplay_populate(
   scene->player.rotation.y = 0.0f;
   scene->player.rotation.z = 0.0f;
 
-  scene->player.speed_movement = metil_player_speed_movement_default;
+  scene->player.speed_movement = (
+    metil_player_speed_movement_default
+  );
 
   scene->player.velocity.x = 0.0f;
   scene->player.velocity.y = 0.0f;
@@ -229,11 +243,9 @@ void scene_gameplay_populate(
     player_data
   );
 
-  unsigned short int iterator_id = 5;
-
   struct metil_group* metil_group_buildings = (
     scene->renderables[
-      0
+      scene_gameplay_renderables_index_buildings
     ].renderable
   );
 
@@ -241,12 +253,14 @@ void scene_gameplay_populate(
     scene->renderer_interface->metal_device,
     metil_group_buildings,
     length_buildings,
-    scene->textures[0]
+    scene->textures[
+      scene_gameplay_textures_index_buildings
+    ]
   );
 
   struct metil_object* object = (
     metil_group_buildings->renderables[
-      1
+      scene_gameplay_group_buildings_index_starting
     ]->renderable
   );
 
@@ -259,7 +273,7 @@ void scene_gameplay_populate(
 
   object = (
     scene->renderables[
-      1
+      scene_gameplay_renderables_index_player
     ].renderable
   );
 
@@ -278,13 +292,17 @@ void scene_gameplay_poll(
   );
 
   if (
-    player_data->on_ground == 3
+    player_data->on_ground == scene_gameplay_group_buildings_index_target
   ) {
+    struct metil_group* metil_group_buildings = (
+      scene->renderables[
+        scene_gameplay_renderables_index_buildings
+      ].renderable
+    );
+
     unsigned short int length_buildings_reduced = (
-      ((struct metil_group*) scene->renderables[
-        0
-      ].renderable)->length
-       * 0.9f
+      metil_group_buildings->length *
+      0.9f
     );
 
     if (
@@ -316,7 +334,7 @@ void scene_gameplay_poll(
 
   struct metil_object* object = (
     scene->renderables[
-      1
+      scene_gameplay_renderables_index_player
     ].renderable
   );
 
@@ -326,7 +344,7 @@ void scene_gameplay_poll(
 
   object = (
     scene->renderables[
-      2
+      scene_gameplay_renderables_index_hud_boosted
     ].renderable
   );
 
@@ -353,7 +371,7 @@ void scene_gameplay_poll(
 
   object = (
     scene->renderables[
-      3
+      scene_gameplay_renderables_index_hud_jumping
     ].renderable
   );
 
@@ -367,7 +385,7 @@ void scene_gameplay_poll(
 
   object = (
     scene->renderables[
-      4
+      scene_gameplay_renderables_index_hud_jumping_secondary
     ].renderable
   );
 

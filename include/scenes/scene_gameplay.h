@@ -12,6 +12,31 @@
 
 #define scene_gameplay_length_buildings_default 200
 
+enum scene_gameplay_renderables_index {
+  scene_gameplay_renderables_index_buildings = 0,
+  scene_gameplay_renderables_index_player = 1,
+  scene_gameplay_renderables_index_projectiles = 2,
+  scene_gameplay_renderables_index_hud_boosted = 3,
+  scene_gameplay_renderables_index_hud_jumping = 4,
+  scene_gameplay_renderables_index_hud_jumping_secondary = 5,
+  scene_gameplay_renderables_index_crosshair = 6
+};
+
+enum scene_gameplay_renderables_index_range {
+  scene_gameplay_renderables_index_range_hud_start = 3,
+  scene_gameplay_renderables_index_range_hud_end = 5
+};
+
+enum scene_gameplay_group_buildings_index {
+  scene_gameplay_group_buildings_index_starting = 1,
+  scene_gameplay_group_buildings_index_target = 3
+};
+
+enum scene_gameplay_textures {
+  scene_gameplay_textures_index_player = 0,
+  scene_gameplay_textures_index_buildings = 0
+};
+
 struct scene_gameplay_data {
   struct metil_menu menu;
   unsigned char visible_menu;
