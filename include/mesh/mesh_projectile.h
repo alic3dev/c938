@@ -1,0 +1,10 @@
+#ifndef __mesh_mesh_projectile_h
+#define __mesh_mesh_projectile_h
+
+#include <metil_mesh/mesh.h>
+
+void mesh_projectile_initialize(
+  struct metil_mesh*
+);
+
+#endif

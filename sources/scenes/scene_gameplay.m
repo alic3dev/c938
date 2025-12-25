@@ -249,6 +249,20 @@ void scene_gameplay_populate(
     ].renderable
   );
 
+  struct metil_group* metil_group_projectiles = (
+    scene->renderables[
+      scene_gameplay_renderables_index_projectiles
+    ].renderable
+  );
+
+  metil_group_destroy(
+    metil_group_projectiles
+  );
+
+  metil_group_initialize(
+    metil_group_projectiles
+  );
+
   generate_buildings(
     scene->renderer_interface->metal_device,
     metil_group_buildings,
@@ -279,8 +293,20 @@ void scene_gameplay_populate(
 
   object->position.y = scene->player.position.y;
 
+  player_data->metal_device = (
+    scene->renderer_interface->metal_device
+  );
+
   player_data->buildings = (
     metil_group_buildings
+  );
+
+  player_data->projectiles = (
+    metil_group_projectiles
+  );
+
+  player_data->height = (
+    scene->renderer_interface->rendering_properties->camera.height
   );
 }
 
@@ -331,6 +357,41 @@ void scene_gameplay_poll(
   metil_scene_poll_default(
     scene
   );
+
+  struct metil_group* metil_group_projectiles = (
+    scene->renderables[
+      scene_gameplay_renderables_index_projectiles
+    ].renderable
+  );
+
+  for (
+    unsigned int index_projectile = 0;
+    index_projectile < metil_group_projectiles->length;
+  ) {
+    struct metil_object* metil_object_projectile = (
+      metil_group_projectiles->renderables[
+        index_projectile
+      ]->renderable
+    );
+
+    struct metil_renderer_data_object* metil_renderer_data_object = (
+      metil_object_projectile->data.contents
+    );
+
+    if (
+      metil_renderer_data_object->noise == 0
+    ) {
+      metil_group_destroy_renderable_at_index(
+        metil_group_projectiles,
+        index_projectile
+      );
+    } else {
+      index_projectile = (
+        index_projectile +
+        1
+      );
+    }
+  }
 
   struct metil_object* object = (
     scene->renderables[

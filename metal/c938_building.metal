@@ -47,7 +47,7 @@ struct data_vertex {
     ? 0.5f
     : 0.6f
     : 1.0f
-  ) : 0.5f);
+  ) : 0.013f);
 
   data_vertex.color = float4(
     data_object->color.x,
@@ -92,6 +92,15 @@ struct data_vertex {
     )
   );
 
+  brightness = (
+    brightness *
+    brightness *
+    brightness *
+    brightness *
+    brightness *
+    brightness
+  );
+
   constexpr metal::sampler sampler_texture(
     metal::t_address::repeat,
     metal::r_address::repeat,
@@ -101,7 +110,7 @@ struct data_vertex {
   float4 color_texture = float4(
     texture.sample(
       sampler_texture,
-      data_vertex.position_texture / 1000.0f
+      data_vertex.position_texture / 100.0f
     )
   );
 

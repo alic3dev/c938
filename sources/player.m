@@ -1,5 +1,6 @@
 #include <player.h>
 
+#include <objects/object_projectile.h>
 #include <player_data.h>
 
 #include <metil_input/controller_state.h>
@@ -175,8 +176,7 @@ void player_poll_input(
 
   if (metil_controller_state.available == 1) {
     if (
-      metil_controller_state.right_stick.x >= 0.1f || 
-      metil_controller_state.right_stick.x <= -0.1f
+      metil_controller_state.right_stick.x != 0.0f
     ) {
       player->rotation.y = (
         player->rotation.y - (
@@ -187,8 +187,7 @@ void player_poll_input(
     }
 
     if (
-      metil_controller_state.right_stick.y >= 0.1f || 
-      metil_controller_state.right_stick.y <= -0.1f
+      metil_controller_state.right_stick.y != 0.0f
     ) {
       player->rotation.x = (
         player->rotation.x + (
@@ -398,11 +397,11 @@ void player_poll_input(
 
   if (
     metil_controller_state.available == 1 &&
-    metil_controller_state.r2 >= 0.1f
+    metil_controller_state.l1 >= 0.1f
   ) {
     player->velocity.y = (
       player->velocity.y -
-      (metil_controller_state.r2 * time_delta * 5.0f)
+      (metil_controller_state.l1 * time_delta * 5.0f)
     );
   } else if (
     metil_input_map_keydown[
@@ -605,16 +604,81 @@ void player_poll_input(
   }
 
   player->speed_movement = speed_original;
+
+  if (
+    player_data->shooting == 0 && (
+      metil_controller_state.available == 1 &&
+      metil_controller_state.r2 >= 0.1f ||
+      metil_input_cursor.down == 1
+    )
+  ) {
+    player_data->shooting = 1;
+  }
 }
 
 void player_poll(
   struct metil_player* player
-) {}
+) {
+  struct player_data* player_data = (
+    (struct player_data*) player->data
+  );
+
+  if (
+    player_data->shooting == 1
+  ) {
+    metil_group_add_initialize(
+      player_data->projectiles,
+      metil_renderable_type_object
+    );
+
+    struct metil_renderable* metil_renderable_projectile = (
+      player_data->projectiles->renderables[
+        player_data->projectiles->length - 1
+      ]
+    );
+
+    struct metil_object* metil_object_projectile = (
+      metil_renderable_projectile->renderable
+    );
+
+    object_projectile_initialize(
+      metil_object_projectile,
+      player_data->metal_device,
+      (struct clic3_vector3_float) {
+        .x = player->position.x,
+        .y = (
+          player->position.y +
+          player_data->height
+        ),
+        .z = player->position.z
+      },
+      (struct clic3_vector3_float) {
+        .x = player->rotation.x,
+        .y = -player->rotation.y,
+        .z = player->rotation.z
+      }
+    );
+
+    player_data->shooting = 2;
+  } else if (
+    player_data->shooting > 1
+  ) {
+    player_data->shooting = (
+      (
+        player_data->shooting +
+        1
+      ) %
+      4
+    );
+  }
+}
 
 void player_destroy(
   struct metil_player* player
 ) {
-  free(player->data);
+  free(
+    player->data
+  );
 
   metil_player_destroy(
     player

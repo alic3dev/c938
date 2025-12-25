@@ -8,7 +8,6 @@
 #if !target_os_ios
 #include <CoreAudio/CoreAudio.h>
 #endif
-#include <MetalKit/MetalKit.h>
 
 #define scene_menu_main_length_buildings_default 200
 #define scene_menu_main_time_scene_transition 333
