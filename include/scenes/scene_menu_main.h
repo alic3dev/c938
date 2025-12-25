@@ -8,14 +8,22 @@
 #if !target_os_ios
 #include <CoreAudio/CoreAudio.h>
 #endif
-#include <MetalKit/MetalKit.h>
 
-extern const unsigned long int scene_menu_main_time_scene_transition;
+#define scene_menu_main_length_buildings_default 200
+#define scene_menu_main_time_scene_transition 333
+
+enum scene_menu_main_renderables_index {
+  scene_menu_main_renderables_index_buildings = 0,
+  scene_menu_main_renderables_index_title = 1,
+  scene_menu_main_renderables_index_menu_enter = 2,
+  scene_menu_main_renderables_index_menu_exit = 3
+};
 
 enum textures_scene_menu_main {
-  textures_scene_menu_main_title = 0,
-  textures_scene_menu_main_menu_enter = 1,
-  textures_scene_menu_main_menu_exit = 2
+  scene_menu_main_textures_index_title = 0,
+  scene_menu_main_textures_index_menu_enter = 1,
+  scene_menu_main_textures_index_menu_exit = 2,
+  scene_menu_main_textures_index_buildings = 3
 };
 
 struct scene_menu_main_data {

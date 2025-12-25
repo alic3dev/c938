@@ -1,3 +1,5 @@
+#include <projectile_lifespan.h>
+
 #include <metil_rendering/metil_renderer_data_frame.h>
 #include <metil_rendering/metil_renderer_data_object.h>
 #include <metil_rendering/metil_renderer_vertex_index_parameter.h>
@@ -6,11 +8,12 @@
 
 struct data_vertex {
   float4 position [[position]];
-  float2 position_texture;
   float brightness;
+  float alpha;
+  float4 color;
 };
 
-[[vertex]] struct data_vertex c938_ground_vertex(
+[[vertex]] struct data_vertex c938_projectile_vertex(
   const device simd_float4* positions [[
     buffer(
       metil_renderer_vertex_index_parameter_positions
@@ -35,55 +38,35 @@ struct data_vertex {
     positions[id_vertex]
   );
 
-  data_vertex.position_texture.x = positions[id_vertex].z;
-  data_vertex.position_texture.y = positions[id_vertex].x;
-
   data_vertex.brightness = (
-    data_frame->brightness *
-    metal::fmax(
-      metal::fmin(
-        1.0f - (
-          (
-            positions[
-              id_vertex
-            ].z +
-            data_object->size.z / 2.0f
-          ) /
-          data_object->size.z *
-          8.0f
-        ),
-        1.0f
-      ) *
-      0.5f,
-      0.0f
-    ) *
-    0.013
+    data_frame->brightness
+  );
+
+  data_vertex.alpha = metal::fmin(
+    (float) data_object->noise *
+    1.3f /
+    projectile_lifespan,
+    1.0f
+  );
+
+  data_vertex.color = float4(
+    data_object->color.x,
+    data_object->color.y,
+    data_object->color.z,
+    data_object->color.w
   );
 
   return data_vertex;
 }
 
-[[fragment]] float4 c938_ground_fragment(
+[[fragment]] float4 c938_projectile_fragment(
   data_vertex data_vertex [[stage_in]],
   metal::texture2d<half> texture [[texture(0)]]
 ) {
-  constexpr metal::sampler sampler_texture(
-    metal::t_address::repeat,
-    metal::r_address::repeat,
-    metal::s_address::repeat
-  );
-
-  float4 color_texture = float4(
-    texture.sample(
-      sampler_texture,
-      data_vertex.position_texture / 1000.0f
-    )
-  );
-
   return float4(
-    color_texture[0] * data_vertex.brightness,
-    color_texture[1] * data_vertex.brightness,
-    color_texture[2] * data_vertex.brightness,
-    color_texture[3]
+    data_vertex.color.r * data_vertex.brightness,
+    data_vertex.color.g * data_vertex.brightness,
+    data_vertex.color.b * data_vertex.brightness,
+    data_vertex.color.a * data_vertex.alpha
   );
 }

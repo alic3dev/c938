@@ -68,18 +68,20 @@ void c938_renderer_on_initialize(
   );
 
   metil_renderer_interface->rendering_properties->color_clear.x = (
-    0.8724f * metil_configuration.rendering_properties.brightness
+    0.0f * metil_configuration.rendering_properties.brightness
   );
   
   metil_renderer_interface->rendering_properties->color_clear.y = (
-    0.8824f * metil_configuration.rendering_properties.brightness
+    0.0f * metil_configuration.rendering_properties.brightness
   );
 
   metil_renderer_interface->rendering_properties->color_clear.z = (
-    0.9049f * metil_configuration.rendering_properties.brightness
+    0.0f * metil_configuration.rendering_properties.brightness
   );
 
-  metil_renderer_interface->rendering_properties->color_clear.w = 1.0f;
+  metil_renderer_interface->rendering_properties->color_clear.w = (
+    1.0f
+  );
 
   c938_pipeline_index_building = [
     metil_renderer_interface->renderer
@@ -150,6 +152,18 @@ void c938_renderer_on_initialize(
     function_vertex: [
       metil_library.library
       newFunctionWithName: @"c938_crosshair_vertex"
+    ]
+  ];
+
+  c938_pipeline_index_projectile = [
+    metil_renderer_interface->renderer
+    pipeline_add: [
+      metil_library.library
+      newFunctionWithName: @"c938_projectile_fragment"
+    ]
+    function_vertex: [
+      metil_library.library
+      newFunctionWithName: @"c938_projectile_vertex"
     ]
   ];
 
