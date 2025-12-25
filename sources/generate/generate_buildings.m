@@ -19,38 +19,47 @@
 
 void generate_buildings(
   id<MTLDevice> metal_device,
-  struct metil_renderable* renderables,
-  unsigned short int length_renderables,
+  struct metil_group* metil_group_buildings,
+  unsigned short int length_buildings,
   id<MTLTexture> texture
 ) {
   signed int size = 2500;
 
-  struct metil_object* object = (void*)0;
-  struct metil_object* object_target = (void*)0;
+  struct metil_object* object = (void*) 0;
+  struct metil_object* object_starting_point = (void*) 0;
+
+  metil_group_destroy(
+    metil_group_buildings
+  );
+
+  metil_group_initialize(
+    metil_group_buildings
+  );
 
   for (
-    unsigned int index_renderable = 0;
-    index_renderable < length_renderables;
-    ++index_renderable
+    unsigned short int index_building = metil_group_buildings->length;
+    index_building < length_buildings;
+    ++index_building
   ) {
-    metil_renderable_initialize_at_index(
-      renderables,
-      index_renderable,
+    metil_group_add_initialize(
+      metil_group_buildings,
       metil_renderable_type_object
     );
 
-    object = renderables[
-      index_renderable
-    ].renderable;
+    object = metil_group_buildings->renderables[
+      index_building
+    ]->renderable;
 
     object->index_pipeline_render = (
       c938_pipeline_index_building
     );
   }
 
-  object = renderables[
-    0
-  ].renderable;
+  object = (
+    metil_group_buildings->renderables[
+      0
+    ]->renderable
+  );
 
   mesh_building_initialize(
     &object->mesh,
@@ -95,9 +104,9 @@ void generate_buildings(
   unsigned char offset_index_bytes = 0;
 
   for (
-    unsigned char index_renderable = 1;
-    index_renderable < length_renderables;
-    ++index_renderable
+    unsigned char index_building = 1;
+    index_building < length_buildings;
+    ++index_building
   ) {
     offset_index_bytes = 0;
 
@@ -107,9 +116,11 @@ void generate_buildings(
       &rand_parameters
     );
 
-    object = renderables[
-      index_renderable
-    ].renderable;
+    object = (
+      metil_group_buildings->renderables[
+        index_building
+      ]->renderable
+    );
 
     mesh_building_initialize(
       &object->mesh,
@@ -130,17 +141,17 @@ void generate_buildings(
     object->position.y = 0.0f;
 
     if (
-      index_renderable == 1
+      index_building == 1
     ) {
-      object_target = renderables[
-        index_renderable
-      ].renderable;
+      object_starting_point = metil_group_buildings->renderables[
+        index_building
+      ]->renderable;
     } else {
       while (
-        object->position.x - object->mesh.size.x / 2.0f <= object_target->mesh.size.x / 2.0f &&
-        object->position.x + object->mesh.size.x / 2.0f >= -object_target->mesh.size.x / 2.0f &&
-        object->position.z - object->mesh.size.z / 2.0f <= object_target->mesh.size.z / 2.0f &&
-        object->position.z + object->mesh.size.z / 2.0f >= -object_target->mesh.size.z / 2.0f
+        object->position.x - object->mesh.size.x / 2.0f <= object_starting_point->mesh.size.x / 2.0f &&
+        object->position.x + object->mesh.size.x / 2.0f >= -object_starting_point->mesh.size.x / 2.0f &&
+        object->position.z - object->mesh.size.z / 2.0f <= object_starting_point->mesh.size.z / 2.0f &&
+        object->position.z + object->mesh.size.z / 2.0f >= -object_starting_point->mesh.size.z / 2.0f
       ) {
         object->position.x = (
           (size / -2) + ((
@@ -194,7 +205,7 @@ void generate_buildings(
     data = object->data.contents;
 
     if (
-      index_renderable == 2
+      index_building == 2
     ) {
       data->color.x = 0.0f;
       data->color.y = 0.0f;

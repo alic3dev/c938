@@ -6,8 +6,7 @@
 #include <clic3_vector.h>
 
 struct player_data {
-  struct metil_renderable* renderables;
-  unsigned short int length_renderables;
+  struct metil_group* buildings;
 
   unsigned long int time_boost;
   unsigned long int time_jump;
