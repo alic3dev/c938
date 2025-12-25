@@ -4,6 +4,7 @@
 
 #include <metil_input/controller_state.h>
 #include <metil_input/cursor.h>
+#include <metil_group.h>
 #include <metil_input/keycodes.h>
 #include <metil_input/map.h>
 #include <metil_object.h>
@@ -482,12 +483,12 @@ void player_poll_input(
 
   for (
     unsigned int index_renderable = 0;
-    index_renderable < player_data->length_renderables;
+    index_renderable < player_data->buildings->length;
     ++index_renderable
   ) {
-    object = player_data->renderables[
+    object = player_data->buildings->renderables[
       index_renderable
-    ].renderable;
+    ]->renderable;
 
     struct clic3_vector2_float size_half_object = {
       .x = object->mesh.size.x / 2.0f,

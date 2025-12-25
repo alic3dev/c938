@@ -8,6 +8,7 @@
 
 #include <metil_audio/metil_audio_io_proc.h>
 #include <metil_debug/log.h>
+#include <metil_group.h>
 #include <metil_input/keycodes.h>
 #include <metil_input/map.h>
 #include <metil_menus/menu.h>
@@ -44,7 +45,7 @@ void scene_menu_main_initialize(
   metil_scene_initialize_with_renderables(
     scene,
     renderer_interface,
-    103
+    4
   );
 
   scene->poll = scene_menu_main_poll;
@@ -85,30 +86,16 @@ void scene_menu_main_initialize(
   );
 
   [texture_loader release];
-
-  unsigned short int iterator_id = 0;
-
-  generate_buildings(
-    scene->renderer_interface->metal_device,
-    scene->renderables,
-    scene->length_renderables - 3,
-    scene->textures[3]
-  );
-
-  iterator_id = (
-    scene->length_renderables -
-    3
-  );
   
   metil_renderable_initialize_at_index(
     scene->renderables,
-    iterator_id,
+    1,
     metil_renderable_type_object
   );
 
   struct metil_object* object = (
     scene->renderables[
-      iterator_id
+      1
     ].renderable
   );
 
@@ -152,13 +139,13 @@ void scene_menu_main_initialize(
 
   metil_renderable_initialize_at_index(
     scene->renderables,
-    ++iterator_id,
+    2,
     metil_renderable_type_object
   );
 
   object = (
     scene->renderables[
-      iterator_id
+      2
     ].renderable
   );
 
@@ -198,13 +185,13 @@ void scene_menu_main_initialize(
 
   metil_renderable_initialize_at_index(
     scene->renderables,
-    ++iterator_id,
+    3,
     metil_renderable_type_object
   );
 
   object = (
     scene->renderables[
-      iterator_id
+      3
     ].renderable
   );
 
@@ -240,6 +227,21 @@ void scene_menu_main_initialize(
     scene->textures[
       textures_scene_menu_main_menu_exit
     ]
+  );
+
+  metil_renderable_initialize_at_index(
+    scene->renderables,
+    0,
+    metil_renderable_type_group
+  );
+
+  generate_buildings(
+    scene->renderer_interface->metal_device,
+    scene->renderables[
+      0
+    ].renderable,
+    100,
+    scene->textures[3]
   );
 
   scene->player.position.y = (
@@ -293,7 +295,7 @@ void scene_menu_main_poll(
       struct metil_renderer_data_object* data_object = (
         (
           (struct metil_object*) scene->renderables[
-            scene->length_renderables - 2
+            2
           ].renderable
         )->data.contents
       );
@@ -301,7 +303,7 @@ void scene_menu_main_poll(
 
       data_object = (
         (struct metil_object*) scene->renderables[
-          scene->length_renderables - 1
+          3
         ].renderable
       )->data.contents;
       data_object->noise = 0;
@@ -310,14 +312,14 @@ void scene_menu_main_poll(
     case 1: {
       struct metil_renderer_data_object* data_object = (
         ((struct metil_object*) scene->renderables[
-          scene->length_renderables - 1
+          3
         ].renderable)->data.contents
       );
       data_object->noise = 1;
 
       data_object = (
         (struct metil_object*) scene->renderables[
-          scene->length_renderables - 2
+          2
         ].renderable
       )->data.contents;
       data_object->noise = 0;
@@ -407,7 +409,9 @@ void scene_menu_main_destroy(
     )->menu
   );
 
-  metil_scene_destroy_default(scene);
+  metil_scene_destroy_default(
+    scene
+  );
 }
 
 #if !target_os_ios

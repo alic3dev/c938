@@ -11,7 +11,6 @@
 #include <MetalKit/MetalKit.h>
 
 #define scene_gameplay_length_buildings_default 200
-#define scene_gameplay_length_renderables_default scene_gameplay_length_buildings_default + 6
 
 struct scene_gameplay_data {
   struct metil_menu menu;
