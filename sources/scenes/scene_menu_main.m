@@ -30,8 +30,6 @@
 #include <UIKit/UIKit.h>
 #endif
 
-const unsigned long int scene_menu_main_time_scene_transition = 333;
-
 void scene_menu_main_initialize(
   struct metil_scene* scene,
   struct metil_renderer_interface* renderer_interface
@@ -89,13 +87,13 @@ void scene_menu_main_initialize(
   
   metil_renderable_initialize_at_index(
     scene->renderables,
-    1,
+    scene_menu_main_renderables_index_title,
     metil_renderable_type_object
   );
 
   struct metil_object* object = (
     scene->renderables[
-      1
+      scene_menu_main_renderables_index_title
     ].renderable
   );
 
@@ -104,7 +102,7 @@ void scene_menu_main_initialize(
   );
 
   scene->textures[
-    textures_scene_menu_main_title
+    scene_menu_main_textures_index_title
   ] = metil_text_mesh_with_texture_initialize(
     scene->renderer_interface->metal_device,
     &object->mesh,
@@ -129,7 +127,7 @@ void scene_menu_main_initialize(
   metil_object_texture_add(
     object,
     scene->textures[
-      textures_scene_menu_main_title
+      scene_menu_main_textures_index_title
     ]
   );
 
@@ -139,13 +137,13 @@ void scene_menu_main_initialize(
 
   metil_renderable_initialize_at_index(
     scene->renderables,
-    2,
+    scene_menu_main_renderables_index_menu_enter,
     metil_renderable_type_object
   );
 
   object = (
     scene->renderables[
-      2
+      scene_menu_main_renderables_index_menu_enter
     ].renderable
   );
 
@@ -154,7 +152,7 @@ void scene_menu_main_initialize(
   );
 
   scene->textures[
-    textures_scene_menu_main_menu_enter
+    scene_menu_main_textures_index_menu_enter
   ] = metil_text_mesh_with_texture_initialize(
     scene->renderer_interface->metal_device,
     &object->mesh,
@@ -177,7 +175,7 @@ void scene_menu_main_initialize(
   metil_object_texture_add(
     object,
     scene->textures[
-      textures_scene_menu_main_menu_enter
+      scene_menu_main_textures_index_menu_enter
     ]
   );
 
@@ -185,13 +183,13 @@ void scene_menu_main_initialize(
 
   metil_renderable_initialize_at_index(
     scene->renderables,
-    3,
+    scene_menu_main_renderables_index_menu_exit,
     metil_renderable_type_object
   );
 
   object = (
     scene->renderables[
-      3
+      scene_menu_main_renderables_index_menu_exit
     ].renderable
   );
 
@@ -200,7 +198,7 @@ void scene_menu_main_initialize(
   );
 
   scene->textures[
-    textures_scene_menu_main_menu_exit
+    scene_menu_main_textures_index_menu_exit
   ] = metil_text_mesh_with_texture_initialize(
     scene->renderer_interface->metal_device,
     &object->mesh,
@@ -225,23 +223,25 @@ void scene_menu_main_initialize(
   metil_object_texture_add(
     object,
     scene->textures[
-      textures_scene_menu_main_menu_exit
+      scene_menu_main_textures_index_menu_exit
     ]
   );
 
   metil_renderable_initialize_at_index(
     scene->renderables,
-    0,
+    scene_menu_main_renderables_index_buildings,
     metil_renderable_type_group
   );
 
   generate_buildings(
     scene->renderer_interface->metal_device,
     scene->renderables[
-      0
+      scene_menu_main_renderables_index_buildings
     ].renderable,
-    100,
-    scene->textures[3]
+    scene_menu_main_length_buildings_default,
+    scene->textures[
+      scene_menu_main_textures_index_buildings
+    ]
   );
 
   scene->player.position.y = (
@@ -295,7 +295,7 @@ void scene_menu_main_poll(
       struct metil_renderer_data_object* data_object = (
         (
           (struct metil_object*) scene->renderables[
-            2
+            scene_menu_main_renderables_index_menu_enter
           ].renderable
         )->data.contents
       );
@@ -303,7 +303,7 @@ void scene_menu_main_poll(
 
       data_object = (
         (struct metil_object*) scene->renderables[
-          3
+          scene_menu_main_renderables_index_menu_exit
         ].renderable
       )->data.contents;
       data_object->noise = 0;
@@ -312,14 +312,14 @@ void scene_menu_main_poll(
     case 1: {
       struct metil_renderer_data_object* data_object = (
         ((struct metil_object*) scene->renderables[
-          3
+          scene_menu_main_renderables_index_menu_exit
         ].renderable)->data.contents
       );
       data_object->noise = 1;
 
       data_object = (
         (struct metil_object*) scene->renderables[
-          2
+          scene_menu_main_renderables_index_menu_enter
         ].renderable
       )->data.contents;
       data_object->noise = 0;
