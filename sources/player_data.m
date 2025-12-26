@@ -24,4 +24,10 @@ void player_data_initialize(
   player_data->shooting = 0;
 
   player_data->height = __metil_camera_height_default;
+
+  player_data->time_shot = player_data_default_rate_fire;
+
+  player_data->time = (
+    (void*) 0
+  );
 }

@@ -7,6 +7,8 @@
 
 #include <Metal/MTLDevice.h>
 
+#define player_data_default_rate_fire 10
+
 struct player_data {
   id<MTLDevice> _Nonnull metal_device;
 
@@ -15,6 +17,7 @@ struct player_data {
 
   unsigned long int time_boost;
   unsigned long int time_jump;
+  unsigned long int time_shot;
 
   unsigned char is_boosted;
   unsigned char is_jumping;
@@ -25,6 +28,10 @@ struct player_data {
   unsigned char shooting;
 
   float height;
+
+  unsigned long int rate_fire;
+
+  unsigned long int* _Nonnull time;
 };
 
 void player_data_initialize(

@@ -1,7 +1,6 @@
-#include <projectile_lifespan.h>
+#include <projectile_data.h>
 
 #include <metil_rendering/metil_renderer_data_frame.h>
-#include <metil_rendering/metil_renderer_data_object.h>
 #include <metil_rendering/metil_renderer_vertex_index_parameter.h>
 
 #include <metal_stdlib>
@@ -9,7 +8,6 @@
 struct data_vertex {
   float4 position [[position]];
   float brightness;
-  float alpha;
   float4 color;
 };
 
@@ -24,7 +22,7 @@ struct data_vertex {
       metil_renderer_vertex_index_parameter_data_frame
     )
   ]],
-  constant struct metil_renderer_data_object* data_object [[
+  constant struct projectile_data* projectile_data [[
     buffer(
       metil_renderer_vertex_index_parameter_data_object
     )
@@ -34,7 +32,7 @@ struct data_vertex {
   struct data_vertex data_vertex;
 
   data_vertex.position = (
-    data_object->view_model_matrix_projection *
+    projectile_data->view_model_matrix_projection *
     positions[id_vertex]
   );
 
@@ -42,18 +40,31 @@ struct data_vertex {
     data_frame->brightness
   );
 
-  data_vertex.alpha = metal::fmin(
-    (float) data_object->noise *
-    1.3f /
-    projectile_lifespan,
-    1.0f
+  float percentage_lifespan = (
+    metal::fmax(
+      metal::fmin(
+        (
+          (float) (
+            projectile_data->time_current -
+            projectile_data->time_fired
+          ) /
+          projectile_data->lifespan
+        ),
+        1.0f
+      ),
+      0.0f
+    )
   );
 
   data_vertex.color = float4(
-    data_object->color.x,
-    data_object->color.y,
-    data_object->color.z,
-    data_object->color.w
+    projectile_data->color.x,
+    projectile_data->color.y,
+    projectile_data->color.z,
+    (1.0f - percentage_lifespan) *
+    metal::fmin(
+      id_vertex,
+      1.0f
+    )
   );
 
   return data_vertex;
@@ -67,6 +78,6 @@ struct data_vertex {
     data_vertex.color.r * data_vertex.brightness,
     data_vertex.color.g * data_vertex.brightness,
     data_vertex.color.b * data_vertex.brightness,
-    data_vertex.color.a * data_vertex.alpha
+    data_vertex.color.a
   );
 }
