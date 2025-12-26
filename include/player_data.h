@@ -7,7 +7,7 @@
 
 #include <Metal/MTLDevice.h>
 
-#define player_data_default_rate_fire 10
+#define player_data_default_rate_fire 24
 
 struct player_data {
   id<MTLDevice> _Nonnull metal_device;
