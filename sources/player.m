@@ -641,6 +641,10 @@ void player_poll(
       metil_renderable_projectile->renderable
     );
 
+    player_data->time_shot = (
+      *player_data->time
+    );
+
     object_projectile_initialize(
       metil_object_projectile,
       player_data->metal_device,
@@ -656,20 +660,27 @@ void player_poll(
         .x = player->rotation.x,
         .y = -player->rotation.y,
         .z = player->rotation.z
-      }
+      },
+      *player_data->time,
+      player_data->is_boosted == 0
+      ? 200.0f :
+      800.0f
     );
 
     player_data->shooting = 2;
   } else if (
     player_data->shooting > 1
   ) {
-    player_data->shooting = (
-      (
-        player_data->shooting +
-        1
-      ) %
-      4
-    );
+    if (
+      *player_data->time -
+      player_data->time_shot > (
+        player_data->is_boosted == 0
+        ? player_data->rate_fire
+        : player_data->rate_fire / 8
+      )
+    ) {
+      player_data->shooting = 0;
+    }
   }
 }
 

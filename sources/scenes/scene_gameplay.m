@@ -7,6 +7,7 @@
 #include <pipeline_index.h>
 #include <player.h>
 #include <player_data.h>
+#include <projectile_data.h>
 #include <textures/textures_buildings.h>
 
 #include <metil_audio/metil_audio_io_proc.h>
@@ -243,6 +244,8 @@ void scene_gameplay_populate(
     player_data
   );
 
+  player_data->time = &scene->time;
+
   struct metil_group* metil_group_buildings = (
     scene->renderables[
       scene_gameplay_renderables_index_buildings
@@ -364,6 +367,11 @@ void scene_gameplay_poll(
     ].renderable
   );
 
+  float time_delta_percent = (
+    (float) scene->time_delta /
+    1000.0f
+  );
+
   for (
     unsigned int index_projectile = 0;
     index_projectile < metil_group_projectiles->length;
@@ -374,12 +382,22 @@ void scene_gameplay_poll(
       ]->renderable
     );
 
-    struct metil_renderer_data_object* metil_renderer_data_object = (
+    struct projectile_data* projectile_data = (
       metil_object_projectile->data.contents
     );
 
+    projectile_data->time_current = (
+      scene->time
+    );
+
+    projectile_data->time_delta_percent = (
+      time_delta_percent
+    );
+
     if (
-      metil_renderer_data_object->noise == 0
+      projectile_data->time_current -
+      projectile_data->time_fired >
+      projectile_data->lifespan
     ) {
       metil_group_destroy_renderable_at_index(
         metil_group_projectiles,

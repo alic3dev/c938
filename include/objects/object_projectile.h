@@ -1,6 +1,8 @@
 #ifndef __object_projectile_h
 #define __object_projectile_h
 
+#include <projectile_data.h>
+
 #include <clic3_vector.h>
 
 #include <metil_object.h>
@@ -11,7 +13,14 @@ void object_projectile_initialize(
   struct metil_object* _Nonnull,
   id<MTLDevice> _Nonnull,
   struct clic3_vector3_float,
-  struct clic3_vector3_float
+  struct clic3_vector3_float,
+  unsigned long int,
+  float
+);
+
+void object_projectile_travel(
+  struct metil_object* _Nonnull metil_object,
+  struct projectile_data* _Nonnull projectile_data
 );
 
 void object_projectile_poll(
