@@ -15,6 +15,7 @@ void player_data_initialize(
 
   player_data->time_jump = 0;
   player_data->time_boost = 0;
+  player_data->time_shot = 0;
 
   player_data->is_jumping = 0;
   player_data->is_jumping_secondary = 0;
@@ -25,7 +26,7 @@ void player_data_initialize(
 
   player_data->height = __metil_camera_height_default;
 
-  player_data->time_shot = player_data_default_rate_fire;
+  player_data->rate_fire = player_data_default_rate_fire;
 
   player_data->time = (
     (void*) 0
