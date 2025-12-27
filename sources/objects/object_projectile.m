@@ -47,7 +47,9 @@ void object_projectile_initialize(
   object->rotation.z = angle.z;
 
   struct projectile_data* projectile_data = (
-    object->data.contents
+    object->buffers_vertex[
+      metil_object_buffer_default_index_data
+    ].buffer.contents
   );
 
   projectile_data->color.x = 0.7f;
@@ -142,7 +144,9 @@ void object_projectile_poll(
   struct metil_camera* metil_camera
 ) {
   struct projectile_data* projectile_data = (
-    metil_object->data.contents
+    metil_object->buffers_vertex[
+      metil_object_buffer_default_index_data
+    ].buffer.contents
   );
 
   object_projectile_travel(

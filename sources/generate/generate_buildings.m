@@ -85,7 +85,9 @@ void generate_buildings(
   );
 
   struct metil_renderer_data_object* data = (
-    object->data.contents
+    object->buffers_vertex[
+      metil_object_buffer_default_index_data
+    ].buffer.contents
   );
 
   struct rand_parameters rand_parameters;
@@ -202,7 +204,9 @@ void generate_buildings(
       metal_device
     );
 
-    data = object->data.contents;
+    data = object->buffers_vertex[
+      metil_object_buffer_default_index_data
+    ].buffer.contents;
 
     if (
       index_building == 2

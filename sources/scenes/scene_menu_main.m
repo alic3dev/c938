@@ -132,7 +132,9 @@ void scene_menu_main_initialize(
   );
 
   struct metil_renderer_data_menu_item* data_object = (
-    object->data.contents
+    object->buffers_vertex[
+      metil_object_buffer_default_index_data
+    ].buffer.contents
   );
 
   metil_renderable_initialize_at_index(
@@ -179,7 +181,9 @@ void scene_menu_main_initialize(
     ]
   );
 
-  data_object = object->data.contents;
+  data_object = object->buffers_vertex[
+    metil_object_buffer_default_index_data
+  ].buffer.contents;
 
   metil_renderable_initialize_at_index(
     scene->renderables,
@@ -218,7 +222,9 @@ void scene_menu_main_initialize(
     -10.0f
   );
 
-  data_object = object->data.contents;
+  data_object = object->buffers_vertex[
+    metil_object_buffer_default_index_data
+  ].buffer.contents;
   
   metil_object_texture_add(
     object,
@@ -293,35 +299,45 @@ void scene_menu_main_poll(
   switch (menu->index_current) {
     case 0: {
       struct metil_renderer_data_object* data_object = (
-        (
-          (struct metil_object*) scene->renderables[
-            scene_menu_main_renderables_index_menu_enter
-          ].renderable
-        )->data.contents
-      );
+        (struct metil_object*) scene->renderables[
+          scene_menu_main_renderables_index_menu_enter
+        ].renderable
+      )->buffers_vertex[
+        metil_object_buffer_default_index_data
+      ].buffer.contents;
+
       data_object->noise = 1;
 
       data_object = (
         (struct metil_object*) scene->renderables[
           scene_menu_main_renderables_index_menu_exit
         ].renderable
-      )->data.contents;
+      )->buffers_vertex[
+        metil_object_buffer_default_index_data
+      ].buffer.contents;
+
       data_object->noise = 0;
       break;
     }
     case 1: {
       struct metil_renderer_data_object* data_object = (
-        ((struct metil_object*) scene->renderables[
+        (struct metil_object*) scene->renderables[
           scene_menu_main_renderables_index_menu_exit
-        ].renderable)->data.contents
-      );
+        ].renderable
+      )->buffers_vertex[
+        metil_object_buffer_default_index_data
+      ].buffer.contents;
+
       data_object->noise = 1;
 
       data_object = (
         (struct metil_object*) scene->renderables[
           scene_menu_main_renderables_index_menu_enter
         ].renderable
-      )->data.contents;
+      )->buffers_vertex[
+        metil_object_buffer_default_index_data
+      ].buffer.contents;
+
       data_object->noise = 0;
       break;
     }

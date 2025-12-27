@@ -42,7 +42,9 @@ void object_crosshair_initialize(
   object->position.z = 0.0f;
 
   struct metil_renderer_data_object* data = (
-    object->data.contents
+    object->buffers_vertex[
+      metil_object_buffer_default_index_data
+    ].buffer.contents
   );
 
   data->color.x = 1.0f;

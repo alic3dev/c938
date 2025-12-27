@@ -158,7 +158,9 @@ void scene_gameplay_initialize(
   );
 
   struct metil_renderer_data_object* data = (
-    object->data.contents
+    object->buffers_vertex[
+      metil_object_buffer_default_index_data
+    ].buffer.contents
   );
 
   object = (
@@ -167,7 +169,9 @@ void scene_gameplay_initialize(
     ].renderable
   );
 
-  data = object->data.contents;
+  data = object->buffers_vertex[
+    metil_object_buffer_default_index_data
+  ].buffer.contents;
 
   data->noise = 2000;
 
@@ -181,7 +185,9 @@ void scene_gameplay_initialize(
     ].renderable
   );
 
-  data = object->data.contents;
+  data = object->buffers_vertex[
+    metil_object_buffer_default_index_data
+  ].buffer.contents;
 
   data->noise = 1.0f;
 
@@ -195,7 +201,9 @@ void scene_gameplay_initialize(
     ].renderable
   );
 
-  data = object->data.contents;
+  data = object->buffers_vertex[
+    metil_object_buffer_default_index_data
+  ].buffer.contents;
 
   data->noise = 2000;
 
@@ -383,7 +391,9 @@ void scene_gameplay_poll(
     );
 
     struct projectile_data* projectile_data = (
-      metil_object_projectile->data.contents
+      metil_object_projectile->buffers_vertex[
+        metil_object_buffer_default_index_data
+      ].buffer.contents
     );
 
     projectile_data->time_current = (
@@ -428,7 +438,9 @@ void scene_gameplay_poll(
   );
 
   struct metil_renderer_data_object* data = (
-    object->data.contents
+    object->buffers_vertex[
+      metil_object_buffer_default_index_data
+    ].buffer.contents
   );
 
   if (
@@ -454,7 +466,9 @@ void scene_gameplay_poll(
     ].renderable
   );
 
-  data = object->data.contents;
+  data = object->buffers_vertex[
+    metil_object_buffer_default_index_data
+  ].buffer.contents;
 
   data->noise = (
     player_data->is_jumping != 0
@@ -468,7 +482,9 @@ void scene_gameplay_poll(
     ].renderable
   );
 
-  data = object->data.contents;
+  data = object->buffers_vertex[
+    metil_object_buffer_default_index_data
+  ].buffer.contents;
 
   data->noise = (
     player_data->is_jumping_secondary != 0
