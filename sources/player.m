@@ -37,6 +37,9 @@ void player_poll_input(
     player_data->is_boosted == 0 &&
     (metil_input_map_keydown[
       metil_keycode_x
+    ] == 1 || 
+    metil_input_map_keydown[
+      metil_keycode_period
     ] == 1 || (
       metil_controller_state.available == 1 &&
       metil_controller_state.r1 >= 0.1f
@@ -320,13 +323,13 @@ void player_poll_input(
       .x = (
         (
           metil_input_map_keydown[
-            metil_keycode_right_arrow
+            metil_keycode_single_quote
           ] || metil_input_map_keydown[
             metil_keycode_d
           ]
         ) - (
           metil_input_map_keydown[
-            metil_keycode_left_arrow
+            metil_keycode_l
           ] || metil_input_map_keydown[
             metil_keycode_a
           ]
@@ -335,13 +338,13 @@ void player_poll_input(
       .y = (
         (
           metil_input_map_keydown[
-            metil_keycode_up_arrow
+            metil_keycode_p
           ] || metil_input_map_keydown[
             metil_keycode_w
           ]
         ) - (
           metil_input_map_keydown[
-            metil_keycode_down_arrow
+            metil_keycode_semi_colon
           ] || 
           metil_input_map_keydown[
             metil_keycode_s
@@ -379,7 +382,7 @@ void player_poll_input(
       metil_keycode_e
     ] == 1 ||
     metil_input_map_keydown[
-      metil_keycode_slash
+      metil_keycode_o
     ] == 1) && (
       player_data->is_jumping == 0 ||
       (player_data->is_jumping_secondary == 0 && delta_time_jump >= delta_time_jump_threshold)
@@ -408,7 +411,7 @@ void player_poll_input(
       metil_keycode_q
     ] == 1 ||
     metil_input_map_keydown[
-      metil_keycode_period
+      metil_keycode_opening_square_bracket
     ] == 1
   ) {
     player->velocity.y = (
