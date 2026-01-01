@@ -18,6 +18,7 @@
 #include <Metal/MTLTexture.h>
 
 void generate_buildings(
+  struct metil* metil,
   id<MTLDevice> metal_device,
   struct metil_group* metil_group_buildings,
   unsigned short int length_buildings,
@@ -29,6 +30,7 @@ void generate_buildings(
   struct metil_object* object_starting_point = (void*) 0;
 
   metil_group_destroy(
+    metil,
     metil_group_buildings
   );
 

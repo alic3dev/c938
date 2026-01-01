@@ -1,27 +1,22 @@
 #include <mesh/mesh_player.h>
 
-#include <metil_mesh/mesh.h>
-#include <metil_player.h>
+#include <metil_mesh/metil_mesh.h>
+#include <metil_player/metil_player_defaults.h>
 
 #include <clic3_vector.h>
 
 #include <math.h>
 #include <stdlib.h>
 
-const struct clic3_vector3_float mesh_player_size = {
-  .x = __metil_player_size_default_x,
-  .y = __metil_player_size_default_y * 13.0f / 16.0f,
-  .z = __metil_player_size_default_z
-};
-
 void mesh_player_initialize(
-  struct metil_mesh* mesh
+  struct metil_mesh* mesh,
+  struct metil_player_defaults* metil_player_defaults
 ) {
   metil_mesh_initialize(mesh);
 
-  mesh->size.x = mesh_player_size.x;
-  mesh->size.y = mesh_player_size.y;
-  mesh->size.z = mesh_player_size.z;
+  mesh->size.x = metil_player_defaults->size.x;
+  mesh->size.y = metil_player_defaults->size.y;
+  mesh->size.z = metil_player_defaults->size.z;
 
   mesh->length_vertices = 14;
   mesh->length_indices = (
@@ -41,7 +36,7 @@ void mesh_player_initialize(
   );
 
   mesh->vertices[0].x = 0;
-  mesh->vertices[0].y = mesh_player_size.y;
+  mesh->vertices[0].y = metil_player_defaults->size.y;
   mesh->vertices[0].z = 0;
   mesh->vertices[0].w = 1.0f;
 
@@ -56,9 +51,9 @@ void mesh_player_initialize(
       M_PI * 2.0f
     );
     
-    mesh->vertices[index_vertex].x = cos(angle) * mesh_player_size.x;
+    mesh->vertices[index_vertex].x = cos(angle) * metil_player_defaults->size.x;
     mesh->vertices[index_vertex].y = 0;
-    mesh->vertices[index_vertex].z = sin(angle) * mesh_player_size.z;
+    mesh->vertices[index_vertex].z = sin(angle) * metil_player_defaults->size.z;
     mesh->vertices[index_vertex].w = 1.0f;
   }
 

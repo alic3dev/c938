@@ -1,9 +1,8 @@
 #include <player_data.h>
 
-#include <metil_rendering/camera/camera.h>
-
 void player_data_initialize(
-  struct player_data* player_data
+  struct player_data* player_data,
+  float height
 ) {
   player_data->buildings = (
     (void*) 0
@@ -24,7 +23,7 @@ void player_data_initialize(
 
   player_data->shooting = 0;
 
-  player_data->height = __metil_camera_height_default;
+  player_data->height = height;
 
   player_data->rate_fire = player_data_default_rate_fire;
 

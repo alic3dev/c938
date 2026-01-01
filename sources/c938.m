@@ -9,16 +9,20 @@
 #if target_os_ios
 #include <metil_application/metil_application.h>
 #include <metil_application/metil_application_delegate.h>
+#include <metil_application/metil_view_controller.h>
 #endif
-#include <metil_configuration/configuration.h>
 #include <metil_initialize.h>
 #include <metil_library.h>
-#include <metil_player.h>
+#include <metil_player/metil_player.h>
 #include <metil_rendering/metil_renderer_interface.h>
-#include <metil_scenes/scene.h>
-#include <metil_scenes/scene_controller.h>
+#include <metil_scenes/metil_scene.h>
+#include <metil_scenes/metil_scene_controller.h>
 
-#include <Metal/MTLDevice.h>
+#if target_os_ios
+char* c938_executable_path = (
+  (void*) 0
+);
+#endif
 
 int main(
   int length_parameters,
@@ -28,17 +32,13 @@ int main(
   const char** parameters
   #endif
 ) {
-  metil_configuration_default_rendering_properties_brightness = 1.0f;
-  metil_configuration_default_rendering_properties_brightness_text = 1.0f;
-
-  metil_player_speed_movement_default = player_speed_movement_default;
-
   #if target_os_ios
-  metil_initialize(
-    length_parameters,
-    parameters,
-    "c938",
-    c938_renderer_on_initialize
+  c938_executable_path = (
+    parameters[0]
+  );
+
+  metil_view_controller_on_view_did_load = (
+    c938_view_controller_on_view_did_load
   );
 
   return UIApplicationMain(
@@ -57,137 +57,163 @@ int main(
   #endif
 }
 
+#if target_os_ios
+void c938_view_controller_on_view_did_load() {
+  metil_initialize(
+    1,
+    &c938_executable_path,
+    "c938",
+    c938_renderer_on_initialize
+  );
+}
+#endif
+
 void c938_renderer_on_initialize(
-  struct metil_renderer_interface* metil_renderer_interface,
+  struct metil* metil,
   void* data
 ) {
+  metil->player_defaults.speed_movement = (
+    player_speed_movement_default
+  );
+
   metil_library_initialize(
-    metil_renderer_interface->metal_device,
+    &metil->library,
+    metil->renderer_interface.metal_device,
     @"c938_fragment",
     @"c938_vertex"
   );
 
-  metil_renderer_interface->rendering_properties->color_clear.x = (
-    0.0f * metil_configuration.rendering_properties.brightness
+  metil->renderer_interface.rendering_properties->color_clear.x = (
+    0.0f *
+    metil->rendering_properties.brightness
   );
   
-  metil_renderer_interface->rendering_properties->color_clear.y = (
-    0.0f * metil_configuration.rendering_properties.brightness
+  metil->renderer_interface.rendering_properties->color_clear.y = (
+    0.0f *
+    metil->rendering_properties.brightness
   );
 
-  metil_renderer_interface->rendering_properties->color_clear.z = (
-    0.0f * metil_configuration.rendering_properties.brightness
+  metil->renderer_interface.rendering_properties->color_clear.z = (
+    0.0f *
+    metil->rendering_properties.brightness
   );
 
-  metil_renderer_interface->rendering_properties->color_clear.w = (
+  metil->renderer_interface.rendering_properties->color_clear.w = (
     1.0f
   );
 
   c938_pipeline_index_building = [
-    metil_renderer_interface->renderer
+    metil->renderer_interface.renderer
     pipeline_add: [
-      metil_library.library
+      metil->library.library
       newFunctionWithName: @"c938_building_fragment"
     ]
     function_vertex: [
-      metil_library.library
+      metil->library.library
       newFunctionWithName: @"c938_building_vertex"
     ]
   ];
 
   c938_pipeline_index_ground = [
-    metil_renderer_interface->renderer
+    metil->renderer_interface.renderer
     pipeline_add: [
-      metil_library.library
+      metil->library.library
       newFunctionWithName: @"c938_ground_fragment"
     ]
     function_vertex: [
-      metil_library.library
+      metil->library.library
       newFunctionWithName: @"c938_ground_vertex"
     ]
   ];
 
   c938_pipeline_index_hud_item = [
-    metil_renderer_interface->renderer
+    metil->renderer_interface.renderer
     pipeline_add: [
-      metil_library.library
+      metil->library.library
       newFunctionWithName: @"c938_hud_item_fragment"
     ]
     function_vertex: [
-      metil_library.library
+      metil->library.library
       newFunctionWithName: @"c938_hud_item_vertex"
     ]
   ];
 
   c938_pipeline_index_player = [
-    metil_renderer_interface->renderer
+    metil->renderer_interface.renderer
     pipeline_add: [
-      metil_library.library
+      metil->library.library
       newFunctionWithName: @"c938_player_fragment"
     ]
     function_vertex: [
-      metil_library.library
+      metil->library.library
       newFunctionWithName: @"c938_player_vertex"
     ]
   ];
 
   c938_pipeline_index_text = [
-    metil_renderer_interface->renderer
+    metil->renderer_interface.renderer
     pipeline_add: [
-      metil_library.library
+      metil->library.library
       newFunctionWithName: @"c938_text_fragment"
     ]
     function_vertex: [
-      metil_library.library
+      metil->library.library
       newFunctionWithName: @"c938_text_vertex"
     ]
   ];
 
   c938_pipeline_index_crosshair = [
-    metil_renderer_interface->renderer
+    metil->renderer_interface.renderer
     pipeline_add: [
-      metil_library.library
+      metil->library.library
       newFunctionWithName: @"c938_crosshair_fragment"
     ]
     function_vertex: [
-      metil_library.library
+      metil->library.library
       newFunctionWithName: @"c938_crosshair_vertex"
     ]
   ];
 
   c938_pipeline_index_projectile = [
-    metil_renderer_interface->renderer
+    metil->renderer_interface.renderer
     pipeline_add: [
-      metil_library.library
+      metil->library.library
       newFunctionWithName: @"c938_projectile_fragment"
     ]
     function_vertex: [
-      metil_library.library
+      metil->library.library
       newFunctionWithName: @"c938_projectile_vertex"
     ]
   ];
 
   scene_menu_main_initialize(
-    &metil_scene_controller.scene,
-    metil_renderer_interface
+    metil,
+    &((struct metil_scene_controller*) metil->scene_controller)->scene
   );
 
   metil_scene_controller_on_scene_change_add(
+    metil->scene_controller,
     c938_on_scene_change,
-    metil_renderer_interface
+    (void*) 0
   );
 }
 
 void c938_on_scene_change(
+  struct metil* metil,
   int id_scene,
   void* data
 ) {
-  struct metil_renderer_interface* metil_renderer_interface = (
-    data
+  struct metil_scene_controller* metil_scene_controller = (
+    metil->scene_controller
+  );
+
+  struct metil_scene* metil_scene = &(
+    metil_scene_controller->scene
   );
 
   metil_scene_destroy(
-    &metil_scene_controller.scene
+    metil,
+    metil_scene
   );
 
   switch (
@@ -196,14 +222,14 @@ void c938_on_scene_change(
     case scene_id_unknown:
     case scene_id_menu_main:
       scene_menu_main_initialize(
-        &metil_scene_controller.scene,
-        metil_renderer_interface
+        metil,
+        metil_scene
       );
       break;
     case scene_id_gameplay:
       scene_gameplay_initialize(
-        &metil_scene_controller.scene,
-        metil_renderer_interface
+        metil,
+        metil_scene
       );
       break;
   }
