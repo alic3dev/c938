@@ -1,9 +1,10 @@
 #ifndef __scenes_scene_menu_main_h
 #define __scenes_scene_menu_main_h
 
-#include <metil_menus/menu.h>
+#include <metil.h>
+#include <metil_menus/metil_menu.h>
 #include <metil_rendering/metil_renderer_interface.h>
-#include <metil_scenes/scene.h>
+#include <metil_scenes/metil_scene.h>
 
 #if !target_os_ios
 #include <CoreAudio/CoreAudio.h>
@@ -33,19 +34,22 @@ struct scene_menu_main_data {
 };
 
 void scene_menu_main_initialize(
-  struct metil_scene* _Nonnull,
-  struct metil_renderer_interface* _Nonnull
+  struct metil* _Nonnull,
+  struct metil_scene* _Nonnull
 );
 
 void scene_menu_main_poll(
+  struct metil* _Nonnull,
   struct metil_scene* _Nonnull
 );
 
 void scene_menu_main_poll_input(
+  struct metil* _Nonnull,
   struct metil_scene* _Nonnull
 );
 
 void scene_menu_main_destroy(
+  struct metil* _Nonnull,
   struct metil_scene* _Nonnull
 );
 

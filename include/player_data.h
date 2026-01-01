@@ -35,7 +35,8 @@ struct player_data {
 };
 
 void player_data_initialize(
-  struct player_data* _Nonnull
+  struct player_data* _Nonnull,
+  float
 );
 
 #endif

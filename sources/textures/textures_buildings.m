@@ -1,13 +1,14 @@
 #include <textures/textures_buildings.h>
 
-#include <metil_paths/paths.h>
+#include <metil_paths/metil_paths.h>
 
 #include <Metal/MTLTexture.h>
 #include <MetalKit/MTKTextureLoader.h>
 
 void textures_buildings_load(
   MTKTextureLoader* texture_loader,
-  id<MTLTexture>* textures
+  id<MTLTexture>* textures,
+  struct metil_paths* metil_paths
 ) {
   textures[
     0
@@ -17,7 +18,7 @@ void textures_buildings_load(
       isDirectory: 0
       relativeToURL: [NSURL
         fileURLWithPath:[NSString
-          stringWithUTF8String: metil_paths.directory_textures
+          stringWithUTF8String: metil_paths->directory_textures
         ]
         isDirectory: 1
       ]

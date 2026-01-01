@@ -10,30 +10,39 @@
 #include <projectile_data.h>
 #include <textures/textures_buildings.h>
 
+#include <metil.h>
 #include <metil_audio/metil_audio_io_proc.h>
-#include <metil_debug/log.h>
+#include <metil_debug/metil_debug_log.h>
 #include <metil_group.h>
 #include <metil_object.h>
-#include <metil_paths/paths.h>
+#include <metil_paths/metil_paths.h>
 #include <metil_positioning.h>
 #include <metil_rendering/metil_renderer_data_object.h>
 #include <metil_rendering/metil_renderer_interface.h>
-#include <metil_scenes/scene.h>
+#include <metil_scenes/metil_scene.h>
 
 #include <stdlib.h>
 
 void scene_gameplay_initialize(
-  struct metil_scene* scene,
-  struct metil_renderer_interface* renderer_interface
+  struct metil* metil,
+  struct metil_scene* scene
 ) {
+  metil->rendering_properties.brightness = (
+    metil->configuration.rendering_properties.brightness
+  );
+  metil->rendering_properties.brightness_text = (
+    metil->configuration.rendering_properties.brightness_text
+  );
+
   metil_scene_initialize_with_renderables(
+    metil,
     scene,
-    renderer_interface,
     7
   );
 
   #if !target_os_ios
   metil_audio_io_proc_add(
+    &metil->audio,
     scene_gameplay_io_proc
   );
   #endif
@@ -106,7 +115,7 @@ void scene_gameplay_initialize(
 
     metil_object_buffers_initialize(
       object,
-      scene->renderer_interface->metal_device
+      metil->renderer_interface.metal_device
     );
 
     object->positioning = metil_positioning_static;
@@ -125,12 +134,13 @@ void scene_gameplay_initialize(
 
   MTKTextureLoader* texture_loader = [
     [MTKTextureLoader alloc]
-    initWithDevice: scene->renderer_interface->metal_device
+    initWithDevice: metil->renderer_interface.metal_device
   ];
 
   textures_buildings_load(
     texture_loader,
-    scene->textures
+    scene->textures,
+    &metil->paths
   );
 
   [texture_loader release];
@@ -140,14 +150,15 @@ void scene_gameplay_initialize(
   ].renderable;
 
   mesh_player_initialize(
-    &object->mesh
+    &object->mesh,
+    &metil->player_defaults
   );
 
   object->positioning = metil_positioning_player;
 
   metil_object_buffers_initialize(
     object,
-    scene->renderer_interface->metal_device
+    metil->renderer_interface.metal_device
   );
 
   metil_object_texture_add(
@@ -219,16 +230,18 @@ void scene_gameplay_initialize(
 
   object_crosshair_initialize(
     object,
-    scene->renderer_interface->metal_device
+    metil->renderer_interface.metal_device
   );
 
   scene_gameplay_populate(
+    metil,
     scene,
     scene_gameplay_length_buildings_default
   );
 }
 
 void scene_gameplay_populate(
+  struct metil* metil,
   struct metil_scene* scene,
   unsigned short int length_buildings
 ) {
@@ -237,7 +250,7 @@ void scene_gameplay_populate(
   scene->player.rotation.z = 0.0f;
 
   scene->player.speed_movement = (
-    metil_player_speed_movement_default
+    metil->player_defaults.speed_movement
   );
 
   scene->player.velocity.x = 0.0f;
@@ -249,7 +262,8 @@ void scene_gameplay_populate(
   );
 
   player_data_initialize(
-    player_data
+    player_data,
+    metil->rendering_properties.camera.height_default
   );
 
   player_data->time = &scene->time;
@@ -267,6 +281,7 @@ void scene_gameplay_populate(
   );
 
   metil_group_destroy(
+    metil,
     metil_group_projectiles
   );
 
@@ -275,7 +290,8 @@ void scene_gameplay_populate(
   );
 
   generate_buildings(
-    scene->renderer_interface->metal_device,
+    metil,
+    metil->renderer_interface.metal_device,
     metil_group_buildings,
     length_buildings,
     scene->textures[
@@ -305,7 +321,7 @@ void scene_gameplay_populate(
   object->position.y = scene->player.position.y;
 
   player_data->metal_device = (
-    scene->renderer_interface->metal_device
+    metil->renderer_interface.metal_device
   );
 
   player_data->buildings = (
@@ -317,11 +333,12 @@ void scene_gameplay_populate(
   );
 
   player_data->height = (
-    scene->renderer_interface->rendering_properties->camera.height
+    metil->rendering_properties.camera.height
   );
 }
 
 void scene_gameplay_poll(
+  struct metil* metil,
   struct metil_scene* scene
 ) {
   struct player_data* player_data = (
@@ -349,6 +366,7 @@ void scene_gameplay_poll(
     }
 
     scene_gameplay_populate(
+      metil,
       scene,
       length_buildings_reduced
     );
@@ -358,6 +376,7 @@ void scene_gameplay_poll(
     scene->player.position.y <= 10.0f
   ) {
     scene_gameplay_populate(
+      metil,
       scene,
       scene_gameplay_length_buildings_default
     );
@@ -366,6 +385,7 @@ void scene_gameplay_poll(
   }
 
   metil_scene_poll_default(
+    metil,
     scene
   );
 
@@ -410,6 +430,7 @@ void scene_gameplay_poll(
       projectile_data->lifespan
     ) {
       metil_group_destroy_renderable_at_index(
+        metil,
         metil_group_projectiles,
         index_projectile
       );
@@ -494,15 +515,18 @@ void scene_gameplay_poll(
 }
 
 void scene_gameplay_destroy(
+  struct metil* metil,
   struct metil_scene* scene
 ) {
   #if !target_os_ios
   metil_audio_io_proc_remove(
+    &metil->audio,
     scene_gameplay_io_proc
   );
   #endif
 
   metil_scene_destroy_default(
+    metil,
     scene
   );
 }

@@ -10,6 +10,7 @@
 #include <metil_object.h>
 #include <metil_positioning.h>
 #include <metil_rendering/metil_renderer_data_object.h>
+#include <metil_scenes/metil_scene_controller.h>
 
 #include <Metal/MTLDevice.h>
 #include <Metal/MTLRenderCommandEncoder.h>
@@ -137,6 +138,7 @@ void object_projectile_travel(
 }
 
 void object_projectile_poll(
+  struct metil* metil,
   struct metil_object* metil_object,
   matrix_float3x4* matrix_projection_static,
   matrix_float4x4* matrix_object_projection,
@@ -162,6 +164,7 @@ void object_projectile_poll(
     matrix_player_projection,
     &metil_object->position,
     &metil_object->rotation,
+    &((struct metil_scene_controller*) metil->scene_controller)->scene.player.position,
     metil_camera
   );
 }

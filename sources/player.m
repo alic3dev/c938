@@ -3,13 +3,11 @@
 #include <objects/object_projectile.h>
 #include <player_data.h>
 
-#include <metil_input/controller_state.h>
-#include <metil_input/cursor.h>
 #include <metil_group.h>
-#include <metil_input/keycodes.h>
-#include <metil_input/map.h>
+#include <metil_input/metil_keycodes.h>
+#include <metil_input/metil_input_map.h>
 #include <metil_object.h>
-#include <metil_player.h>
+#include <metil_player/metil_player.h>
 
 #include <math.h>
 #include <stdlib.h>
@@ -21,6 +19,7 @@ const float player_jump_velocity = 90.0f;
 const unsigned long int delta_time_jump_threshold = 250;
 
 void player_poll_input(
+  struct metil* metil,
   struct metil_player* player,
   unsigned long int time,
   unsigned long int time_delta
@@ -35,14 +34,14 @@ void player_poll_input(
 
   if (
     player_data->is_boosted == 0 &&
-    (metil_input_map_keydown[
+    (metil->input.keydown_map[
       metil_keycode_x
     ] == 1 || 
-    metil_input_map_keydown[
+    metil->input.keydown_map[
       metil_keycode_period
     ] == 1 || (
-      metil_controller_state.available == 1 &&
-      metil_controller_state.r1 >= 0.1f
+      metil->input.controller_state.available == 1 &&
+      metil->input.controller_state.r1 >= 0.1f
     ))
   ) {
     player->speed_movement = (
@@ -82,35 +81,35 @@ void player_poll_input(
   );
 
   if (
-    metil_controller_state.available == 1 &&
-    metil_controller_state.l2 >= 0.1f &&
-    metil_controller_state.l3 == 0.0f
+    metil->input.controller_state.available == 1 &&
+    metil->input.controller_state.l2 >= 0.1f &&
+    metil->input.controller_state.l3 == 0.0f
   ) {
     player->speed_movement = (
       player->speed_movement *
-      (metil_controller_state.l2 + 1.0f)
+      (metil->input.controller_state.l2 + 1.0f)
     );
   } else if (
-    metil_controller_state.available == 1 &&
-    metil_controller_state.l2 < 0.1f &&
-    metil_controller_state.l3 >= 0.1f
+    metil->input.controller_state.available == 1 &&
+    metil->input.controller_state.l2 < 0.1f &&
+    metil->input.controller_state.l3 >= 0.1f
   ) {
     player->speed_movement = (
       player->speed_movement / 2.0f
     );
   } else if (
     (
-      metil_input_map_keydown[
+      metil->input.keydown_map[
         metil_keycode_option_right
       ] == 1 ||
-      metil_input_map_keydown[
+      metil->input.keydown_map[
         metil_keycode_control
       ] == 1
     )  && (
-      metil_input_map_keydown[
+      metil->input.keydown_map[
         metil_keycode_shift_left
       ] == 0 &&
-      metil_input_map_keydown[
+      metil->input.keydown_map[
         metil_keycode_shift_right
       ] == 0
     )
@@ -120,17 +119,17 @@ void player_poll_input(
     );
   } else if (
     (
-      metil_input_map_keydown[
+      metil->input.keydown_map[
         metil_keycode_option_right
       ] == 0 &&
-      metil_input_map_keydown[
+      metil->input.keydown_map[
         metil_keycode_control
       ] == 0
     ) && (
-      metil_input_map_keydown[
+      metil->input.keydown_map[
         metil_keycode_shift_left
       ] == 1 ||
-      metil_input_map_keydown[
+      metil->input.keydown_map[
         metil_keycode_shift_right
       ] == 1 
     )
@@ -157,44 +156,44 @@ void player_poll_input(
   };
 
   if (
-    metil_input_cursor.locked == 1
+    metil->input.cursor.locked == 1
   ) {
     player->rotation.y = (
       player->rotation.y - (
-        metil_input_cursor.delta.x / 50.0f *
+        metil->input.cursor.delta.x / 50.0f *
         player->speed_rotation
       )
     );
 
     player->rotation.x = (
       player->rotation.x - (
-        metil_input_cursor.delta.y / 50.0f *
+        metil->input.cursor.delta.y / 50.0f *
         player->speed_rotation
       )
     );
 
-    metil_input_cursor.delta.x = 0;
-    metil_input_cursor.delta.y = 0;
+    metil->input.cursor.delta.x = 0;
+    metil->input.cursor.delta.y = 0;
   }
 
-  if (metil_controller_state.available == 1) {
+  if (metil->input.controller_state.available == 1) {
     if (
-      metil_controller_state.right_stick.x != 0.0f
+      metil->input.controller_state.right_stick.x != 0.0f
     ) {
       player->rotation.y = (
         player->rotation.y - (
-          metil_controller_state.right_stick.x *
+          metil->input.controller_state.right_stick.x *
           player->speed_rotation
         )
       );
     }
 
     if (
-      metil_controller_state.right_stick.y != 0.0f
+      metil->input.controller_state.right_stick.y != 0.0f
     ) {
       player->rotation.x = (
         player->rotation.x + (
-          metil_controller_state.right_stick.y *
+          metil->input.controller_state.right_stick.y *
           player->speed_rotation
         )
       );
@@ -305,48 +304,48 @@ void player_poll_input(
   }
 
   if (
-    metil_controller_state.available == 1 &&
-    metil_controller_state.left_stick.x != 0.0f ||
-    metil_controller_state.left_stick.y != 0.0f
+    metil->input.controller_state.available == 1 &&
+    metil->input.controller_state.left_stick.x != 0.0f ||
+    metil->input.controller_state.left_stick.y != 0.0f
   ) {
     movement.x = (
-      (metil_controller_state.left_stick.y * ratio_movement.x) +
-      (metil_controller_state.left_stick.x * ratio_movement_strafe.x)
+      (metil->input.controller_state.left_stick.y * ratio_movement.x) +
+      (metil->input.controller_state.left_stick.x * ratio_movement_strafe.x)
     );
 
     movement.z = (
-      (metil_controller_state.left_stick.y * ratio_movement.y) +
-      (metil_controller_state.left_stick.x * ratio_movement_strafe.y)
+      (metil->input.controller_state.left_stick.y * ratio_movement.y) +
+      (metil->input.controller_state.left_stick.x * ratio_movement_strafe.y)
     );
   } else {
     struct clic3_vector2_float direction_arrows = {
       .x = (
         (
-          metil_input_map_keydown[
+          metil->input.keydown_map[
             metil_keycode_single_quote
-          ] || metil_input_map_keydown[
+          ] || metil->input.keydown_map[
             metil_keycode_d
           ]
         ) - (
-          metil_input_map_keydown[
+          metil->input.keydown_map[
             metil_keycode_l
-          ] || metil_input_map_keydown[
+          ] || metil->input.keydown_map[
             metil_keycode_a
           ]
         )
       ),
       .y = (
         (
-          metil_input_map_keydown[
+          metil->input.keydown_map[
             metil_keycode_p
-          ] || metil_input_map_keydown[
+          ] || metil->input.keydown_map[
             metil_keycode_w
           ]
         ) - (
-          metil_input_map_keydown[
+          metil->input.keydown_map[
             metil_keycode_semi_colon
           ] || 
-          metil_input_map_keydown[
+          metil->input.keydown_map[
             metil_keycode_s
           ]
         )
@@ -378,10 +377,10 @@ void player_poll_input(
   }
 
   if (
-    (metil_input_map_keydown[
+    (metil->input.keydown_map[
       metil_keycode_e
     ] == 1 ||
-    metil_input_map_keydown[
+    metil->input.keydown_map[
       metil_keycode_o
     ] == 1) && (
       player_data->is_jumping == 0 ||
@@ -399,18 +398,18 @@ void player_poll_input(
   }
 
   if (
-    metil_controller_state.available == 1 &&
-    metil_controller_state.l1 >= 0.1f
+    metil->input.controller_state.available == 1 &&
+    metil->input.controller_state.l1 >= 0.1f
   ) {
     player->velocity.y = (
       player->velocity.y -
-      (metil_controller_state.l1 * time_delta * 5.0f)
+      (metil->input.controller_state.l1 * time_delta * 5.0f)
     );
   } else if (
-    metil_input_map_keydown[
+    metil->input.keydown_map[
       metil_keycode_q
     ] == 1 ||
-    metil_input_map_keydown[
+    metil->input.keydown_map[
       metil_keycode_opening_square_bracket
     ] == 1
   ) {
@@ -421,11 +420,11 @@ void player_poll_input(
   }
 
   if (
-    (metil_input_map_keydown[
+    (metil->input.keydown_map[
       metil_keycode_space
     ] == 1 || (
-      metil_controller_state.available == 1 &&
-      metil_controller_state.cross >= 0.1f
+      metil->input.controller_state.available == 1 &&
+      metil->input.controller_state.cross >= 0.1f
     )) &&
     (
       player_data->is_jumping == 0 || 
@@ -610,9 +609,9 @@ void player_poll_input(
 
   if (
     player_data->shooting == 0 && (
-      metil_controller_state.available == 1 &&
-      metil_controller_state.r2 >= 0.1f ||
-      metil_input_cursor.down == 1
+      metil->input.controller_state.available == 1 &&
+      metil->input.controller_state.r2 >= 0.1f ||
+      metil->input.cursor.down == 1
     )
   ) {
     player_data->shooting = 1;
@@ -620,6 +619,7 @@ void player_poll_input(
 }
 
 void player_poll(
+  struct metil* metil,
   struct metil_player* player
 ) {
   struct player_data* player_data = (
@@ -688,6 +688,7 @@ void player_poll(
 }
 
 void player_destroy(
+  struct metil* metil,
   struct metil_player* player
 ) {
   free(
@@ -695,6 +696,7 @@ void player_destroy(
   );
 
   metil_player_destroy(
+    metil,
     player
   );
 }

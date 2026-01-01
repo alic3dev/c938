@@ -74,6 +74,7 @@
         <windowController
           id="windowcontroller-core"
           sceneMemberID="viewController"
+          customClass="metil_window_controller"
         >
           <window
             id="window-core"
