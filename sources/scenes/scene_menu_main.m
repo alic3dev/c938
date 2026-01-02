@@ -7,6 +7,7 @@
 #include <textures/textures_buildings.h>
 
 #include <metil_audio/metil_audio_io_proc.h>
+#include <metil_audio/metil_audio_io_proc_data.h>
 #include <metil_debug/metil_debug_log.h>
 #include <metil_group.h>
 #include <metil_input/metil_keycodes.h>
@@ -27,6 +28,7 @@
 #include <AppKit/AppKit.h>
 #include <CoreAudio/CoreAudio.h>
 #else
+#include <AVFAudio/AVFAudio.h>
 #include <UIKit/UIKit.h>
 #endif
 
@@ -34,13 +36,6 @@ void scene_menu_main_initialize(
   struct metil* metil,
   struct metil_scene* scene
 ) {
-  #if !target_os_ios
-  metil_audio_io_proc_add(
-    &metil->audio,
-    scene_menu_main_io_proc
-  );
-  #endif
-
   metil_scene_initialize_with_renderables(
     metil,
     scene,
@@ -268,6 +263,11 @@ void scene_menu_main_initialize(
   );
 
   scene->player.rotation.x = -0.3f;
+
+  metil_audio_io_proc_add(
+    &metil->audio,
+    scene_menu_main_io_proc
+  );
 }
 
 void scene_menu_main_poll(
@@ -436,12 +436,10 @@ void scene_menu_main_destroy(
   struct metil* metil,
   struct metil_scene* scene
 ) {
-  #if !target_os_ios
   metil_audio_io_proc_remove(
     &metil->audio,
     scene_menu_main_io_proc
   );
-  #endif
 
   metil_menu_destroy(
     &(
@@ -455,7 +453,61 @@ void scene_menu_main_destroy(
   );
 }
 
-#if !target_os_ios
+#if target_os_ios
+int scene_menu_main_io_proc(
+  unsigned char silence,
+  const AudioTimeStamp* _Nonnull timestamp,
+  AVAudioFrameCount frame_count,
+  AudioBufferList* _Nonnull output_data,
+  void* data
+) {
+  struct metil_audio_io_proc_data* metil_audio_io_proc_data = (
+    data
+  );
+
+  struct metil* metil = (
+    metil_audio_io_proc_data->metil
+  );
+
+  struct metil_scene_controller* metil_scene_controller = (
+    metil->scene_controller
+  );
+
+  struct metil_scene* metil_scene_gameplay = &(
+    metil_scene_controller->scene
+  );
+
+  struct scene_gameplay_data* scene_gameplay_data = (
+    metil_scene_gameplay->data
+  );
+
+  for (
+    unsigned int index_frame = 0;
+    index_frame < frame_count;
+    ++index_frame
+  ) {
+    for (
+      unsigned long int index_buffer = 0;
+      index_buffer < output_data->mNumberBuffers;
+      ++index_buffer
+    ) {
+      AudioBuffer audio_buffer_current = output_data->mBuffers[
+        index_buffer
+      ];
+
+      float* buffer_out = audio_buffer_current.mData;
+
+      buffer_out[
+        index_frame
+      ] = (
+        0.0f
+      );
+    }
+  }
+  
+  return 0;
+}
+#else
 OSStatus scene_menu_main_io_proc(
   AudioObjectID id_audio_object,
   const AudioTimeStamp* time_stamp_audio,
@@ -495,20 +547,11 @@ OSStatus scene_menu_main_io_proc(
         count_channel_out
       );
 
-      if (
-        index_buffer == 0
-      ) {
-        buffer_out[
-          index_buffer_out
-        ] = 0.0f;
-      } else {
-        buffer_out[
-          index_buffer_out
-        ] = buffer_out[
-          index_buffer_out -
-          channel
-        ];
-      }
+      buffer_out[
+        index_buffer_out
+      ] = (
+        0.0f
+      );
     }
   }
 
