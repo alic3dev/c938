@@ -1,12 +1,14 @@
 #ifndef __scenes_scene_gameplay_h
 #define __scenes_scene_gameplay_h
 
+#include <data/scene_gameplay_data.h>
+
 #include <metil.h>
-#include <metil_menus/metil_menu.h>
-#include <metil_rendering/metil_renderer_interface.h>
 #include <metil_scenes/metil_scene.h>
 
-#if !target_os_ios
+#if target_os_ios
+#include <AVFAudio/AVFAudio.h>
+#else
 #include <CoreAudio/CoreAudio.h>
 #endif
 
@@ -40,11 +42,6 @@ enum scene_gameplay_textures {
   scene_gameplay_textures_index_buildings = 0
 };
 
-struct scene_gameplay_data {
-  struct metil_menu menu;
-  unsigned char visible_menu;
-};
-
 void scene_gameplay_initialize(
   struct metil* _Nonnull,
   struct metil_scene* _Nonnull
@@ -66,7 +63,22 @@ void scene_gameplay_destroy(
   struct metil_scene* _Nonnull
 );
 
-#if !target_os_ios
+float scene_gameplay_io_proc_value_get(
+  struct scene_gameplay_data* _Nonnull,
+  unsigned long int,
+  unsigned long int,
+  unsigned long int
+);
+
+#if target_os_ios
+int scene_gameplay_io_proc(
+  unsigned char,
+  const AudioTimeStamp* _Nonnull,
+  unsigned int,
+  AudioBufferList* _Nonnull,
+  void* _Nonnull
+);
+#else
 OSStatus scene_gameplay_io_proc(
   AudioObjectID,
   const AudioTimeStamp* _Nonnull,

@@ -1,5 +1,9 @@
 #include <scenes/scene_gameplay.h>
 
+#include <data/enemy_data.h>
+#include <data/player_data.h>
+#include <data/projectile_data.h>
+#include <data/scene_gameplay_data.h>
 #include <generate/generate_buildings.h>
 #include <mesh/mesh_hud_item.h>
 #include <mesh/mesh_player.h>
@@ -13,6 +17,7 @@
 
 #include <metil.h>
 #include <metil_audio/metil_audio_io_proc.h>
+#include <metil_audio/metil_audio_io_proc_data.h>
 #include <metil_debug/metil_debug_log.h>
 #include <metil_group.h>
 #include <metil_object.h>
@@ -21,6 +26,7 @@
 #include <metil_rendering/metil_renderer_data_object.h>
 #include <metil_rendering/metil_renderer_interface.h>
 #include <metil_scenes/metil_scene.h>
+#include <metil_scenes/metil_scene_controller.h>
 
 #include <rand_functions.h>
 #include <rand_initialize.h>
@@ -28,6 +34,12 @@
 #include <rand_result.h>
 #include <rand_source.h>
 #include <rand_source_type.h>
+
+#if !target_os_ios
+#include <CoreAudio/CoreAudio.h>
+#else
+#include <UIKit/UIKit.h>
+#endif
 
 #include <stdlib.h>
 
@@ -48,12 +60,27 @@ void scene_gameplay_initialize(
     scene_gameplay_length_renderables
   );
 
-  #if !target_os_ios
-  metil_audio_io_proc_add(
-    &metil->audio,
-    scene_gameplay_io_proc
+  scene->data = malloc(
+    sizeof(struct scene_gameplay_data)
   );
-  #endif
+
+  struct scene_gameplay_data* scene_gameplay_data = (
+    scene->data
+  );
+
+  scene_gameplay_data->length_projectiles = 0;
+
+  for (
+    unsigned char index_projectile = 0;
+    index_projectile < scene_gameplay_data_length_projectiles_maximum;
+    ++index_projectile
+  ) {
+    scene_gameplay_data->fired_projectiles[
+      index_projectile
+    ] = (
+      0
+    );
+  }
 
   scene->player.poll = player_poll;
   scene->player.poll_input = player_poll_input;
@@ -247,6 +274,11 @@ void scene_gameplay_initialize(
     scene,
     scene_gameplay_length_buildings_default
   );
+
+  metil_audio_io_proc_add(
+    &metil->audio,
+    scene_gameplay_io_proc
+  );
 }
 
 void scene_gameplay_populate(
@@ -266,8 +298,12 @@ void scene_gameplay_populate(
   scene->player.velocity.y = 0.0f;
   scene->player.velocity.z = 0.0f;
 
+  struct scene_gameplay_data* scene_gameplay_data = (
+    scene->data
+  );
+
   struct player_data* player_data = (
-    (struct player_data*) scene->player.data
+    scene->player.data
   );
 
   player_data_initialize(
@@ -276,6 +312,20 @@ void scene_gameplay_populate(
   );
 
   player_data->time = &scene->time;
+
+  scene_gameplay_data->length_projectiles = 0;
+
+  for (
+    unsigned char index_projectile = 0;
+    index_projectile < scene_gameplay_data_length_projectiles_maximum;
+    ++index_projectile
+  ) {
+    scene_gameplay_data->fired_projectiles[
+      index_projectile
+    ] = (
+      0
+    );
+  }
 
   struct metil_group* metil_group_buildings = (
     scene->renderables[
@@ -765,12 +815,18 @@ void scene_gameplay_destroy(
   struct metil* metil,
   struct metil_scene* scene
 ) {
-  #if !target_os_ios
   metil_audio_io_proc_remove(
     &metil->audio,
     scene_gameplay_io_proc
   );
-  #endif
+
+  free(
+    scene->data
+  );
+
+  scene->data = (
+    (void*) 0
+  );
 
   metil_scene_destroy_default(
     metil,
@@ -778,7 +834,167 @@ void scene_gameplay_destroy(
   );
 }
 
-#if !target_os_ios
+
+unsigned int b = 100;
+unsigned int d = 1000;
+
+float scene_gameplay_io_proc_value_get(
+  struct scene_gameplay_data* scene_gameplay_data,
+  unsigned long int time_current,
+  unsigned long int channel,
+  unsigned long int frame
+) {
+  float value = 0.0f;
+
+  for (
+    unsigned int index_projectile = 0;
+    index_projectile < scene_gameplay_data->length_projectiles;
+  ) {
+    unsigned long int time_fired = (
+      scene_gameplay_data->fired_projectiles[
+        index_projectile
+      ]
+    );
+
+    unsigned long int v = time_current - time_fired;
+
+    float a = 0.0f;
+    
+    if (v <= b) {
+      a = (float) (
+        b - v
+      ) / (((float) b) / 2.0f) - 1.0f;
+    } else {
+      if (v > d) {
+        for (
+          unsigned int index_projectile_shift = index_projectile;
+          index_projectile_shift < scene_gameplay_data->length_projectiles - 1;
+          ++index_projectile_shift
+        ) {
+          scene_gameplay_data->fired_projectiles[
+            index_projectile_shift
+          ] = (
+            scene_gameplay_data->fired_projectiles[
+              index_projectile_shift +
+              1
+            ]
+          );
+        }
+
+        scene_gameplay_data->length_projectiles = (
+          scene_gameplay_data->length_projectiles -
+          1
+        );
+
+        continue;
+      }
+
+      a = ((float) (
+        d - v
+      ) / (((float) d) / 2.0f) - 1.0f) * 0.5f;
+    }
+
+    if (
+      v % 2 == 0
+    ) {
+      a = -a;
+    }
+
+    value = (
+      value +
+      a
+    );
+
+    index_projectile = (
+      index_projectile +
+      1
+    );
+  }
+
+  if (value > 1.0f) {
+    value = (
+      value - (
+        (float) (
+          (unsigned long int) value
+        )
+      )
+    );
+  } else if (value < -1.0f) {
+    value = (
+      value + (
+        (float) (
+          (unsigned long int) (-value)
+        )
+      )
+    );
+  }
+
+  value = (
+    value
+  );
+
+  return value;
+}
+
+
+#if target_os_ios
+int scene_gameplay_io_proc(
+  unsigned char silence,
+  const AudioTimeStamp* _Nonnull timestamp,
+  AVAudioFrameCount frame_count,
+  AudioBufferList* _Nonnull output_data,
+  void* data
+) {
+  struct metil_audio_io_proc_data* metil_audio_io_proc_data = (
+    data
+  );
+
+  struct metil* metil = (
+    metil_audio_io_proc_data->metil
+  );
+
+  struct metil_scene_controller* metil_scene_controller = (
+    metil->scene_controller
+  );
+
+  struct metil_scene* metil_scene_gameplay = &(
+    metil_scene_controller->scene
+  );
+
+  struct scene_gameplay_data* scene_gameplay_data = (
+    metil_scene_gameplay->data
+  );
+
+  for (
+    unsigned int index_frame = 0;
+    index_frame < frame_count;
+    ++index_frame
+  ) {
+    for (
+      unsigned long int index_buffer = 0;
+      index_buffer < output_data->mNumberBuffers;
+      ++index_buffer
+    ) {
+      AudioBuffer audio_buffer_current = output_data->mBuffers[
+        index_buffer
+      ];
+
+      float* buffer_out = audio_buffer_current.mData;
+
+      buffer_out[
+        index_frame
+      ] = scene_gameplay_io_proc_value_get(
+        scene_gameplay_data,
+        metil_scene_gameplay->time,
+        index_buffer,
+        index_frame
+      );
+    }
+  }
+  
+  return 0;
+}
+#else
 OSStatus scene_gameplay_io_proc(
   AudioObjectID id_audio_object,
   const AudioTimeStamp* time_stamp_audio,
@@ -788,6 +1004,26 @@ OSStatus scene_gameplay_io_proc(
   const AudioTimeStamp* time_stamp_audio_out,
   void* data
 ) {
+  struct metil_audio_io_proc_data* metil_audio_io_proc_data = (
+    data
+  );
+
+  struct metil* metil = (
+    metil_audio_io_proc_data->metil
+  );
+
+  struct metil_scene_controller* metil_scene_controller = (
+    metil->scene_controller
+  );
+
+  struct metil_scene* metil_scene_gameplay = &(
+    metil_scene_controller->scene
+  );
+
+  struct scene_gameplay_data* scene_gameplay_data = (
+    metil_scene_gameplay->data
+  );
+
   for (
     unsigned long int index_buffer = 0;
     index_buffer < list_buffer_audio_out->mNumberBuffers;
@@ -820,20 +1056,16 @@ OSStatus scene_gameplay_io_proc(
         count_channel_out
       );
 
-      if (
-        channel == 0
-      ) {
-        buffer_out[
+      buffer_out[
+        index_buffer_out
+      ] = (
+        scene_gameplay_io_proc_value_get(
+          scene_gameplay_data,
+          metil_scene_gameplay->time,
+          channel,
           index_buffer_out
-        ] = 0.0f;
-      } else {
-        buffer_out[
-          index_buffer_out
-        ] = buffer_out[
-          index_buffer_out -
-          channel
-        ];
-      }
+        )
+      );
     }
   }
 

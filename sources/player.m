@@ -2,12 +2,15 @@
 
 #include <objects/object_projectile.h>
 #include <data/player_data.h>
+#include <data/scene_gameplay_data.h>
 
 #include <metil_group.h>
 #include <metil_input/metil_keycodes.h>
 #include <metil_input/metil_input_map.h>
 #include <metil_object.h>
 #include <metil_player/metil_player.h>
+#include <metil_scenes/metil_scene.h>
+#include <metil_scenes/metil_scene_controller.h>
 
 #include <math.h>
 #include <stdlib.h>
@@ -632,6 +635,49 @@ void player_poll(
     metil_group_add_initialize(
       player_data->projectiles,
       metil_renderable_type_object
+    );
+
+    struct metil_scene_controller* metil_scene_controller = (
+      metil->scene_controller
+    );
+
+    struct metil_scene* metil_scene_gameplay = &(
+      metil_scene_controller->scene
+    );
+
+    struct scene_gameplay_data* scene_gameplay_data = (
+      metil_scene_gameplay->data
+    );
+
+    if (
+      scene_gameplay_data->length_projectiles == scene_gameplay_data_length_projectiles_maximum
+    ) {
+      for (
+        unsigned int index_projectile_shift = 0;
+        index_projectile_shift < scene_gameplay_data->length_projectiles - 1;
+        ++index_projectile_shift
+      ) {
+        scene_gameplay_data->fired_projectiles[
+          index_projectile_shift
+        ] = (
+          scene_gameplay_data->fired_projectiles[
+            index_projectile_shift +
+            1
+          ]
+        );
+      }
+    } else {
+      scene_gameplay_data->length_projectiles = (
+        scene_gameplay_data->length_projectiles +
+        1
+      );
+    }
+    
+    scene_gameplay_data->fired_projectiles[
+      scene_gameplay_data->length_projectiles -
+      1
+    ] = (
+      *player_data->time
     );
 
     struct metil_renderable* metil_renderable_projectile = (
