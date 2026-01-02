@@ -7,7 +7,7 @@
 #include <objects/object_enemy.h>
 #include <pipeline_index.h>
 #include <player.h>
-#include <player_data.h>
+#include <data/player_data.h>
 #include <data/projectile_data.h>
 #include <textures/textures_buildings.h>
 
@@ -520,11 +520,6 @@ void scene_gameplay_poll(
     return;
   }
 
-  metil_scene_poll_default(
-    metil,
-    scene
-  );
-
   struct metil_group* metil_group_projectiles = (
     scene->renderables[
       scene_gameplay_renderables_index_projectiles
@@ -636,6 +631,63 @@ void scene_gameplay_poll(
       );
     }
   }
+
+  for (
+    unsigned char index_enemy = 0;
+    index_enemy < metil_group_enemies->length;
+  ) {
+    struct metil_object* metil_object_enemy = (
+      metil_group_enemies->renderables[
+        index_enemy
+      ]->renderable
+    );
+
+    if (
+      scene->player.position.x >= metil_object_enemy->position.x - (metil_object_enemy->mesh.size.x / 2.0f) &&
+      scene->player.position.x <= metil_object_enemy->position.x + (metil_object_enemy->mesh.size.x / 2.0f) &&
+
+      (scene->player.position.y + player_data->height) >= metil_object_enemy->position.y - (metil_object_enemy->mesh.size.y / 2.0f) &&
+      (scene->player.position.y + player_data->height) <= metil_object_enemy->position.y + (metil_object_enemy->mesh.size.y / 2.0f) &&
+
+      scene->player.position.z >= metil_object_enemy->position.z - (metil_object_enemy->mesh.size.z / 2.0f) &&
+      scene->player.position.z <= metil_object_enemy->position.z + (metil_object_enemy->mesh.size.z / 2.0f)
+    ) {
+      player_data->life = (
+        player_data->life -
+        1
+      );
+      
+      metil_group_destroy_renderable_at_index(
+        metil,
+        metil_group_enemies,
+        index_enemy
+      );
+
+      if (
+        player_data->life <= 0
+      ) {
+        scene_gameplay_populate(
+          metil,
+          scene,
+          scene_gameplay_length_buildings_default
+        );
+
+        return;
+      }
+
+      continue;
+    } else {
+      index_enemy = (
+        index_enemy +
+        1
+      );
+    }
+  }
+
+  metil_scene_poll_default(
+    metil,
+    scene
+  );
 
   struct metil_object* object = (
     scene->renderables[

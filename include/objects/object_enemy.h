@@ -18,8 +18,11 @@ void object_enemy_initialize(
 );
 
 void object_enemy_travel(
-  struct metil_object* _Nonnull metil_object,
-  struct enemy_data* _Nonnull enemy_data
+  struct metil_object* _Nonnull,
+  struct clic3_vector3_float* _Nonnull,
+  struct enemy_data* _Nonnull,
+  unsigned long int* _Nonnull,
+  float
 );
 
 void object_enemy_poll(

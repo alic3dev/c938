@@ -1,4 +1,4 @@
-#include <player_data.h>
+#include <data/player_data.h>
 
 void player_data_initialize(
   struct player_data* player_data,
@@ -24,6 +24,9 @@ void player_data_initialize(
   player_data->shooting = 0;
 
   player_data->height = height;
+
+  player_data->life_maximum = 3;
+  player_data->life = player_data->life_maximum;
 
   player_data->rate_fire = player_data_default_rate_fire;
 

@@ -3,6 +3,7 @@
 #include <mesh/mesh_enemy.h>
 #include <pipeline_index.h>
 #include <data/enemy_data.h>
+#include <data/player_data.h>
 
 #include <clic3_vector.h>
 
@@ -54,6 +55,8 @@ void object_enemy_initialize(
   enemy_data->color.y = 1.0f;
   enemy_data->color.z = 1.0f;
 
+  enemy_data->speed = 16.0f;
+
   enemy_data->life_maximum = life;
   enemy_data->life = (
     enemy_data->life_maximum
@@ -62,31 +65,55 @@ void object_enemy_initialize(
 
 void object_enemy_travel(
   struct metil_object* metil_object,
-  struct enemy_data* enemy_data
+  struct clic3_vector3_float* position_player,
+  struct enemy_data* enemy_data,
+  unsigned long int* time_delta,
+  float height
 ) {
   enemy_data->position_previous.x = metil_object->position.x;
   enemy_data->position_previous.y = metil_object->position.y;
   enemy_data->position_previous.z = metil_object->position.z;
 
-  // float distance = (
-  //   enemy_data->time_delta_percent *
-  //   enemy_data->speed
-  // );
+  float distance = (
+    (((float) *time_delta) / 1000.0f) *
+    enemy_data->speed 
+  );
 
-  // metil_object->position.x = (
-  //   metil_object->position.x +
-  //   enemy_data->translation.x * distance
-  // );
+  struct clic3_vector3_float translation = {
+    .x = (
+      metil_object->position.x < position_player->x
+      ? 1.0f
+      : -1.0f
+    ),
+    .y = (
+      metil_object->position.y < (position_player->y + height)
+      ? 1.0f
+      : -1.0f
+    ),
+    .z = (
+      metil_object->position.z < position_player->z
+      ? 1.0f
+      : -1.0f
+    )
+  };
 
-  // metil_object->position.y = (
-  //   metil_object->position.y +
-  //   enemy_data->translation.y * distance
-  // );
+  metil_object->position.x = (
+    metil_object->position.x +
+    translation.x *
+    distance
+  );
 
-  // metil_object->position.z = (
-  //   metil_object->position.z +
-  //   enemy_data->translation.z * distance
-  // );
+  metil_object->position.y = (
+    metil_object->position.y +
+    translation.y *
+    distance
+  );
+
+  metil_object->position.z = (
+    metil_object->position.z +
+    translation.z *
+    distance
+  );
 }
 
 void object_enemy_poll(
@@ -103,9 +130,19 @@ void object_enemy_poll(
     ].buffer.contents
   );
 
+  struct metil_scene* metil_scene = &(
+    (
+      (struct metil_scene_controller*)
+      metil->scene_controller
+    )->scene
+  );
+
   object_enemy_travel(
     metil_object,
-    enemy_data
+    &metil_scene->player.position,
+    enemy_data,
+    &metil_scene->time_delta,
+    ((struct player_data*) metil_scene->player.data)->height
   );
 
   metil_positioning_view_model_matrix_projection_set(
@@ -116,7 +153,7 @@ void object_enemy_poll(
     matrix_player_projection,
     &metil_object->position,
     &metil_object->rotation,
-    &((struct metil_scene_controller*) metil->scene_controller)->scene.player.position,
+    &metil_scene->player.position,
     metil_camera
   );
 }
