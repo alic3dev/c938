@@ -41,8 +41,8 @@ struct data_vertex {
   );
 
   float percentage_life = (
-    (float) enemy_data->life_maximum /
-    (float) enemy_data->life
+    (float) enemy_data->life /
+    (float) enemy_data->life_maximum
   );
 
   data_vertex.color = float4(

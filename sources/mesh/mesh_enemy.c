@@ -12,9 +12,9 @@ void mesh_enemy_initialize(
   metil_mesh_box_initialize(
     mesh,
     (struct clic3_vector3_float) {
-      .x = 10.0f,
-      .y = 10.0f,
-      .z = 10.0f
+      .x = 30.0f,
+      .y = 30.0f,
+      .z = 30.0f
     }
   );
 

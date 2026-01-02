@@ -22,6 +22,13 @@
 #include <metil_rendering/metil_renderer_interface.h>
 #include <metil_scenes/metil_scene.h>
 
+#include <rand_functions.h>
+#include <rand_initialize.h>
+#include <rand_parameters.h>
+#include <rand_result.h>
+#include <rand_source.h>
+#include <rand_source_type.h>
+
 #include <stdlib.h>
 
 void scene_gameplay_initialize(
@@ -353,11 +360,32 @@ void scene_gameplay_populate(
     metil_group_enemies
   );
 
+  struct rand_parameters rand_parameters;
+  struct rand_source rand_source;
+  struct rand_result rand_result;
+
+  rand_initialize(
+    &rand_parameters,
+    &rand_result,
+    &rand_source,
+    6,
+    rand_mode_bytes,
+    rand_source_type_divisive
+  );
+
+  float distance_minimum = 200.0f;
+
   for (
     unsigned char index_enemy = 0;
     index_enemy < 255;
     ++index_enemy
   ) {
+    rand_get(
+      &rand_source,
+      &rand_result,
+      &rand_parameters
+    );
+
     metil_group_add_initialize(
       metil_group_enemies,
       metil_renderable_type_object
@@ -369,14 +397,77 @@ void scene_gameplay_populate(
       ]->renderable
     );
 
+    struct clic3_vector3_float position_enemy = {
+      .x = (
+        1250 - (
+          rand_result.bytes[0] *
+          rand_result.bytes[1]
+        ) % 2500
+      ),
+      .y = 1000 + (
+        rand_result.bytes[2] *
+        rand_result.bytes[3]
+      ) % 500,
+      .z = (
+        1250 - (
+          rand_result.bytes[4] *
+          rand_result.bytes[5]
+        ) % 2500
+      )
+    };
+
+    if (
+      position_enemy.x <= distance_minimum &&
+      position_enemy.x >= -distance_minimum
+    ) {
+      float offset = (
+        rand_result.bytes[3] +
+        distance_minimum
+      );
+
+      if (
+        position_enemy.x < 0.0f
+      ) {
+        offset = (
+          offset *
+          -1
+        );
+      }
+
+      position_enemy.x = (
+        position_enemy.x +
+        offset
+      );
+    }
+
+    if (
+      position_enemy.z <= distance_minimum &&
+      position_enemy.z >= -distance_minimum
+    ) {
+      float offset = (
+        rand_result.bytes[1] +
+        distance_minimum
+      );
+
+      if (
+        position_enemy.z < 0.0f
+      ) {
+        offset = (
+          offset *
+          -1
+        );
+      }
+
+      position_enemy.z = (
+        position_enemy.z +
+        offset
+      );
+    }
+
     object_enemy_initialize(
       metil_object_enemy,
       metil->renderer_interface.metal_device,
-      (struct clic3_vector3_float) {
-        .x = index_enemy * 10.0f + 10.0f,
-        .y = scene->player.position.y,
-        .z = index_enemy * -10.0f - 10.0f
-      },
+      position_enemy,
       4
     );
   }
