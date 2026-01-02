@@ -6,7 +6,9 @@
 #include <metil.h>
 #include <metil_scenes/metil_scene.h>
 
-#if !target_os_ios
+#if target_os_ios
+#include <AVFAudio/AVFAudio.h>
+#else
 #include <CoreAudio/CoreAudio.h>
 #endif
 
@@ -68,7 +70,15 @@ float scene_gameplay_io_proc_value_get(
   unsigned long int
 );
 
-#if !target_os_ios
+#if target_os_ios
+int scene_gameplay_io_proc(
+  unsigned char,
+  const AudioTimeStamp* _Nonnull,
+  unsigned int,
+  AudioBufferList* _Nonnull,
+  void* _Nonnull
+);
+#else
 OSStatus scene_gameplay_io_proc(
   AudioObjectID,
   const AudioTimeStamp* _Nonnull,

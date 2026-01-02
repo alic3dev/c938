@@ -6,7 +6,9 @@
 #include <metil_rendering/metil_renderer_interface.h>
 #include <metil_scenes/metil_scene.h>
 
-#if !target_os_ios
+#if target_os_ios
+#include <AVFAudio/AVFAudio.h>
+#else
 #include <CoreAudio/CoreAudio.h>
 #endif
 
@@ -53,7 +55,15 @@ void scene_menu_main_destroy(
   struct metil_scene* _Nonnull
 );
 
-#if !target_os_ios
+#if target_os_ios
+int scene_menu_main_io_proc(
+  unsigned char,
+  const AudioTimeStamp* _Nonnull,
+  unsigned int,
+  AudioBufferList* _Nonnull,
+  void* _Nonnull
+);
+#else
 OSStatus scene_menu_main_io_proc(
   AudioObjectID,
   const AudioTimeStamp* _Nonnull,
