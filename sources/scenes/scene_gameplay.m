@@ -63,10 +63,18 @@ void scene_gameplay_initialize(
   );
 
   scene_gameplay_data->length_projectiles = 0;
-  scene_gameplay_data->fired_projectiles = malloc(
-    sizeof(unsigned long int) *
-    scene_gameplay_data->length_projectiles
-  );
+
+  for (
+    unsigned char index_projectile = 0;
+    index_projectile < scene_gameplay_data_length_projectiles_maximum;
+    ++index_projectile
+  ) {
+    scene_gameplay_data->fired_projectiles[
+      index_projectile
+    ] = (
+      0
+    );
+  }
 
   #if !target_os_ios
   metil_audio_io_proc_add(
@@ -286,8 +294,12 @@ void scene_gameplay_populate(
   scene->player.velocity.y = 0.0f;
   scene->player.velocity.z = 0.0f;
 
+  struct scene_gameplay_data* scene_gameplay_data = (
+    scene->data
+  );
+
   struct player_data* player_data = (
-    (struct player_data*) scene->player.data
+    scene->player.data
   );
 
   player_data_initialize(
@@ -296,6 +308,20 @@ void scene_gameplay_populate(
   );
 
   player_data->time = &scene->time;
+
+  scene_gameplay_data->length_projectiles = 0;
+
+  for (
+    unsigned char index_projectile = 0;
+    index_projectile < scene_gameplay_data_length_projectiles_maximum;
+    ++index_projectile
+  ) {
+    scene_gameplay_data->fired_projectiles[
+      index_projectile
+    ] = (
+      0
+    );
+  }
 
   struct metil_group* metil_group_buildings = (
     scene->renderables[
@@ -792,14 +818,6 @@ void scene_gameplay_destroy(
   );
   #endif
 
-  struct scene_gameplay_data* scene_gameplay_data = (
-    scene->data
-  );
-
-  free(
-    scene_gameplay_data->fired_projectiles
-  );
-
   free(
     scene->data
   );
@@ -861,13 +879,6 @@ float scene_gameplay_io_proc_value_get(
           );
         }
 
-        // no need to reallocate here as it will be reallocated when another projectile is fired
-        // saves a call to realloc and since the values are shifted they remain aligned to the length
-        // reallocation within the main thread _may_ cause issues with memory addressing but seems to
-        // work fine currently. one potential solution is to allocate an array of X length during initialization
-        // and only allow X number of sounds at a single time. then the array would never need to be reallocated,
-        // would have the same memory address and prevent too many projectile noises leading to muddiness.
-        // to be determined at a later date and time.
         scene_gameplay_data->length_projectiles = (
           scene_gameplay_data->length_projectiles -
           1

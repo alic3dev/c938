@@ -649,17 +649,30 @@ void player_poll(
       metil_scene_gameplay->data
     );
 
-    scene_gameplay_data->length_projectiles = (
-      scene_gameplay_data->length_projectiles +
-      1
-    );
-
-    scene_gameplay_data->fired_projectiles = realloc(
-      scene_gameplay_data->fired_projectiles,
-      sizeof(unsigned long int) *
-      scene_gameplay_data->length_projectiles
-    );
-
+    if (
+      scene_gameplay_data->length_projectiles == scene_gameplay_data_length_projectiles_maximum
+    ) {
+      for (
+        unsigned int index_projectile_shift = 0;
+        index_projectile_shift < scene_gameplay_data->length_projectiles - 1;
+        ++index_projectile_shift
+      ) {
+        scene_gameplay_data->fired_projectiles[
+          index_projectile_shift
+        ] = (
+          scene_gameplay_data->fired_projectiles[
+            index_projectile_shift +
+            1
+          ]
+        );
+      }
+    } else {
+      scene_gameplay_data->length_projectiles = (
+        scene_gameplay_data->length_projectiles +
+        1
+      );
+    }
+    
     scene_gameplay_data->fired_projectiles[
       scene_gameplay_data->length_projectiles -
       1
