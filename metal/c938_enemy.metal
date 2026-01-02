@@ -1,4 +1,4 @@
-#include <data/projectile_data.h>
+#include <data/enemy_data.h>
 
 #include <metil_rendering/metil_renderer_data_frame.h>
 #include <metil_rendering/metil_renderer_vertex_index_parameter.h>
@@ -11,7 +11,7 @@ struct data_vertex {
   float4 color;
 };
 
-[[vertex]] struct data_vertex c938_projectile_vertex(
+[[vertex]] struct data_vertex c938_enemy_vertex(
   const device simd_float4* positions [[
     buffer(
       metil_renderer_vertex_index_parameter_vertices
@@ -22,7 +22,7 @@ struct data_vertex {
       metil_renderer_vertex_index_parameter_data_frame
     )
   ]],
-  constant struct projectile_data* projectile_data [[
+  constant struct enemy_data* enemy_data [[
     buffer(
       metil_renderer_vertex_index_parameter_data_object
     )
@@ -32,7 +32,7 @@ struct data_vertex {
   struct data_vertex data_vertex;
 
   data_vertex.position = (
-    projectile_data->view_model_matrix_projection *
+    enemy_data->view_model_matrix_projection *
     positions[id_vertex]
   );
 
@@ -40,37 +40,22 @@ struct data_vertex {
     data_frame->brightness
   );
 
-  float percentage_lifespan = (
-    metal::fmax(
-      metal::fmin(
-        (
-          (float) (
-            projectile_data->time_current -
-            projectile_data->time_fired
-          ) /
-          projectile_data->lifespan
-        ),
-        1.0f
-      ),
-      0.0f
-    )
+  float percentage_life = (
+    (float) enemy_data->life_maximum /
+    (float) enemy_data->life
   );
 
   data_vertex.color = float4(
-    projectile_data->color.x,
-    projectile_data->color.y,
-    projectile_data->color.z,
-    (1.0f - percentage_lifespan) *
-    metal::fmin(
-      id_vertex,
-      1.0f
-    )
+    enemy_data->color.x * metal::fmin(percentage_life * 2.0f, 1.0f),
+    enemy_data->color.y * percentage_life,
+    enemy_data->color.z * percentage_life,
+    1.0f
   );
 
   return data_vertex;
 }
 
-[[fragment]] float4 c938_projectile_fragment(
+[[fragment]] float4 c938_enemy_fragment(
   data_vertex data_vertex [[stage_in]],
   metal::texture2d<half> texture [[texture(0)]]
 ) {

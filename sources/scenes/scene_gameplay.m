@@ -4,10 +4,11 @@
 #include <mesh/mesh_hud_item.h>
 #include <mesh/mesh_player.h>
 #include <objects/object_crosshair.h>
+#include <objects/object_enemy.h>
 #include <pipeline_index.h>
 #include <player.h>
 #include <player_data.h>
-#include <projectile_data.h>
+#include <data/projectile_data.h>
 #include <textures/textures_buildings.h>
 
 #include <metil.h>
@@ -37,7 +38,7 @@ void scene_gameplay_initialize(
   metil_scene_initialize_with_renderables(
     metil,
     scene,
-    7
+    scene_gameplay_length_renderables
   );
 
   #if !target_os_ios
@@ -74,6 +75,7 @@ void scene_gameplay_initialize(
     ) {
       case scene_gameplay_renderables_index_buildings:
       case scene_gameplay_renderables_index_projectiles:
+      case scene_gameplay_renderables_index_enemies:
         metil_renderable_initialize_at_index(
           scene->renderables,
           index_renderable,
@@ -335,6 +337,49 @@ void scene_gameplay_populate(
   player_data->height = (
     metil->rendering_properties.camera.height
   );
+
+  struct metil_group* metil_group_enemies = (
+    scene->renderables[
+      scene_gameplay_renderables_index_enemies
+    ].renderable
+  );
+
+  metil_group_destroy(
+    metil,
+    metil_group_enemies
+  );
+
+  metil_group_initialize(
+    metil_group_enemies
+  );
+
+  for (
+    unsigned char index_enemy = 0;
+    index_enemy < 255;
+    ++index_enemy
+  ) {
+    metil_group_add_initialize(
+      metil_group_enemies,
+      metil_renderable_type_object
+    );
+
+    struct metil_object* metil_object_enemy = (
+      metil_group_enemies->renderables[
+        index_enemy
+      ]->renderable
+    );
+
+    object_enemy_initialize(
+      metil_object_enemy,
+      metil->renderer_interface.metal_device,
+      (struct clic3_vector3_float) {
+        .x = index_enemy * 10.0f + 10.0f,
+        .y = scene->player.position.y,
+        .z = index_enemy * -10.0f - 10.0f
+      },
+      4
+    );
+  }
 }
 
 void scene_gameplay_poll(
@@ -395,6 +440,12 @@ void scene_gameplay_poll(
     ].renderable
   );
 
+  struct metil_group* metil_group_enemies = (
+    scene->renderables[
+      scene_gameplay_renderables_index_enemies
+    ].renderable
+  );
+
   float time_delta_percent = (
     (float) scene->time_delta /
     1000.0f
@@ -409,6 +460,58 @@ void scene_gameplay_poll(
         index_projectile
       ]->renderable
     );
+
+    unsigned int collision = (
+      0
+    );
+
+    for (
+      unsigned char index_enemy = 0;
+      index_enemy < metil_group_enemies->length;
+      ++index_enemy
+    ) {
+      struct metil_object* metil_object_enemy = (
+        metil_group_enemies->renderables[
+          index_enemy
+        ]->renderable
+      );
+
+      if (
+        metil_object_projectile->position.x >= metil_object_enemy->position.x - (metil_object_enemy->mesh.size.x / 2.0f) &&
+        metil_object_projectile->position.x <= metil_object_enemy->position.x + (metil_object_enemy->mesh.size.x / 2.0f) &&
+
+        metil_object_projectile->position.y >= metil_object_enemy->position.y - (metil_object_enemy->mesh.size.y / 2.0f) &&
+        metil_object_projectile->position.y <= metil_object_enemy->position.y + (metil_object_enemy->mesh.size.y / 2.0f) &&
+
+        metil_object_projectile->position.z >= metil_object_enemy->position.z - (metil_object_enemy->mesh.size.z / 2.0f) &&
+        metil_object_projectile->position.z <= metil_object_enemy->position.z + (metil_object_enemy->mesh.size.z / 2.0f)
+      ) {
+        collision = 1;
+
+        struct enemy_data* enemy_data = (
+          metil_object_enemy->buffers_vertex[
+            metil_object_buffer_default_index_data
+          ].buffer.contents
+        );
+
+        enemy_data->life = (
+          enemy_data->life -
+          1
+        );
+
+        if (
+          enemy_data->life <= 0
+        ) {
+          metil_group_destroy_renderable_at_index(
+            metil,
+            metil_group_enemies,
+            index_enemy
+          );
+        }
+
+        break;
+      }
+    }
 
     struct projectile_data* projectile_data = (
       metil_object_projectile->buffers_vertex[
@@ -425,6 +528,7 @@ void scene_gameplay_poll(
     );
 
     if (
+      collision == 1 ||
       projectile_data->time_current -
       projectile_data->time_fired >
       projectile_data->lifespan
