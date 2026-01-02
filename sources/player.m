@@ -1,7 +1,7 @@
 #include <player.h>
 
 #include <objects/object_projectile.h>
-#include <player_data.h>
+#include <data/player_data.h>
 
 #include <metil_group.h>
 #include <metil_input/metil_keycodes.h>

@@ -1,15 +1,24 @@
 #include <metil_mesh/metil_mesh.h>
 
+#include <metil_mesh/metil_mesh_box.h>
+
 #include <clic3_vector.h>
 
 #include <stdlib.h>
 
-void mesh_projectile_initialize(
+void mesh_enemy_initialize(
   struct metil_mesh* mesh
 ) {
-  metil_mesh_initialize(
-    mesh
+  metil_mesh_box_initialize(
+    mesh,
+    (struct clic3_vector3_float) {
+      .x = 30.0f,
+      .y = 30.0f,
+      .z = 30.0f
+    }
   );
+
+  return;
 
   mesh->size.x = 0.00000001f;
   mesh->size.y = 0.00000001f;

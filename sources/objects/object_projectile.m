@@ -2,8 +2,8 @@
 
 #include <mesh/mesh_projectile.h>
 #include <pipeline_index.h>
-#include <projectile_data.h>
-#include <projectile_lifespan.h>
+#include <data/projectile_data.h>
+#include <data/projectile_lifespan.h>
 
 #include <clic3_vector.h>
 

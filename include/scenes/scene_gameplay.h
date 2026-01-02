@@ -12,19 +12,22 @@
 
 #define scene_gameplay_length_buildings_default 200
 
+#define scene_gameplay_length_renderables 8
+
 enum scene_gameplay_renderables_index {
   scene_gameplay_renderables_index_buildings = 0,
   scene_gameplay_renderables_index_player = 1,
   scene_gameplay_renderables_index_projectiles = 2,
-  scene_gameplay_renderables_index_hud_boosted = 3,
-  scene_gameplay_renderables_index_hud_jumping = 4,
-  scene_gameplay_renderables_index_hud_jumping_secondary = 5,
-  scene_gameplay_renderables_index_crosshair = 6
+  scene_gameplay_renderables_index_enemies = 3,
+  scene_gameplay_renderables_index_hud_boosted = 4,
+  scene_gameplay_renderables_index_hud_jumping = 5,
+  scene_gameplay_renderables_index_hud_jumping_secondary = 6,
+  scene_gameplay_renderables_index_crosshair = 7
 };
 
 enum scene_gameplay_renderables_index_range {
-  scene_gameplay_renderables_index_range_hud_start = 3,
-  scene_gameplay_renderables_index_range_hud_end = 5
+  scene_gameplay_renderables_index_range_hud_start = 4,
+  scene_gameplay_renderables_index_range_hud_end = 6
 };
 
 enum scene_gameplay_group_buildings_index {

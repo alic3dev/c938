@@ -29,6 +29,9 @@ struct player_data {
 
   float height;
 
+  unsigned char life_maximum;
+  unsigned char life;
+
   unsigned long int rate_fire;
 
   unsigned long int* _Nonnull time;

@@ -186,6 +186,18 @@ void c938_renderer_on_initialize(
     ]
   ];
 
+  c938_pipeline_index_enemy = [
+    metil->renderer_interface.renderer
+    pipeline_add: [
+      metil->library.library
+      newFunctionWithName: @"c938_enemy_fragment"
+    ]
+    function_vertex: [
+      metil->library.library
+      newFunctionWithName: @"c938_enemy_vertex"
+    ]
+  ];
+
   scene_menu_main_initialize(
     metil,
     &((struct metil_scene_controller*) metil->scene_controller)->scene

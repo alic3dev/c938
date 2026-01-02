@@ -1,7 +1,7 @@
-#ifndef __object_projectile_h
-#define __object_projectile_h
+#ifndef __object_enemy_h
+#define __object_enemy_h
 
-#include <data/projectile_data.h>
+#include <data/enemy_data.h>
 
 #include <clic3_vector.h>
 
@@ -10,21 +10,22 @@
 
 #include <Metal/MTLDevice.h>
 
-void object_projectile_initialize(
+void object_enemy_initialize(
   struct metil_object* _Nonnull,
   id<MTLDevice> _Nonnull,
   struct clic3_vector3_float,
-  struct clic3_vector3_float,
-  unsigned long int,
+  unsigned char
+);
+
+void object_enemy_travel(
+  struct metil_object* _Nonnull,
+  struct clic3_vector3_float* _Nonnull,
+  struct enemy_data* _Nonnull,
+  unsigned long int* _Nonnull,
   float
 );
 
-void object_projectile_travel(
-  struct metil_object* _Nonnull metil_object,
-  struct projectile_data* _Nonnull projectile_data
-);
-
-void object_projectile_poll(
+void object_enemy_poll(
   struct metil* _Nonnull,
   struct metil_object* _Nonnull,
   matrix_float3x4* _Nonnull,
