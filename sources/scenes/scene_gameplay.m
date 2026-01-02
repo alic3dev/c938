@@ -1,5 +1,9 @@
 #include <scenes/scene_gameplay.h>
 
+#include <data/enemy_data.h>
+#include <data/player_data.h>
+#include <data/projectile_data.h>
+#include <data/scene_gameplay_data.h>
 #include <generate/generate_buildings.h>
 #include <mesh/mesh_hud_item.h>
 #include <mesh/mesh_player.h>
@@ -13,6 +17,7 @@
 
 #include <metil.h>
 #include <metil_audio/metil_audio_io_proc.h>
+#include <metil_audio/metil_audio_io_proc_data.h>
 #include <metil_debug/metil_debug_log.h>
 #include <metil_group.h>
 #include <metil_object.h>
@@ -21,6 +26,7 @@
 #include <metil_rendering/metil_renderer_data_object.h>
 #include <metil_rendering/metil_renderer_interface.h>
 #include <metil_scenes/metil_scene.h>
+#include <metil_scenes/metil_scene_controller.h>
 
 #include <rand_functions.h>
 #include <rand_initialize.h>
@@ -46,6 +52,20 @@ void scene_gameplay_initialize(
     metil,
     scene,
     scene_gameplay_length_renderables
+  );
+
+  scene->data = malloc(
+    sizeof(struct scene_gameplay_data)
+  );
+
+  struct scene_gameplay_data* scene_gameplay_data = (
+    scene->data
+  );
+
+  scene_gameplay_data->length_projectiles = 0;
+  scene_gameplay_data->fired_projectiles = malloc(
+    sizeof(unsigned long int) *
+    scene_gameplay_data->length_projectiles
   );
 
   #if !target_os_ios
@@ -772,10 +792,139 @@ void scene_gameplay_destroy(
   );
   #endif
 
+  struct scene_gameplay_data* scene_gameplay_data = (
+    scene->data
+  );
+
+  free(
+    scene_gameplay_data->fired_projectiles
+  );
+
+  free(
+    scene->data
+  );
+
+  scene->data = (
+    (void*) 0
+  );
+
   metil_scene_destroy_default(
     metil,
     scene
   );
+}
+
+
+unsigned int b = 100;
+unsigned int d = 1000;
+
+float scene_gameplay_io_proc_value_get(
+  struct scene_gameplay_data* scene_gameplay_data,
+  unsigned long int time_current,
+  unsigned long int channel,
+  unsigned long int frame
+) {
+  float value = 0.0f;
+
+  for (
+    unsigned int index_projectile = 0;
+    index_projectile < scene_gameplay_data->length_projectiles;
+  ) {
+    unsigned long int time_fired = (
+      scene_gameplay_data->fired_projectiles[
+        index_projectile
+      ]
+    );
+
+    unsigned long int v = time_current - time_fired;
+
+    float a = 0.0f;
+    
+    if (v <= b) {
+      a = (float) (
+        b - v
+      ) / (((float) b) / 2.0f) - 1.0f;
+    } else {
+      if (v > d) {
+        for (
+          unsigned int index_projectile_shift = index_projectile;
+          index_projectile_shift < scene_gameplay_data->length_projectiles - 1;
+          ++index_projectile_shift
+        ) {
+          scene_gameplay_data->fired_projectiles[
+            index_projectile_shift
+          ] = (
+            scene_gameplay_data->fired_projectiles[
+              index_projectile_shift +
+              1
+            ]
+          );
+        }
+
+        // no need to reallocate here as it will be reallocated when another projectile is fired
+        // saves a call to realloc and since the values are shifted they remain aligned to the length
+        // reallocation within the main thread _may_ cause issues with memory addressing but seems to
+        // work fine currently. one potential solution is to allocate an array of X length during initialization
+        // and only allow X number of sounds at a single time. then the array would never need to be reallocated,
+        // would have the same memory address and prevent too many projectile noises leading to muddiness.
+        // to be determined at a later date and time.
+        scene_gameplay_data->length_projectiles = (
+          scene_gameplay_data->length_projectiles -
+          1
+        );
+
+        continue;
+      }
+
+      a = ((float) (
+        d - v
+      ) / (((float) d) / 2.0f) - 1.0f) * 0.5f;
+    }
+
+    if (frame % 2 == 0) {
+      a = -a;
+    }
+
+    if (
+      v % 2 == 0
+    ) {
+      a = -a;
+    }
+
+    value = (
+      value +
+      a
+    );
+
+    index_projectile = (
+      index_projectile +
+      1
+    );
+  }
+
+  if (value > 1.0f) {
+    value = (
+      value - (
+        (float) (
+          (unsigned long int) value
+        )
+      )
+    );
+  } else if (value < -1.0f) {
+    value = (
+      value + (
+        (float) (
+          (unsigned long int) (-value)
+        )
+      )
+    );
+  }
+
+  value = (
+    value
+  );
+
+  return value;
 }
 
 #if !target_os_ios
@@ -788,6 +937,26 @@ OSStatus scene_gameplay_io_proc(
   const AudioTimeStamp* time_stamp_audio_out,
   void* data
 ) {
+  struct metil_audio_io_proc_data* metil_audio_io_proc_data = (
+    data
+  );
+
+  struct metil* metil = (
+    metil_audio_io_proc_data->metil
+  );
+
+  struct metil_scene_controller* metil_scene_controller = (
+    metil->scene_controller
+  );
+
+  struct metil_scene* metil_scene_gameplay = &(
+    metil_scene_controller->scene
+  );
+
+  struct scene_gameplay_data* scene_gameplay_data = (
+    metil_scene_gameplay->data
+  );
+
   for (
     unsigned long int index_buffer = 0;
     index_buffer < list_buffer_audio_out->mNumberBuffers;
@@ -820,20 +989,16 @@ OSStatus scene_gameplay_io_proc(
         count_channel_out
       );
 
-      if (
-        channel == 0
-      ) {
-        buffer_out[
+      buffer_out[
+        index_buffer_out
+      ] = (
+        scene_gameplay_io_proc_value_get(
+          scene_gameplay_data,
+          metil_scene_gameplay->time,
+          channel,
           index_buffer_out
-        ] = 0.0f;
-      } else {
-        buffer_out[
-          index_buffer_out
-        ] = buffer_out[
-          index_buffer_out -
-          channel
-        ];
-      }
+        )
+      );
     }
   }
 
