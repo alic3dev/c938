@@ -7,6 +7,8 @@
 
 #include <clic3_vector.h>
 
+#include <math_c_absolute.h>
+
 #include <metil_object.h>
 #include <metil_positioning.h>
 #include <metil_rendering/metil_renderer_data_object.h>
@@ -79,39 +81,79 @@ void object_enemy_travel(
     enemy_data->speed 
   );
 
-  struct clic3_vector3_float translation = {
+  float position_player_y = (
+    position_player->y +
+    height
+  );
+
+  struct clic3_vector3_float distances = {
     .x = (
-      metil_object->position.x < position_player->x
-      ? 1.0f
-      : -1.0f
+      metil_object->position.x - position_player->x
     ),
     .y = (
-      metil_object->position.y < (position_player->y + height)
-      ? 1.0f
-      : -1.0f
+      metil_object->position.y - position_player_y
     ),
     .z = (
-      metil_object->position.z < position_player->z
-      ? 1.0f
-      : -1.0f
+      metil_object->position.z - position_player->z
     )
   };
 
+  float distance_total = (
+    math_c_absolute_float(
+      distances.x
+    ) +
+    math_c_absolute_float(
+      distances.y
+    ) +
+    math_c_absolute_float(
+      distances.z
+    )
+  );
+
+  if (
+    distance_total == 0.0f
+  ) {
+    return;
+  }
+
+  struct clic3_vector3_float percentagages = {
+    .x = (
+      -distances.x /
+      distance_total
+    ),
+    .y = (
+      -distances.y /
+      distance_total
+    ),
+    .z = (
+      -distances.z /
+      distance_total
+    )
+  };
+
+  if (
+    distance > distance_total
+  ) {
+    distance = (
+      distance_total
+    );
+  }
+
   metil_object->position.x = (
     metil_object->position.x +
-    translation.x *
+    percentagages.x *
     distance
   );
 
   metil_object->position.y = (
     metil_object->position.y +
-    translation.y *
+    percentagages.y *
     distance
   );
 
   metil_object->position.z = (
     metil_object->position.z +
-    translation.z *
+    percentagages.z *
     distance
   );
 }
