@@ -88,13 +88,16 @@ void object_enemy_travel(
 
   struct clic3_vector3_float distances = {
     .x = (
-      metil_object->position.x - position_player->x
+      metil_object->position.x -
+      position_player->x
     ),
     .y = (
-      metil_object->position.y - position_player_y
+      metil_object->position.y -
+      position_player_y
     ),
     .z = (
-      metil_object->position.z - position_player->z
+      metil_object->position.z -
+      position_player->z
     )
   };
 
