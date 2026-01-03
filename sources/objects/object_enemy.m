@@ -76,11 +76,6 @@ void object_enemy_travel(
   enemy_data->position_previous.y = metil_object->position.y;
   enemy_data->position_previous.z = metil_object->position.z;
 
-  float distance = (
-    (((float) *time_delta) / 1000.0f) *
-    enemy_data->speed 
-  );
-
   float position_player_y = (
     position_player->y +
     height
@@ -133,6 +128,36 @@ void object_enemy_travel(
       distance_total
     )
   };
+
+  float speed = (
+    enemy_data->speed
+  );
+
+  if (
+    distance_total < enemy_distance_speed_boost
+  ) {
+    speed = (
+      speed +
+      speed * (
+        (
+          enemy_distance_speed_boost -
+          distance_total
+        ) /
+        enemy_distance_speed_boost
+      ) * (
+        distance_total /
+        enemy_distance_speed_boost_half
+      )
+    );
+  }
+
+  float distance = (
+    (
+      (float) *time_delta /
+      1000.0f
+    ) *
+    speed  
+  );
 
   if (
     distance > distance_total
