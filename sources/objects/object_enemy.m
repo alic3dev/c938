@@ -55,7 +55,7 @@ void object_enemy_initialize(
   enemy_data->color.y = 1.0f;
   enemy_data->color.z = 1.0f;
 
-  enemy_data->speed = 16.0f;
+  enemy_data->speed = 48.0f;
 
   enemy_data->life_maximum = life;
   enemy_data->life = (
