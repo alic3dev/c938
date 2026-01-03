@@ -21,7 +21,8 @@ void object_enemy_initialize(
   struct metil_object* object,
   id<MTLDevice> metal_device,
   struct clic3_vector3_float position,
-  unsigned char life
+  unsigned char life,
+  float speed
 ) {
   mesh_enemy_initialize(
     &object->mesh
@@ -57,7 +58,7 @@ void object_enemy_initialize(
   enemy_data->color.y = 1.0f;
   enemy_data->color.z = 1.0f;
 
-  enemy_data->speed = 48.0f;
+  enemy_data->speed = speed;
 
   enemy_data->life_maximum = life;
   enemy_data->life = (
@@ -76,11 +77,6 @@ void object_enemy_travel(
   enemy_data->position_previous.y = metil_object->position.y;
   enemy_data->position_previous.z = metil_object->position.z;
 
-  float distance = (
-    (((float) *time_delta) / 1000.0f) *
-    enemy_data->speed 
-  );
-
   float position_player_y = (
     position_player->y +
     height
@@ -88,13 +84,16 @@ void object_enemy_travel(
 
   struct clic3_vector3_float distances = {
     .x = (
-      metil_object->position.x - position_player->x
+      metil_object->position.x -
+      position_player->x
     ),
     .y = (
-      metil_object->position.y - position_player_y
+      metil_object->position.y -
+      position_player_y
     ),
     .z = (
-      metil_object->position.z - position_player->z
+      metil_object->position.z -
+      position_player->z
     )
   };
 
@@ -130,6 +129,36 @@ void object_enemy_travel(
       distance_total
     )
   };
+
+  float speed = (
+    enemy_data->speed
+  );
+
+  if (
+    distance_total < enemy_distance_speed_boost
+  ) {
+    speed = (
+      speed +
+      speed * (
+        (
+          enemy_distance_speed_boost -
+          distance_total
+        ) /
+        enemy_distance_speed_boost
+      ) * (
+        distance_total /
+        enemy_distance_speed_boost_half
+      )
+    );
+  }
+
+  float distance = (
+    (
+      (float) *time_delta /
+      1000.0f
+    ) *
+    speed  
+  );
 
   if (
     distance > distance_total
