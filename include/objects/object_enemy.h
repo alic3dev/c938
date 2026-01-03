@@ -17,7 +17,8 @@ void object_enemy_initialize(
   struct metil_object* _Nonnull,
   id<MTLDevice> _Nonnull,
   struct clic3_vector3_float,
-  unsigned char
+  unsigned char,
+  float
 );
 
 void object_enemy_travel(

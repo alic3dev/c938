@@ -418,7 +418,7 @@ void scene_gameplay_populate(
     &rand_parameters,
     &rand_result,
     &rand_source,
-    6,
+    10,
     rand_mode_bytes,
     rand_source_type_divisive
   );
@@ -471,7 +471,7 @@ void scene_gameplay_populate(
       position_enemy.x >= -distance_minimum
     ) {
       float offset = (
-        rand_result.bytes[3] +
+        rand_result.bytes[7] +
         distance_minimum
       );
 
@@ -495,7 +495,7 @@ void scene_gameplay_populate(
       position_enemy.z >= -distance_minimum
     ) {
       float offset = (
-        rand_result.bytes[1] +
+        rand_result.bytes[6] +
         distance_minimum
       );
 
@@ -514,11 +514,21 @@ void scene_gameplay_populate(
       );
     }
 
+    float speed_enemy = (
+      (float) (
+        rand_result.bytes[8] +
+        rand_result.bytes[9]
+      ) / 255.0f *
+      16.0f +
+      32.0f
+    );
+
     object_enemy_initialize(
       metil_object_enemy,
       metil->renderer_interface.metal_device,
       position_enemy,
-      4
+      4,
+      speed_enemy
     );
   }
 }
