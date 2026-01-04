@@ -10,4 +10,9 @@ void mesh_building_initialize(
   float
 );
 
+void mesh_building_height_set(
+  struct metil_mesh*,
+  float
+);
+
 #endif

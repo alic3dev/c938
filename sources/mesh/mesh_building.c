@@ -230,3 +230,62 @@ void mesh_building_initialize(
     mesh->length_vertices - 1
   );
 }
+
+void mesh_building_height_set(
+  struct metil_mesh* metil_mesh,
+  float height
+) {
+  unsigned char layers = 2;
+
+  metil_mesh->size.y = (
+    height
+  );
+
+  for (
+    unsigned short int index_layer = 0;
+    index_layer < layers;
+    ++index_layer
+  ) {
+    unsigned short int index_vertex = (
+      index_layer * 4
+    );
+
+   float position_y = (
+      (
+        (float) index_layer /
+        (float) (
+          layers -
+          1
+        )
+      ) *
+      metil_mesh->size.y
+    );
+
+    metil_mesh->vertices[
+      index_vertex
+    ].y = (
+      position_y
+    );
+
+    metil_mesh->vertices[
+      index_vertex +
+      1
+    ].y = (
+      position_y
+    );
+
+    metil_mesh->vertices[
+      index_vertex +
+      2
+    ].y = (
+      position_y
+    );
+
+    metil_mesh->vertices[
+      index_vertex +
+      3
+    ].y = (
+      position_y
+    );
+  }
+}
