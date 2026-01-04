@@ -1102,7 +1102,7 @@ OSStatus scene_gameplay_io_proc(
           metil_scene_gameplay->time,
           channel,
           index_buffer_out
-        ) * 0.25f
+        )
       );
     }
   }
