@@ -249,6 +249,7 @@ void scene_menu_main_initialize(
       scene_menu_main_renderables_index_buildings
     ].renderable,
     scene_menu_main_length_buildings_default,
+    100,
     scene->textures[
       scene_menu_main_textures_index_buildings
     ]
