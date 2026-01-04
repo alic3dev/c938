@@ -28,6 +28,7 @@
 #include <metil_scenes/metil_scene.h>
 #include <metil_scenes/metil_scene_controller.h>
 
+#include <rand_clean.h>
 #include <rand_functions.h>
 #include <rand_initialize.h>
 #include <rand_parameters.h>
@@ -286,6 +287,25 @@ void scene_gameplay_populate(
   struct metil_scene* scene,
   unsigned short int length_buildings
 ) {
+  struct rand_parameters rand_parameters;
+  struct rand_source rand_source;
+  struct rand_result rand_result;
+
+  rand_initialize(
+    &rand_parameters,
+    &rand_result,
+    &rand_source,
+    10,
+    rand_mode_bytes,
+    rand_source_type_divisive
+  );
+
+  rand_get(
+    &rand_source,
+    &rand_result,
+    &rand_parameters
+  );
+
   scene->player.rotation.x = 0.0f;
   scene->player.rotation.y = 0.0f;
   scene->player.rotation.z = 0.0f;
@@ -309,6 +329,18 @@ void scene_gameplay_populate(
   player_data_initialize(
     player_data,
     metil->rendering_properties.camera.height_default
+  );
+
+  player_data->index_target_building = (
+    (
+      rand_result.bytes[0] *
+      rand_result.bytes[1] +
+      rand_result.bytes[2]
+    ) % (
+      length_buildings -
+      2
+    ) +
+    2
   );
 
   player_data->time = &scene->time;
@@ -353,6 +385,7 @@ void scene_gameplay_populate(
     metil->renderer_interface.metal_device,
     metil_group_buildings,
     length_buildings,
+    player_data->index_target_building,
     scene->textures[
       scene_gameplay_textures_index_buildings
     ]
@@ -408,19 +441,6 @@ void scene_gameplay_populate(
 
   metil_group_initialize(
     metil_group_enemies
-  );
-
-  struct rand_parameters rand_parameters;
-  struct rand_source rand_source;
-  struct rand_result rand_result;
-
-  rand_initialize(
-    &rand_parameters,
-    &rand_result,
-    &rand_source,
-    10,
-    rand_mode_bytes,
-    rand_source_type_divisive
   );
 
   float distance_minimum = 200.0f;
@@ -531,6 +551,11 @@ void scene_gameplay_populate(
       speed_enemy
     );
   }
+
+  rand_clean(
+    &rand_result,
+    &rand_source
+  );
 }
 
 void scene_gameplay_poll(
@@ -542,7 +567,10 @@ void scene_gameplay_poll(
   );
 
   if (
-    player_data->on_ground == scene_gameplay_group_buildings_index_target
+    player_data->on_ground == (
+      player_data->index_target_building +
+      1
+    )
   ) {
     struct metil_group* metil_group_buildings = (
       scene->renderables[

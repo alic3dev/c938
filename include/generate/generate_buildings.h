@@ -13,6 +13,7 @@ void generate_buildings(
   _Nonnull id<MTLDevice>,
   struct metil_group* _Nonnull,
   unsigned short int,
+  unsigned short int,
   _Nonnull id<MTLTexture>
 );
 

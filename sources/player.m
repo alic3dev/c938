@@ -12,7 +12,6 @@
 #include <metil_scenes/metil_scene.h>
 #include <metil_scenes/metil_scene_controller.h>
 
-#include <math.h>
 #include <stdlib.h>
 
 const float player_speed_movement_default = 100.0f;
