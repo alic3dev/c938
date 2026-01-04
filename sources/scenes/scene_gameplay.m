@@ -28,6 +28,7 @@
 #include <metil_scenes/metil_scene.h>
 #include <metil_scenes/metil_scene_controller.h>
 
+#include <rand_clean.h>
 #include <rand_functions.h>
 #include <rand_initialize.h>
 #include <rand_parameters.h>
@@ -531,6 +532,11 @@ void scene_gameplay_populate(
       speed_enemy
     );
   }
+
+  rand_clean(
+    &rand_result,
+    &rand_source
+  );
 }
 
 void scene_gameplay_poll(

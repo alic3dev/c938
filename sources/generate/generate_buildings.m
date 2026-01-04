@@ -7,6 +7,7 @@
 #include <metil_rendering/metil_renderable.h>
 #include <metil_rendering/metil_renderer_data_object.h>
 
+#include <rand_clean.h>
 #include <rand_functions.h>
 #include <rand_initialize.h>
 #include <rand_parameters.h>
@@ -224,4 +225,9 @@ void generate_buildings(
       data->color.w = 1.0f;
     }
   }
+
+  rand_clean(
+    &rand_result,
+    &rand_source
+  );
 }
