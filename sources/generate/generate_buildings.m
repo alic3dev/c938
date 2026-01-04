@@ -7,6 +7,9 @@
 #include <metil_rendering/metil_renderable.h>
 #include <metil_rendering/metil_renderer_data_object.h>
 
+#include <math_c_absolute.h>
+#include <math_c_maximum.h>
+
 #include <rand_clean.h>
 #include <rand_functions.h>
 #include <rand_initialize.h>
@@ -26,8 +29,6 @@ void generate_buildings(
   unsigned short int index_target_building,
   id<MTLTexture> texture
 ) {
-  signed int size = 2500;
-
   struct metil_object* object = (void*) 0;
   struct metil_object* object_starting_point = (void*) 0;
 
@@ -59,40 +60,12 @@ void generate_buildings(
     );
   }
 
-  object = (
-    metil_group_buildings->renderables[
-      0
-    ]->renderable
-  );
+  struct clic3_vector2_float size_maximum = {
+    .x = 0.0f,
+    .y = 0.0f
+  };
 
-  mesh_building_initialize(
-    &object->mesh,
-    size * 2,
-    1.0f,
-    size * 2
-  );
-
-  object->index_pipeline_render = (
-    c938_pipeline_index_ground
-  );
-
-  object->position.y = 0.0f;
-
-  metil_object_buffers_initialize(
-    object,
-    metal_device
-  );
-
-  metil_object_texture_add(
-    object,
-    texture
-  );
-
-  struct metil_renderer_data_object* data = (
-    object->buffers_vertex[
-      metil_object_buffer_default_index_data
-    ].buffer.contents
-  );
+  struct metil_renderer_data_object* data;
 
   struct rand_parameters rand_parameters;
   struct rand_source rand_source;
@@ -299,7 +272,89 @@ void generate_buildings(
       data->color.z = 1.0f;
       data->color.w = 1.0f;
     }
+
+    struct clic3_vector2_float limits = {
+      .x = (
+        math_c_maximum_float(
+          object->position.x + (
+            object->mesh.size.x /
+            2.0f
+          ),
+          math_c_absolute_float(
+            object->position.x - (
+              object->mesh.size.x /
+              2.0f
+            )
+          )
+        )
+      ),
+      .y = (
+        math_c_maximum_float(
+          object->position.z + (
+            object->mesh.size.z /
+            2.0f
+          ),
+          math_c_absolute_float(
+            object->position.z - (
+              object->mesh.size.z /
+              2.0f
+            )
+          )
+        )
+      )
+    };
+
+    if (
+      limits.x > size_maximum.x
+    ) {
+      size_maximum.x = (
+        limits.x
+      );
+    }
+
+    if (
+      limits.y > size_maximum.y
+    ) {
+      size_maximum.y = (
+        limits.y
+      );
+    } 
   }
+
+  object = (
+    metil_group_buildings->renderables[
+      0
+    ]->renderable
+  );
+
+  mesh_building_initialize(
+    &object->mesh, (
+      size_maximum.x *
+      2.0f +
+      200.0f
+    ),
+    1.0f, (
+      size_maximum.y *
+      2.0f +
+      200.0f
+    )
+  );
+
+  object->index_pipeline_render = (
+    c938_pipeline_index_ground
+  );
+
+  object->position.y = 0.0f;
+
+  metil_object_buffers_initialize(
+    object,
+    metal_device
+  );
+
+  metil_object_texture_add(
+    object,
+    texture
+  );
 
   rand_clean(
     &rand_result,
