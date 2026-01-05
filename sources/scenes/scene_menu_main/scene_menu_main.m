@@ -222,7 +222,7 @@ void scene_menu_main_poll(
   struct metil_scene* scene
 ) {
   struct scene_menu_main_data* data = (
-    (struct scene_menu_main_data*) scene->data
+    scene->data
   );
 
   data->angle = fmod((
@@ -420,10 +420,12 @@ void scene_menu_main_poll_input(
   struct metil* metil,
   struct metil_scene* scene
 ) {
+  struct scene_menu_main_data* scene_menu_main_data = (
+    scene->data
+  );
+  
   struct metil_menu* menu = (
-    &(
-      (struct scene_menu_main_data*) scene->data
-    )->menu
+    &scene_menu_main_data->menu
   );
 
   metil_menu_poll_input(
@@ -441,10 +443,12 @@ void scene_menu_main_destroy(
     scene_menu_main_io_proc
   );
 
+  struct scene_menu_main_data* scene_menu_main_data = (
+    scene->data
+  );
+
   metil_menu_destroy(
-    &(
-      (struct scene_menu_main_data*) scene->data
-    )->menu
+    &scene_menu_main_data->menu
   );
 
   metil_scene_destroy_default(
