@@ -1,4 +1,4 @@
-#include <scenes/scene_menu_main.h>
+#include <scenes/scene_menu_main/scene_menu_main.h>
 
 #include <generate/generate_buildings.h>
 #include <menus/menu_main.h>
@@ -14,7 +14,8 @@
 #include <metil_input/metil_input_map.h>
 #include <metil_menus/metil_menu.h>
 #include <metil_mesh/metil_mesh_text.h>
-#include <metil_object.h>
+#include <metil_object/metil_object.h>
+#include <metil_object/metil_object_text.h>
 #include <metil_paths/metil_paths.h>
 #include <metil_positioning.h>
 #include <metil_rendering/metil_renderer_data_object.h>
@@ -39,35 +40,80 @@ void scene_menu_main_initialize(
   metil_scene_initialize_with_renderables(
     metil,
     scene,
-    4
+    scene_menu_main_length_renderables
   );
 
-  scene->poll = scene_menu_main_poll;
-  scene->poll_input = scene_menu_main_poll_input;
-  scene->destroy = scene_menu_main_destroy;
+  for (
+    unsigned char index_renderable = 0;
+    index_renderable < scene->length_renderables;
+    ++index_renderable
+  ) {
+    switch (
+      index_renderable
+    ) {
+      case scene_menu_main_renderables_index_buildings:
+        metil_renderable_initialize_at_index(
+          scene->renderables,
+          index_renderable,
+          metil_renderable_type_group
+        );
+        break;
+      default:
+        metil_renderable_initialize_at_index(
+          scene->renderables,
+          index_renderable,
+          metil_renderable_type_object
+        );
+        break;
+    }
+  }
+
+  scene->poll = (
+    scene_menu_main_poll
+  );
+
+  scene->poll_input = (
+    scene_menu_main_poll_input
+  );
+
+  scene->destroy = (
+    scene_menu_main_destroy
+  );
 
   scene->data = malloc(
-    sizeof(struct scene_menu_main_data)
+    sizeof(
+      struct scene_menu_main_data
+    )
   );
 
   struct scene_menu_main_data* data = (
-    (struct scene_menu_main_data*) scene->data
+    scene->data
   );
 
-  data->angle = 0.0f;
+  data->angle = (
+    0.0f
+  );
 
-  data->time_started = 0;
+  data->time_started = (
+    0
+  );
 
   menu_main_initialize(
     metil,
     &data->menu
   );
 
-  scene->length_textures = 4;
+  scene->length_textures = (
+    scene_menu_main_length_textures
+  );
+
   scene->textures = realloc(
-    scene->textures,
-    sizeof(id<MTLTexture>) *
-    scene->length_textures
+    scene->textures, (
+      sizeof(
+        id<MTLTexture>
+      ) *
+      scene->length_textures
+    )
   );
 
   MTKTextureLoader* texture_loader = [
@@ -78,176 +124,76 @@ void scene_menu_main_initialize(
   textures_buildings_load(
     texture_loader, (
       scene->textures +
-      3
+      scene_menu_main_textures_index_buildings
     ),
     &metil->paths
   );
 
   [texture_loader release];
-  
-  metil_renderable_initialize_at_index(
-    scene->renderables,
-    scene_menu_main_renderables_index_title,
-    metil_renderable_type_object
-  );
 
-  struct metil_object* object = (
+  struct metil_object* metil_object_text_title = (
     scene->renderables[
-      scene_menu_main_renderables_index_title
+      scene_menu_main_renderables_index_text_title
     ].renderable
   );
 
-  object->index_pipeline_render = (
-    c938_pipeline_index_text
+  metil_object_text_initialize(
+    metil,
+    metil_object_text_title,
+    "c938"
   );
 
-  scene->textures[
-    scene_menu_main_textures_index_title
-  ] = metil_text_mesh_with_texture_initialize(
-    metil->renderer_interface.metal_device,
-    &object->mesh,
-    "c938",
-    &metil->text_defaults.render_parameters,
-    &metil->configuration
-  );
-
-  object->positioning = metil_positioning_static;
-
-  metil_object_buffers_initialize(
-    object,
-    metil->renderer_interface.metal_device
-  );
-
-  object->position.y = (
+  metil_object_text_title->position.y = (
     0.5f - (
-      object->mesh.size.y /
+      metil_object_text_title->mesh.size.y /
       4.0f
     )
   );
 
-  metil_object_texture_add(
-    object,
-    scene->textures[
-      scene_menu_main_textures_index_title
-    ]
-  );
-
-  struct metil_renderer_data_menu_item* data_object = (
-    object->buffers_vertex[
-      metil_object_buffer_default_index_data
-    ].buffer.contents
-  );
-
-  metil_renderable_initialize_at_index(
-    scene->renderables,
-    scene_menu_main_renderables_index_menu_enter,
-    metil_renderable_type_object
-  );
-
-  object = (
+  struct metil_object* metil_object_text_enter = (
     scene->renderables[
       scene_menu_main_renderables_index_menu_enter
     ].renderable
   );
 
-  object->index_pipeline_render = (
-    c938_pipeline_index_text
+  metil_object_text_initialize(
+    metil,
+    metil_object_text_enter,
+    "enter"
   );
 
-  scene->textures[
-    scene_menu_main_textures_index_menu_enter
-  ] = metil_text_mesh_with_texture_initialize(
-    metil->renderer_interface.metal_device,
-    &object->mesh,
-    "enter",
-    &metil->text_defaults.render_parameters,
-    &metil->configuration
-  );
-
-  object->positioning = metil_positioning_static;
-
-  metil_object_buffers_initialize(
-    object,
-    metil->renderer_interface.metal_device
-  );
-
-  object->position.y = (
-    object->mesh.size.y *
+  metil_object_text_enter->position.y = (
+    metil_object_text_enter->mesh.size.y *
     -6.0
   );
 
-  metil_object_texture_add(
-    object,
-    scene->textures[
-      scene_menu_main_textures_index_menu_enter
-    ]
-  );
-
-  data_object = object->buffers_vertex[
-    metil_object_buffer_default_index_data
-  ].buffer.contents;
-
-  metil_renderable_initialize_at_index(
-    scene->renderables,
-    scene_menu_main_renderables_index_menu_exit,
-    metil_renderable_type_object
-  );
-
-  object = (
+  struct metil_object* metil_object_text_exit = (
     scene->renderables[
       scene_menu_main_renderables_index_menu_exit
     ].renderable
   );
 
-  object->index_pipeline_render = (
-    c938_pipeline_index_text
+  metil_object_text_initialize(
+    metil,
+    metil_object_text_exit,
+    "exit"
   );
 
-  scene->textures[
-    scene_menu_main_textures_index_menu_exit
-  ] = metil_text_mesh_with_texture_initialize(
-    metil->renderer_interface.metal_device,
-    &object->mesh,
-    "exit",
-    &metil->text_defaults.render_parameters,
-    &metil->configuration
-  );
-
-  object->positioning = metil_positioning_static;
-
-  metil_object_buffers_initialize(
-    object,
-    metil->renderer_interface.metal_device
-  );
-
-  object->position.y = (
-    object->mesh.size.y *
+  metil_object_text_exit->position.y = (
+    metil_object_text_exit->mesh.size.y *
     -10.0f
   );
 
-  data_object = object->buffers_vertex[
-    metil_object_buffer_default_index_data
-  ].buffer.contents;
-  
-  metil_object_texture_add(
-    object,
-    scene->textures[
-      scene_menu_main_textures_index_menu_exit
-    ]
-  );
-
-  metil_renderable_initialize_at_index(
-    scene->renderables,
-    scene_menu_main_renderables_index_buildings,
-    metil_renderable_type_group
+  struct metil_group* metil_group_buildings = (
+    scene->renderables[
+      scene_menu_main_renderables_index_buildings
+    ].renderable
   );
 
   generate_buildings(
     metil,
     metil->renderer_interface.metal_device,
-    scene->renderables[
-      scene_menu_main_renderables_index_buildings
-    ].renderable,
+    metil_group_buildings,
     scene_menu_main_length_buildings_default,
     100,
     scene->textures[
@@ -276,7 +222,7 @@ void scene_menu_main_poll(
   struct metil_scene* scene
 ) {
   struct scene_menu_main_data* data = (
-    (struct scene_menu_main_data*) scene->data
+    scene->data
   );
 
   data->angle = fmod((
@@ -289,67 +235,111 @@ void scene_menu_main_poll(
     )
   );
 
-  scene->player.position.x = -cos(
-    data->angle
-  ) * 1500.0f;
+  scene->player.position.x = (
+    cos(
+      data->angle
+    ) *
+    -1500.0f
+  );
   
-  scene->player.position.z = -sin(
-    data->angle
-  ) * 1500.0f;
+  scene->player.position.z = (
+    sin(
+      data->angle
+    ) *
+    -1500.0f
+  );
 
-  scene->player.rotation.y = ((
+  scene->player.rotation.y = (
+    (
       data->angle *
       1.0f
     ) - (
-      M_PI / 2.0f
+      M_PI /
+      2.0f
     )
   );
 
-  struct metil_menu* menu = &data->menu;
+  struct metil_menu* menu = &(
+    data->menu
+  );
 
-  switch (menu->index_current) {
+  struct metil_object* metil_object_text_enter = (
+    scene->renderables[
+      scene_menu_main_renderables_index_menu_enter
+    ].renderable
+  );
+
+  struct metil_object* metil_object_text_exit = (
+    scene->renderables[
+      scene_menu_main_renderables_index_menu_exit
+    ].renderable
+  );
+
+  struct metil_renderer_data_object* metil_renderer_data_menu_item_enter = (
+    metil_object_text_enter->buffers_vertex[
+      metil_object_buffer_default_index_data
+    ].buffer.contents
+  );
+
+  struct metil_renderer_data_object* metil_renderer_data_menu_item_exit = (
+    metil_object_text_exit->buffers_vertex[
+      metil_object_buffer_default_index_data
+    ].buffer.contents
+  );
+
+  switch (
+    menu->index_current
+  ) {
     case 0: {
-      struct metil_renderer_data_object* data_object = (
-        (struct metil_object*) scene->renderables[
-          scene_menu_main_renderables_index_menu_enter
-        ].renderable
-      )->buffers_vertex[
-        metil_object_buffer_default_index_data
-      ].buffer.contents;
+      metil_renderer_data_menu_item_enter->color.x = (
+        0.1f
+      );
 
-      data_object->noise = 1;
+      metil_renderer_data_menu_item_enter->color.y = (
+        0.1f
+      );
 
-      data_object = (
-        (struct metil_object*) scene->renderables[
-          scene_menu_main_renderables_index_menu_exit
-        ].renderable
-      )->buffers_vertex[
-        metil_object_buffer_default_index_data
-      ].buffer.contents;
+      metil_renderer_data_menu_item_enter->color.z = (
+        0.1f
+      );
 
-      data_object->noise = 0;
+      metil_renderer_data_menu_item_exit->color.x = (
+        1.0f
+      );
+
+      metil_renderer_data_menu_item_exit->color.y = (
+        1.0f
+      );
+
+      metil_renderer_data_menu_item_exit->color.z = (
+        1.0f
+      );
       break;
     }
     case 1: {
-      struct metil_renderer_data_object* data_object = (
-        (struct metil_object*) scene->renderables[
-          scene_menu_main_renderables_index_menu_exit
-        ].renderable
-      )->buffers_vertex[
-        metil_object_buffer_default_index_data
-      ].buffer.contents;
+      metil_renderer_data_menu_item_enter->color.x = (
+        1.0f
+      );
 
-      data_object->noise = 1;
+      metil_renderer_data_menu_item_enter->color.y = (
+        1.0f
+      );
 
-      data_object = (
-        (struct metil_object*) scene->renderables[
-          scene_menu_main_renderables_index_menu_enter
-        ].renderable
-      )->buffers_vertex[
-        metil_object_buffer_default_index_data
-      ].buffer.contents;
+      metil_renderer_data_menu_item_enter->color.z = (
+        1.0f
+      );
 
-      data_object->noise = 0;
+      metil_renderer_data_menu_item_exit->color.x = (
+        0.1f
+      );
+
+      metil_renderer_data_menu_item_exit->color.y = (
+        0.1f
+      );
+
+      metil_renderer_data_menu_item_exit->color.z = (
+        0.1f
+      );
       break;
     }
   }
@@ -376,12 +366,21 @@ void scene_menu_main_poll(
     } else {
       float brightness = (
         (float) (
-          scene_menu_main_time_scene_transition - time_delta
-        ) / (float) scene_menu_main_time_scene_transition
+          scene_menu_main_time_scene_transition -
+          time_delta
+        ) /
+        (float) scene_menu_main_time_scene_transition
       );
 
-      metil->rendering_properties.brightness = brightness;
-      metil->rendering_properties.brightness_text = brightness;
+      metil->rendering_properties.brightness = (
+        brightness *
+        metil->configuration.rendering_properties.brightness
+      );
+
+      metil->rendering_properties.brightness_text = (
+        brightness *
+        metil->configuration.rendering_properties.brightness_text
+      );
     }
   } else if (
     menu->index_selected != -1 &&
@@ -421,10 +420,12 @@ void scene_menu_main_poll_input(
   struct metil* metil,
   struct metil_scene* scene
 ) {
+  struct scene_menu_main_data* scene_menu_main_data = (
+    scene->data
+  );
+  
   struct metil_menu* menu = (
-    &(
-      (struct scene_menu_main_data*) scene->data
-    )->menu
+    &scene_menu_main_data->menu
   );
 
   metil_menu_poll_input(
@@ -442,10 +443,12 @@ void scene_menu_main_destroy(
     scene_menu_main_io_proc
   );
 
+  struct scene_menu_main_data* scene_menu_main_data = (
+    scene->data
+  );
+
   metil_menu_destroy(
-    &(
-      (struct scene_menu_main_data*) scene->data
-    )->menu
+    &scene_menu_main_data->menu
   );
 
   metil_scene_destroy_default(

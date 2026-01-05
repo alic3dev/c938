@@ -15,14 +15,18 @@
 #define scene_menu_main_length_buildings_default 200
 #define scene_menu_main_time_scene_transition 333
 
+#define scene_menu_main_length_renderables 4
+
 enum scene_menu_main_renderables_index {
   scene_menu_main_renderables_index_buildings = 0,
-  scene_menu_main_renderables_index_title = 1,
+  scene_menu_main_renderables_index_text_title = 1,
   scene_menu_main_renderables_index_menu_enter = 2,
   scene_menu_main_renderables_index_menu_exit = 3
 };
 
-enum textures_scene_menu_main {
+#define scene_menu_main_length_textures 4
+
+enum scene_menu_main_textures_index {
   scene_menu_main_textures_index_title = 0,
   scene_menu_main_textures_index_menu_enter = 1,
   scene_menu_main_textures_index_menu_exit = 2,

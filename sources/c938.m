@@ -3,7 +3,7 @@
 #include <pipeline_index.h>
 #include <player.h>
 #include <scenes/scene_id.h>
-#include <scenes/scene_menu_main.h>
+#include <scenes/scene_menu_main/scene_menu_main.h>
 #include <scenes/scene_gameplay.h>
 
 #if target_os_ios
@@ -197,6 +197,10 @@ void c938_renderer_on_initialize(
       newFunctionWithName: @"c938_enemy_vertex"
     ]
   ];
+
+  metil->text_defaults.object_text_index_pipeline_render = (
+    c938_pipeline_index_text
+  );
 
   scene_menu_main_initialize(
     metil,
