@@ -8,6 +8,7 @@ struct data_vertex {
   float4 position [[position]];
   float2 position_texture;
   float brightness;
+  float4 color;
 };
 
 [[vertex]] struct data_vertex c938_text_vertex(
@@ -36,9 +37,23 @@ struct data_vertex {
   );
 
   data_vertex.brightness = (
-    data_object->noise == 1
-    ? data_frame->brightness_text * 0.01f
-    : data_frame->brightness_text
+    data_frame->brightness_text
+  );
+
+  data_vertex.color.r = (
+    data_object->color.x
+  );
+
+  data_vertex.color.g = (
+    data_object->color.y
+  );
+
+  data_vertex.color.b = (
+    data_object->color.z
+  );
+
+  data_vertex.color.a = (
+    data_object->color.w
   );
 
   data_vertex.position_texture.x = (
@@ -73,9 +88,24 @@ struct data_vertex {
   );
 
   return float4(
-    color_texture[0] * data_vertex.brightness,
-    color_texture[1] * data_vertex.brightness,
-    color_texture[2] * data_vertex.brightness,
-    color_texture[3]
+    (
+      color_texture[0] *
+      data_vertex.color.r *
+      data_vertex.brightness
+    ),
+    (
+      color_texture[1] *
+      data_vertex.color.g *
+      data_vertex.brightness
+    ),
+    (
+      color_texture[2] *
+      data_vertex.color.b *
+      data_vertex.brightness
+    ),
+    (
+      color_texture[3] *
+      data_vertex.color.a
+    )
   );
 }
