@@ -87,7 +87,7 @@ void scene_menu_main_initialize(
   );
 
   struct scene_menu_main_data* data = (
-    (struct scene_menu_main_data*) scene->data
+    scene->data
   );
 
   data->angle = (
@@ -235,23 +235,33 @@ void scene_menu_main_poll(
     )
   );
 
-  scene->player.position.x = -cos(
-    data->angle
-  ) * 1500.0f;
+  scene->player.position.x = (
+    cos(
+      data->angle
+    ) *
+    -1500.0f
+  );
   
-  scene->player.position.z = -sin(
-    data->angle
-  ) * 1500.0f;
+  scene->player.position.z = (
+    sin(
+      data->angle
+    ) *
+    -1500.0f
+  );
 
-  scene->player.rotation.y = ((
+  scene->player.rotation.y = (
+    (
       data->angle *
       1.0f
     ) - (
-      M_PI / 2.0f
+      M_PI /
+      2.0f
     )
   );
 
-  struct metil_menu* menu = &data->menu;
+  struct metil_menu* menu = &(
+    data->menu
+  );
 
   struct metil_object* metil_object_text_enter = (
     scene->renderables[
@@ -356,12 +366,21 @@ void scene_menu_main_poll(
     } else {
       float brightness = (
         (float) (
-          scene_menu_main_time_scene_transition - time_delta
-        ) / (float) scene_menu_main_time_scene_transition
+          scene_menu_main_time_scene_transition -
+          time_delta
+        ) /
+        (float) scene_menu_main_time_scene_transition
       );
 
-      metil->rendering_properties.brightness = brightness;
-      metil->rendering_properties.brightness_text = brightness;
+      metil->rendering_properties.brightness = (
+        brightness *
+        metil->configuration.rendering_properties.brightness
+      );
+
+      metil->rendering_properties.brightness_text = (
+        brightness *
+        metil->configuration.rendering_properties.brightness_text
+      );
     }
   } else if (
     menu->index_selected != -1 &&
