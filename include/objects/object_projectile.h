@@ -3,7 +3,7 @@
 
 #include <data/projectile_data.h>
 
-#include <clic3_vector.h>
+#include <math_c_vector.h>
 
 #include <metil.h>
 #include <metil_object.h>
@@ -13,8 +13,8 @@
 void object_projectile_initialize(
   struct metil_object* _Nonnull,
   id<MTLDevice> _Nonnull,
-  struct clic3_vector3_float,
-  struct clic3_vector3_float,
+  struct math_c_vector3_float,
+  struct math_c_vector3_float,
   unsigned long int,
   float
 );

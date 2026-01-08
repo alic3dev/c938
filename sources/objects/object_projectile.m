@@ -5,7 +5,7 @@
 #include <data/projectile_data.h>
 #include <data/projectile_lifespan.h>
 
-#include <clic3_vector.h>
+#include <math_c_vector.h>
 
 #include <metil_object.h>
 #include <metil_positioning.h>
@@ -18,8 +18,8 @@
 void object_projectile_initialize(
   struct metil_object* object,
   id<MTLDevice> metal_device,
-  struct clic3_vector3_float position,
-  struct clic3_vector3_float angle,
+  struct math_c_vector3_float position,
+  struct math_c_vector3_float angle,
   unsigned long int time_fired,
   float speed
 ) {

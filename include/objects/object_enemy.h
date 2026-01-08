@@ -3,7 +3,7 @@
 
 #include <data/enemy_data.h>
 
-#include <clic3_vector.h>
+#include <math_c_vector.h>
 
 #include <metil.h>
 #include <metil_object.h>
@@ -16,14 +16,14 @@
 void object_enemy_initialize(
   struct metil_object* _Nonnull,
   id<MTLDevice> _Nonnull,
-  struct clic3_vector3_float,
+  struct math_c_vector3_float,
   unsigned char,
   float
 );
 
 void object_enemy_travel(
   struct metil_object* _Nonnull,
-  struct clic3_vector3_float* _Nonnull,
+  struct math_c_vector3_float* _Nonnull,
   struct enemy_data* _Nonnull,
   unsigned long int* _Nonnull,
   float
