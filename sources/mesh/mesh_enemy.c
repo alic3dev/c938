@@ -2,7 +2,7 @@
 
 #include <metil_mesh/metil_mesh_box.h>
 
-#include <clic3_vector.h>
+#include <math_c_vector.h>
 
 #include <stdlib.h>
 
@@ -11,7 +11,7 @@ void mesh_enemy_initialize(
 ) {
   metil_mesh_box_initialize(
     mesh,
-    (struct clic3_vector3_float) {
+    (struct math_c_vector3_float) {
       .x = 30.0f,
       .y = 30.0f,
       .z = 30.0f
@@ -35,7 +35,7 @@ void mesh_enemy_initialize(
 
   mesh->vertices = realloc(
     mesh->vertices,
-    sizeof(struct clic3_vector4_float) *
+    sizeof(struct math_c_vector4_float) *
     mesh->length_vertices
   );
 

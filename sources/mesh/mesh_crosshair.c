@@ -2,7 +2,7 @@
 
 #include <metil_mesh/metil_mesh.h>
 
-#include <clic3_vector.h>
+#include <math_c_vector.h>
 
 #include <stdlib.h>
 
@@ -26,7 +26,7 @@ void mesh_crosshair_initialize(
 
   mesh->vertices = realloc(
     mesh->vertices,
-    sizeof(struct clic3_vector4_float) *
+    sizeof(struct math_c_vector4_float) *
     mesh->length_vertices
   );
 

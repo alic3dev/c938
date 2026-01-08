@@ -141,18 +141,18 @@ void player_poll_input(
     );
   }
 
-  struct clic3_vector3_float movement = {
+  struct math_c_vector3_float movement = {
     .x = 0.0f,
     .y = 0.0f,
     .z = 0.0f
   };
 
-  struct clic3_vector2_float ratio_movement = {
+  struct math_c_vector2_float ratio_movement = {
     .x = 0.0f,
     .y = 0.0f
   };
 
-  struct clic3_vector2_float ratio_movement_strafe = {
+  struct math_c_vector2_float ratio_movement_strafe = {
     .x = 0.0f,
     .y = 0.0f
   };
@@ -320,7 +320,7 @@ void player_poll_input(
       (metil->input.controller_state.left_stick.x * ratio_movement_strafe.y)
     );
   } else {
-    struct clic3_vector2_float direction_arrows = {
+    struct math_c_vector2_float direction_arrows = {
       .x = (
         (
           metil->input.keydown_map[
@@ -458,7 +458,7 @@ void player_poll_input(
     )
   );
 
-  struct clic3_vector3_float position_updated = {
+  struct math_c_vector3_float position_updated = {
     .x = (
       player->position.x + (
         movement.x *
@@ -477,7 +477,7 @@ void player_poll_input(
     )
   };
 
-  struct clic3_vector2_float size_half_player = {
+  struct math_c_vector2_float size_half_player = {
     .x = player->size.x / 2.0f,
     .y = player->size.z / 2.0f
   };
@@ -493,17 +493,17 @@ void player_poll_input(
       index_renderable
     ]->renderable;
 
-    struct clic3_vector2_float size_half_object = {
+    struct math_c_vector2_float size_half_object = {
       .x = object->mesh.size.x / 2.0f,
       .y = object->mesh.size.z / 2.0f
     };
 
-    struct clic3_vector2_float position_minimum_object = {
+    struct math_c_vector2_float position_minimum_object = {
       .x = object->position.x - size_half_object.x,
       .y = object->position.z - size_half_object.y
     };
 
-    struct clic3_vector2_float position_maximum_object = {
+    struct math_c_vector2_float position_maximum_object = {
       .x = object->position.x + size_half_object.x,
       .y = object->position.z + size_half_object.y
     };
@@ -696,7 +696,7 @@ void player_poll(
     object_projectile_initialize(
       metil_object_projectile,
       player_data->metal_device,
-      (struct clic3_vector3_float) {
+      (struct math_c_vector3_float) {
         .x = player->position.x,
         .y = (
           player->position.y +
@@ -704,7 +704,7 @@ void player_poll(
         ),
         .z = player->position.z
       },
-      (struct clic3_vector3_float) {
+      (struct math_c_vector3_float) {
         .x = player->rotation.x,
         .y = -player->rotation.y,
         .z = player->rotation.z

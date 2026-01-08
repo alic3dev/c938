@@ -60,7 +60,7 @@ void generate_buildings(
     );
   }
 
-  struct clic3_vector2_float size_maximum = {
+  struct math_c_vector2_float size_maximum = {
     .x = 0.0f,
     .y = 0.0f
   };
@@ -273,7 +273,7 @@ void generate_buildings(
       data->color.w = 1.0f;
     }
 
-    struct clic3_vector2_float limits = {
+    struct math_c_vector2_float limits = {
       .x = (
         math_c_maximum_float(
           object->position.x + (

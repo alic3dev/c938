@@ -5,7 +5,7 @@
 #include <data/enemy_data.h>
 #include <data/player_data.h>
 
-#include <clic3_vector.h>
+#include <math_c_vector.h>
 
 #include <math_c_absolute.h>
 
@@ -20,7 +20,7 @@
 void object_enemy_initialize(
   struct metil_object* object,
   id<MTLDevice> metal_device,
-  struct clic3_vector3_float position,
+  struct math_c_vector3_float position,
   unsigned char life,
   float speed
 ) {
@@ -68,7 +68,7 @@ void object_enemy_initialize(
 
 void object_enemy_travel(
   struct metil_object* metil_object,
-  struct clic3_vector3_float* position_player,
+  struct math_c_vector3_float* position_player,
   struct enemy_data* enemy_data,
   unsigned long int* time_delta,
   float height
@@ -82,7 +82,7 @@ void object_enemy_travel(
     height
   );
 
-  struct clic3_vector3_float distances = {
+  struct math_c_vector3_float distances = {
     .x = (
       metil_object->position.x -
       position_player->x
@@ -115,7 +115,7 @@ void object_enemy_travel(
     return;
   }
 
-  struct clic3_vector3_float percentagages = {
+  struct math_c_vector3_float percentagages = {
     .x = (
       -distances.x /
       distance_total

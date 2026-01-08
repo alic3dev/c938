@@ -467,7 +467,7 @@ void scene_gameplay_populate(
       ]->renderable
     );
 
-    struct clic3_vector3_float position_enemy = {
+    struct math_c_vector3_float position_enemy = {
       .x = (
         1250 - (
           rand_result.bytes[0] *
