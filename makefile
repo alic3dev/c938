@@ -269,7 +269,7 @@ ifeq (${target_os},ios)
 metal_flags_common:=${metal_flags_common} -Dtarget_os_ios
 endif
 
-metal_flags=${metal_flags_common} -I${directory_include} -I${directory_clic3_include} -I${directory_metil_include} -isysroot ${directory_sdk}
+metal_flags=${metal_flags_common} -I${directory_include} -I${directory_clic3_include} -I${directory_math_c_include} -I${directory_metil_include} -isysroot ${directory_sdk}
 
 ifneq (${disable_metal_fast_options}, 1)
 	metal_flags:=${metal_flags} -fmetal-math-mode\=fast -fmetal-math-fp32-functions\=fast
