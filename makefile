@@ -102,6 +102,7 @@ directory_math_c=../math_c
 directory_math_c_include=${directory_math_c}/include
 
 directory_metil=../metil
+directory_metil_library=${directory_metil}/library/${target_os}
 directory_metil_include=${directory_metil}/include
 
 directory_rand=../rand
@@ -112,26 +113,17 @@ directory_cer0_library=${directory_cer0}/library/${target_os}/debug
 directory_clic3_library=${directory_clic3}/library/${target_os}/debug
 directory_interrupt_handler_library=${directory_interrupt_handler}/library/${target_os}/debug
 directory_math_c_library=${directory_math_c}/library/${target_os}/debug
-directory_metil_library=${directory_metil}/library_debug
+directory_metil_library:=${directory_metil_library}/debug
 directory_rand_library=${directory_rand}/library/${target_os}/debug
 
-ifeq (${target_os},ios)
-directory_metil_library=${directory_metil}/library_debug_ios
-else
-directory_metil_library=${directory_metil}/library_debug
-endif
 else
 directory_cer0_library=${directory_cer0}/library/${target_os}/release
 directory_clic3_library=${directory_clic3}/library/${target_os}/release
 directory_interrupt_handler_library=${directory_interrupt_handler}/library/${target_os}/release
 directory_math_c_library=${directory_math_c}/library/${target_os}/release
+directory_metil_library:=${directory_metil_library}/release
 directory_rand_library=${directory_rand}/library/${target_os}/release
 
-ifeq (${target_os},ios)
-directory_metil_library=${directory_metil}/library_ios
-else
-directory_metil_library=${directory_metil}/library
-endif
 endif
 
 ifeq (${target_os},ios)

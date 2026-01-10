@@ -211,9 +211,10 @@ void scene_menu_main_initialize(
 
   scene->player.rotation.x = -0.3f;
 
-  metil_audio_io_proc_add(
+  metil_audio_io_proc_add_with_data(
     &metil->audio,
-    scene_menu_main_io_proc
+    scene_menu_main_io_proc,
+    scene->data
   );
 }
 
@@ -477,12 +478,12 @@ int scene_menu_main_io_proc(
     metil->scene_controller
   );
 
-  struct metil_scene* metil_scene_gameplay = &(
+  struct metil_scene* metil_scene_menu_main= &(
     metil_scene_controller->scene
   );
 
-  struct scene_gameplay_data* scene_gameplay_data = (
-    metil_scene_gameplay->data
+  struct scene_menu_main_data* scene_menu_main_data = (
+    metil_scene_menu_main->data
   );
 
   for (
@@ -521,6 +522,26 @@ OSStatus scene_menu_main_io_proc(
   const AudioTimeStamp* time_stamp_audio_out,
   void* data
 ) {
+  struct metil_audio_io_proc_data* metil_audio_io_proc_data = (
+    data
+  );
+
+  struct metil* metil = (
+    metil_audio_io_proc_data->metil
+  );
+
+  struct metil_scene_controller* metil_scene_controller = (
+    metil->scene_controller
+  );
+
+  struct metil_scene* metil_scene_menu_main= &(
+    metil_scene_controller->scene
+  );
+
+  struct scene_menu_main_data* scene_menu_main_data = (
+    metil_scene_menu_main->data
+  );
+
   for (
     unsigned long int index_buffer = 0;
     index_buffer < list_buffer_audio_out->mNumberBuffers;

@@ -12,6 +12,8 @@
 #include <CoreAudio/CoreAudio.h>
 #endif
 
+#include <stdio.h>
+
 #define scene_menu_main_length_buildings_default 200
 #define scene_menu_main_time_scene_transition 333
 
@@ -37,6 +39,7 @@ struct scene_menu_main_data {
   struct metil_menu menu;
   unsigned long int time_started;
   float angle;
+  FILE* _Nonnull file_audio;
 };
 
 void scene_menu_main_initialize(
