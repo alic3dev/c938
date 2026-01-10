@@ -9,5 +9,6 @@ extern unsigned short int c938_pipeline_index_text;
 extern unsigned short int c938_pipeline_index_crosshair;
 extern unsigned short int c938_pipeline_index_projectile;
 extern unsigned short int c938_pipeline_index_enemy;
+extern unsigned short int c938_pipeline_index_text_backing_menu;
 
 #endif

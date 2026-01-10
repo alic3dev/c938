@@ -1,6 +1,6 @@
 #include <c938.h>
 
-#include <pipeline_index.h>
+#include <c938_pipeline_index.h>
 #include <player.h>
 #include <scenes/scene_id.h>
 #include <scenes/scene_menu_main/scene_menu_main.h>
@@ -195,6 +195,18 @@ void c938_renderer_on_initialize(
     function_vertex: [
       metil->library.library
       newFunctionWithName: @"c938_enemy_vertex"
+    ]
+  ];
+
+  c938_pipeline_index_text_backing_menu = [
+    metil->renderer_interface.renderer
+    pipeline_add: [
+      metil->library.library
+      newFunctionWithName: @"c938_text_backing_menu_fragment"
+    ]
+    function_vertex: [
+      metil->library.library
+      newFunctionWithName: @"c938_text_backing_menu_vertex"
     ]
   ];
 

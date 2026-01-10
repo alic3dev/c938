@@ -1,7 +1,7 @@
 #include <generate/generate_buildings.h>
 
 #include <mesh/mesh_building.h>
-#include <pipeline_index.h>
+#include <c938_pipeline_index.h>
 
 #include <metil_object.h>
 #include <metil_rendering/metil_renderable.h>

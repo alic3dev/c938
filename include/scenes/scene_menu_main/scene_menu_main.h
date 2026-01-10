@@ -1,6 +1,9 @@
 #ifndef __scenes_scene_menu_main_h
 #define __scenes_scene_menu_main_h
 
+#include <menus/menu_main.h>
+#include <menus/menu_main_custom.h>
+
 #include <metil.h>
 #include <metil_menus/metil_menu.h>
 #include <metil_rendering/metil_renderer_interface.h>
@@ -17,28 +20,52 @@
 #define scene_menu_main_length_buildings_default 200
 #define scene_menu_main_time_scene_transition 333
 
-#define scene_menu_main_length_renderables 4
+#define scene_menu_main_length_renderables 6
+
+#define scene_menu_main_length_group_renderables_text_main menus_menu_main_length
+#define scene_menu_main_length_group_renderables_text_main_backing scene_menu_main_length_group_renderables_text_main
+
+#define scene_menu_main_length_group_renderables_text_menu_custom menus_menu_main_custom_length
+#define scene_menu_main_length_group_renderables_text_menu_custom_backing scene_menu_main_length_group_renderables_text_menu_custom
 
 enum scene_menu_main_renderables_index {
-  scene_menu_main_renderables_index_buildings = 0,
+  scene_menu_main_renderables_index_group_buildings = 0,
   scene_menu_main_renderables_index_text_title = 1,
-  scene_menu_main_renderables_index_menu_enter = 2,
-  scene_menu_main_renderables_index_menu_exit = 3
+  scene_menu_main_renderables_index_group_text_menu_main_backing = 2,
+  scene_menu_main_renderables_index_group_text_menu_main = 3,
+  scene_menu_main_renderables_index_group_text_menu_custom_backing = 4,
+  scene_menu_main_renderables_index_group_text_menu_custom = 5,
 };
 
-#define scene_menu_main_length_textures 4
+enum scene_menu_main_renderables_group_text_main_index {
+  scene_menu_main_renderables_group_text_main_index_menu_start = (
+    menus_menu_main_index_start
+  ),
+  scene_menu_main_renderables_group_text_main_index_menu_custom = (
+    menus_menu_main_index_custom
+  ),
+  scene_menu_main_renderables_group_text_main_index_menu_exit = (
+    menus_menu_main_index_exit
+  )
+};
+
+#define scene_menu_main_length_textures 2
 
 enum scene_menu_main_textures_index {
   scene_menu_main_textures_index_title = 0,
-  scene_menu_main_textures_index_menu_enter = 1,
-  scene_menu_main_textures_index_menu_exit = 2,
-  scene_menu_main_textures_index_buildings = 3
+  scene_menu_main_textures_index_buildings = 1,
+  scene_menu_main_textures_index_text_backing = 1
 };
 
 struct scene_menu_main_data {
-  struct metil_menu menu;
+  struct metil_menu* _Nonnull menu_current;
+  struct metil_menu menu_main;
+  struct metil_menu menu_main_custom;
+
   unsigned long int time_started;
+
   float angle;
+
   FILE* _Nonnull file_audio;
 };
 

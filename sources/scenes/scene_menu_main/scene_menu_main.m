@@ -2,7 +2,8 @@
 
 #include <generate/generate_buildings.h>
 #include <menus/menu_main.h>
-#include <pipeline_index.h>
+#include <menus/menu_main_custom.h>
+#include <c938_pipeline_index.h>
 #include <scenes/scene_id.h>
 #include <textures/textures_buildings.h>
 
@@ -13,6 +14,9 @@
 #include <metil_input/metil_keycodes.h>
 #include <metil_input/metil_input_map.h>
 #include <metil_menus/metil_menu.h>
+#include <metil_menus/metil_menu_input.h>
+#include <metil_mesh/metil_mesh_2d/metil_mesh_rectangle.h>
+#include <metil_mesh/metil_mesh_box.h>
 #include <metil_mesh/metil_mesh_text.h>
 #include <metil_object/metil_object.h>
 #include <metil_object/metil_object_text.h>
@@ -24,6 +28,7 @@
 #include <metil_scenes/metil_scene_controller.h>
 #include <metil_termination/metil_termination.h>
 #include <metil_text/metil_text.h>
+#include <metil_utilities/metil_stopwatch.h>
 
 #if !target_os_ios
 #include <AppKit/AppKit.h>
@@ -51,7 +56,11 @@ void scene_menu_main_initialize(
     switch (
       index_renderable
     ) {
-      case scene_menu_main_renderables_index_buildings:
+      case scene_menu_main_renderables_index_group_buildings:
+      case scene_menu_main_renderables_index_group_text_menu_main_backing:
+      case scene_menu_main_renderables_index_group_text_menu_main:
+      case scene_menu_main_renderables_index_group_text_menu_custom_backing:
+      case scene_menu_main_renderables_index_group_text_menu_custom:
         metil_renderable_initialize_at_index(
           scene->renderables,
           index_renderable,
@@ -99,8 +108,15 @@ void scene_menu_main_initialize(
   );
 
   menu_main_initialize(
-    metil,
-    &data->menu
+    &data->menu_main
+  );
+
+  menu_main_custom_initialize(
+    &data->menu_main_custom
+  );
+
+  data->menu_current = &(
+    data->menu_main
   );
 
   scene->length_textures = (
@@ -150,43 +166,282 @@ void scene_menu_main_initialize(
     )
   );
 
-  struct metil_object* metil_object_text_enter = (
+  struct metil_group* metil_group_text_main_backing = (
     scene->renderables[
-      scene_menu_main_renderables_index_menu_enter
+      scene_menu_main_renderables_index_group_text_menu_main_backing
     ].renderable
   );
 
-  metil_object_text_initialize(
-    metil,
-    metil_object_text_enter,
-    "enter"
-  );
-
-  metil_object_text_enter->position.y = (
-    metil_object_text_enter->mesh.size.y *
-    -6.0
-  );
-
-  struct metil_object* metil_object_text_exit = (
+  struct metil_group* metil_group_text_main = (
     scene->renderables[
-      scene_menu_main_renderables_index_menu_exit
+      scene_menu_main_renderables_index_group_text_menu_main
     ].renderable
   );
 
-  metil_object_text_initialize(
-    metil,
-    metil_object_text_exit,
-    "exit"
+  metil_group_add_length_initialize(
+    metil_group_text_main_backing,
+    scene_menu_main_length_group_renderables_text_main_backing,
+    metil_renderable_type_object
   );
 
-  metil_object_text_exit->position.y = (
-    metil_object_text_exit->mesh.size.y *
-    -10.0f
+  metil_group_add_length_initialize(
+    metil_group_text_main,
+    scene_menu_main_length_group_renderables_text_main,
+    metil_renderable_type_object
   );
+
+  for (
+    unsigned char index_metil_group_text_main_renderable = 0;
+    index_metil_group_text_main_renderable < scene_menu_main_length_group_renderables_text_main;
+    ++index_metil_group_text_main_renderable
+  ) {
+    struct metil_object* metil_object_text_backing = (
+      metil_group_text_main_backing->renderables[
+        index_metil_group_text_main_renderable
+      ]->renderable
+    );
+
+    struct metil_object* metil_object_text = (
+      metil_group_text_main->renderables[
+        index_metil_group_text_main_renderable
+      ]->renderable
+    );
+
+    switch (
+      index_metil_group_text_main_renderable
+    ) {
+      case scene_menu_main_renderables_group_text_main_index_menu_start:
+        metil_object_text_initialize(
+          metil,
+          metil_object_text,
+          "start"
+        );
+
+        break;
+      case scene_menu_main_renderables_group_text_main_index_menu_custom:
+        metil_object_text_initialize(
+          metil,
+          metil_object_text,
+          "custom"
+        );
+
+        break;
+      case scene_menu_main_renderables_group_text_main_index_menu_exit:
+        metil_object_text_initialize(
+          metil,
+          metil_object_text,
+          "exit"
+        );
+        
+        break;
+    }
+
+    metil_mesh_box_initialize(
+      &metil_object_text_backing->mesh,
+      (struct math_c_vector3_float) {
+        .x = 0.5f,
+        .y = (
+          metil_object_text->mesh.size.y * 1.5f
+        ),
+        .z = (
+          0.5f
+        )
+      }
+    );
+
+    metil_object_text_backing->position.z = 0.5f;
+
+    metil_object_text_backing->rotation.x = -0.025f;
+    metil_object_text_backing->rotation.y = -0.025f;
+
+    metil_object_texture_add(
+      metil_object_text_backing,
+      scene->textures[
+        scene_menu_main_textures_index_text_backing
+      ]
+    );
+
+    metil_object_buffers_initialize(
+      metil_object_text_backing,
+      metil->renderer_interface.metal_device
+    );
+
+    struct metil_renderer_data_object* metil_renderer_data_object = (
+      metil_object_text_backing->buffers_vertex[
+        metil_object_buffer_default_index_data
+      ].buffer.contents
+    );
+
+    metil_renderer_data_object_initialize(
+      metil_renderer_data_object
+    );
+
+    metil_object_text_backing->index_pipeline_render = (
+      c938_pipeline_index_text_backing_menu
+    );
+
+    metil_object_text_backing->positioning = (
+      metil_positioning_static
+    );
+
+    metil_object_text->position.y = (
+      metil_object_text->mesh.size.y *
+      (
+        -6.0f -
+        (
+          index_metil_group_text_main_renderable *
+          4.0f
+        )
+      )
+    );
+
+    metil_object_text_backing->position.y = (
+      metil_object_text->position.y -
+      (
+        metil_object_text->mesh.size.y /
+        50.0f
+      )
+    );
+  }
+
+  struct metil_group* metil_group_text_menu_custom_backing = (
+    scene->renderables[
+      scene_menu_main_renderables_index_group_text_menu_custom_backing
+    ].renderable
+  );
+
+  struct metil_group* metil_group_text_menu_custom = (
+    scene->renderables[
+      scene_menu_main_renderables_index_group_text_menu_custom
+    ].renderable
+  );
+
+  metil_group_add_length_initialize(
+    metil_group_text_menu_custom_backing,
+    scene_menu_main_length_group_renderables_text_menu_custom_backing,
+    metil_renderable_type_object
+  );
+
+  metil_group_add_length_initialize(
+    metil_group_text_menu_custom,
+    scene_menu_main_length_group_renderables_text_menu_custom,
+    metil_renderable_type_object
+  );
+
+  metil_group_text_menu_custom_backing->visible = 0;
+  metil_group_text_menu_custom->visible = 0;
+
+  for (
+    unsigned char index_metil_group_text_main_renderable = 0;
+    index_metil_group_text_main_renderable < scene_menu_main_length_group_renderables_text_menu_custom;
+    ++index_metil_group_text_main_renderable
+  ) {
+    struct metil_object* metil_object_text_backing = (
+      metil_group_text_menu_custom_backing->renderables[
+        index_metil_group_text_main_renderable
+      ]->renderable
+    );
+
+    struct metil_object* metil_object_text = (
+      metil_group_text_menu_custom->renderables[
+        index_metil_group_text_main_renderable
+      ]->renderable
+    );
+
+    switch (
+      index_metil_group_text_main_renderable
+    ) {
+      case menus_menu_main_custom_index_start: {
+        metil_object_text_initialize(
+          metil,
+          metil_object_text,
+          "start"
+        );
+
+        break;
+      }
+      case menus_menu_main_custom_index_back: {
+        metil_object_text_initialize(
+          metil,
+          metil_object_text,
+          "back"
+        );
+
+        break;
+      }
+    }
+
+    metil_mesh_box_initialize(
+      &metil_object_text_backing->mesh,
+      (struct math_c_vector3_float) {
+        .x = 0.5f,
+        .y = (
+          metil_object_text->mesh.size.y * 1.5f
+        ),
+        .z = (
+          0.5f
+        )
+      }
+    );
+
+    metil_object_text_backing->position.z = 0.5f;
+
+    metil_object_text_backing->rotation.x = -0.025f;
+    metil_object_text_backing->rotation.y = -0.025f;
+
+    metil_object_texture_add(
+      metil_object_text_backing,
+      scene->textures[
+        scene_menu_main_textures_index_text_backing
+      ]
+    );
+
+    metil_object_buffers_initialize(
+      metil_object_text_backing,
+      metil->renderer_interface.metal_device
+    );
+
+    struct metil_renderer_data_object* metil_renderer_data_object = (
+      metil_object_text_backing->buffers_vertex[
+        metil_object_buffer_default_index_data
+      ].buffer.contents
+    );
+
+    metil_renderer_data_object_initialize(
+      metil_renderer_data_object
+    );
+
+    metil_object_text_backing->index_pipeline_render = (
+      c938_pipeline_index_text_backing_menu
+    );
+
+    metil_object_text_backing->positioning = (
+      metil_positioning_static
+    );
+
+    metil_object_text->position.y = (
+      metil_object_text->mesh.size.y *
+      (
+        -6.0f -
+        (
+          index_metil_group_text_main_renderable *
+          4.0f
+        )
+      )
+    );
+
+    metil_object_text_backing->position.y = (
+      metil_object_text->position.y -
+      (
+        metil_object_text->mesh.size.y /
+        50.0f
+      )
+    );
+  }
 
   struct metil_group* metil_group_buildings = (
     scene->renderables[
-      scene_menu_main_renderables_index_buildings
+      scene_menu_main_renderables_index_group_buildings
     ].renderable
   );
 
@@ -260,88 +515,195 @@ void scene_menu_main_poll(
     )
   );
 
-  struct metil_menu* menu = &(
-    data->menu
+  struct metil_menu* menu = (
+    data->menu_current
   );
 
-  struct metil_object* metil_object_text_enter = (
+  struct metil_group* metil_group_text_main_backing = (
     scene->renderables[
-      scene_menu_main_renderables_index_menu_enter
+      scene_menu_main_renderables_index_group_text_menu_main_backing
     ].renderable
   );
 
-  struct metil_object* metil_object_text_exit = (
+  struct metil_group* metil_group_text_main = (
     scene->renderables[
-      scene_menu_main_renderables_index_menu_exit
+      scene_menu_main_renderables_index_group_text_menu_main
     ].renderable
   );
 
-  struct metil_renderer_data_object* metil_renderer_data_menu_item_enter = (
-    metil_object_text_enter->buffers_vertex[
-      metil_object_buffer_default_index_data
-    ].buffer.contents
+  struct metil_group* metil_group_text_menu_custom_backing = (
+    scene->renderables[
+      scene_menu_main_renderables_index_group_text_menu_custom_backing
+    ].renderable
   );
 
-  struct metil_renderer_data_object* metil_renderer_data_menu_item_exit = (
-    metil_object_text_exit->buffers_vertex[
-      metil_object_buffer_default_index_data
-    ].buffer.contents
+  struct metil_group* metil_group_text_menu_custom = (
+    scene->renderables[
+      scene_menu_main_renderables_index_group_text_menu_custom
+    ].renderable
   );
 
-  switch (
-    menu->index_current
+  
+  for (
+    unsigned char index_metil_group_text_main_renderable = 0;
+    index_metil_group_text_main_renderable < (
+      menu == &data->menu_main
+      ? scene_menu_main_length_group_renderables_text_main
+      : scene_menu_main_length_group_renderables_text_menu_custom
+    );
+    ++index_metil_group_text_main_renderable
   ) {
-    case 0: {
-      metil_renderer_data_menu_item_enter->color.x = (
-        0.1f
+    struct metil_object* metil_object_text_backing;
+    struct metil_object* metil_object_text;
+
+    if (
+      menu == &data->menu_main
+    ) {
+      metil_object_text_backing = (
+        metil_group_text_main_backing->renderables[
+          index_metil_group_text_main_renderable
+        ]->renderable
       );
 
-      metil_renderer_data_menu_item_enter->color.y = (
-        0.1f
+      metil_object_text = (
+        metil_group_text_main->renderables[
+          index_metil_group_text_main_renderable
+        ]->renderable
+      );
+    } else {
+      metil_object_text_backing = (
+        metil_group_text_menu_custom_backing->renderables[
+          index_metil_group_text_main_renderable
+        ]->renderable
       );
 
-      metil_renderer_data_menu_item_enter->color.z = (
-        0.1f
+      metil_object_text = (
+        metil_group_text_menu_custom->renderables[
+          index_metil_group_text_main_renderable
+        ]->renderable
       );
-
-      metil_renderer_data_menu_item_exit->color.x = (
-        1.0f
-      );
-
-      metil_renderer_data_menu_item_exit->color.y = (
-        1.0f
-      );
-
-      metil_renderer_data_menu_item_exit->color.z = (
-        1.0f
-      );
-      break;
     }
-    case 1: {
-      metil_renderer_data_menu_item_enter->color.x = (
+
+    struct metil_renderer_data_object* metil_renderer_data_text_backing = (
+      metil_object_text_backing->buffers_vertex[
+        metil_object_buffer_default_index_data
+      ].buffer.contents
+    );
+
+    struct metil_renderer_data_object* metil_renderer_data_text = (
+      metil_object_text->buffers_vertex[
+        metil_object_buffer_default_index_data
+      ].buffer.contents
+    );
+
+    if (
+      menu->index_current == index_metil_group_text_main_renderable
+    ) {
+      metil_object_text_backing->rotation.x = -0.00625f;
+      metil_object_text_backing->rotation.y = -0.00625f;
+
+      metil_object_text->position.x = 0.0f;
+
+      metil_object_text->position.y = (
+        metil_object_text->mesh.size.y *
+        (
+          -6.075f -
+          (
+            index_metil_group_text_main_renderable *
+            4.0f
+          )
+        )
+      );
+
+      metil_renderer_data_text_backing->color.x = (
+        0.8f
+      );
+
+      if (
+        menu == &data->menu_main &&
+        index_metil_group_text_main_renderable == menus_menu_main_index_exit
+      ) {
+        metil_renderer_data_text_backing->color.y = (
+          0.4f
+        );
+
+        metil_renderer_data_text_backing->color.z = (
+          0.4f
+        );
+      } else {
+        metil_renderer_data_text_backing->color.y = (
+          0.8f
+        );
+
+        metil_renderer_data_text_backing->color.z = (
+          0.8f
+        );
+      }
+
+      metil_renderer_data_text->color.x = (
+        0.8f
+      );
+
+      metil_renderer_data_text->color.y = (
+        0.8f
+      );
+
+      metil_renderer_data_text->color.z = (
+        0.8f
+      );
+    } else {
+      metil_object_text_backing->rotation.x = -0.0125f;
+      metil_object_text_backing->rotation.y = -0.0125f;
+
+      metil_object_text->position.x = 0.001f;
+
+      metil_object_text->position.y = (
+        metil_object_text->mesh.size.y *
+        (
+          -6.05f -
+          (
+            index_metil_group_text_main_renderable *
+            4.0f
+          )
+        )
+      );
+
+      metil_renderer_data_text_backing->color.x = (
         1.0f
       );
 
-      metil_renderer_data_menu_item_enter->color.y = (
+      if (
+        menu == &data->menu_main &&
+        index_metil_group_text_main_renderable == menus_menu_main_index_exit
+      ) {
+        metil_renderer_data_text_backing->color.y = (
+          0.5f
+        );
+
+        metil_renderer_data_text_backing->color.z = (
+          0.5f
+        );
+      } else {
+        metil_renderer_data_text_backing->color.y = (
+          1.0f
+        );
+
+        metil_renderer_data_text_backing->color.z = (
+          1.0f
+        );
+      }
+
+      metil_renderer_data_text->color.x = (
         1.0f
       );
 
-      metil_renderer_data_menu_item_enter->color.z = (
+      metil_renderer_data_text->color.y = (
         1.0f
       );
 
-      metil_renderer_data_menu_item_exit->color.x = (
-        0.1f
+      metil_renderer_data_text->color.z = (
+        1.0f
       );
-
-      metil_renderer_data_menu_item_exit->color.y = (
-        0.1f
-      );
-
-      metil_renderer_data_menu_item_exit->color.z = (
-        0.1f
-      );
-      break;
     }
   }
 
@@ -389,30 +751,108 @@ void scene_menu_main_poll(
   ) {
     menu->handled = 1;
 
-    switch (menu->index_selected) {
-      case 0:
-        metil_debug_log(
-          metil->configuration.debug_log_level,
-          "scene_menu_main:starting\n"
-        );
+    if (
+      data->menu_current == &data->menu_main
+    ) {
+      switch (
+        menu->index_selected
+      ) {
+        case menus_menu_main_index_start: {
+          metil_debug_log(
+            metil->configuration.debug_log_level,
+            "scene_menu_main:starting\n"
+          );
 
-        data->time_started = scene->time;
-        break;
-      case 1:
-        metil_debug_log(
-          metil->configuration.debug_log_level,
-          "scene_menu_main:exiting\n"
-        );
+          data->time_started = (
+            scene->time
+          );
 
-        #if target_os_ios
-        metil_termination_terminate(
-          &metil->termination
-        );
-        exit(0);
-        #else
-        [[NSApplication sharedApplication] terminate: 0];
-        #endif
-        break;
+          break;
+        }
+        default:
+        case menus_menu_main_index_custom: {
+          menu->index_selected = -1;
+          menu->handled = 0;
+
+          metil_group_text_main_backing->visible = 0;
+          metil_group_text_main->visible = 0;
+
+          metil_group_text_menu_custom_backing->visible = 1;
+          metil_group_text_menu_custom->visible = 1;
+
+          data->menu_current = &(
+            data->menu_main_custom
+          );
+
+          data->menu_current->index_current = (
+            0
+          );
+
+          metil_stopwatch_start(
+            &data->menu_current->stopwatch_input
+          );
+
+          break;
+        }
+        case menus_menu_main_index_exit: {
+          metil_debug_log(
+            metil->configuration.debug_log_level,
+            "scene_menu_main:exiting\n"
+          );
+
+          #if target_os_ios
+          metil_termination_terminate(
+            &metil->termination
+          );
+          exit(0);
+          #else
+          [[NSApplication sharedApplication] terminate: 0];
+          #endif
+          break;
+        }
+      }
+    } else {
+      switch (
+        menu->index_selected
+      ) {
+        case menus_menu_main_custom_index_start: {
+          metil_debug_log(
+            metil->configuration.debug_log_level,
+            "scene_menu_main:starting\n"
+          );
+
+          data->time_started = (
+            scene->time
+          );
+
+          break;
+        }
+        default:
+        case menus_menu_main_custom_index_back: {
+          menu->index_selected = -1;
+          menu->handled = 0;
+
+          metil_group_text_main_backing->visible = 1;
+          metil_group_text_main->visible = 1;
+
+          metil_group_text_menu_custom_backing->visible = 0;
+          metil_group_text_menu_custom->visible = 0;
+
+          data->menu_current = &(
+            data->menu_main
+          );
+
+          data->menu_current->index_current = (
+            0
+          );
+
+          metil_stopwatch_start(
+            &data->menu_current->stopwatch_input
+          );
+
+          break;
+        }
+      }
     }
   }
 }
@@ -426,7 +866,7 @@ void scene_menu_main_poll_input(
   );
   
   struct metil_menu* menu = (
-    &scene_menu_main_data->menu
+    scene_menu_main_data->menu_current
   );
 
   metil_menu_poll_input(
@@ -449,7 +889,11 @@ void scene_menu_main_destroy(
   );
 
   metil_menu_destroy(
-    &scene_menu_main_data->menu
+    &scene_menu_main_data->menu_main
+  );
+
+  metil_menu_destroy(
+    &scene_menu_main_data->menu_main_custom
   );
 
   metil_scene_destroy_default(
