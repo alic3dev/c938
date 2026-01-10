@@ -19,7 +19,7 @@ void menu_main_initialize(
       menu,
       metil_menu_item_type_selection,
       metil_menu_item_action_select,
-      (void*)0
+      (void*) 0
     );
   }
 }
