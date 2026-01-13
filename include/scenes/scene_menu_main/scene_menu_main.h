@@ -25,7 +25,7 @@
 #define scene_menu_main_length_group_renderables_text_main menus_menu_main_length
 #define scene_menu_main_length_group_renderables_text_main_backing scene_menu_main_length_group_renderables_text_main
 
-#define scene_menu_main_length_group_renderables_text_menu_custom menus_menu_main_custom_length
+#define scene_menu_main_length_group_renderables_text_menu_custom 4
 #define scene_menu_main_length_group_renderables_text_menu_custom_backing scene_menu_main_length_group_renderables_text_menu_custom
 
 enum scene_menu_main_renderables_index {
@@ -47,6 +47,13 @@ enum scene_menu_main_renderables_group_text_main_index {
   scene_menu_main_renderables_group_text_main_index_menu_exit = (
     menus_menu_main_index_exit
   )
+};
+
+enum scene_menu_main_renderables_group_text_menu_custom_index {
+  scene_menu_main_renderables_group_text_menu_custom_index_start = 0,
+  scene_menu_main_renderables_group_text_menu_custom_index_mode_target = 1,
+  scene_menu_main_renderables_group_text_menu_custom_index_mode_enemies = 2,
+  scene_menu_main_renderables_group_text_menu_custom_index_menu_back = 3
 };
 
 #define scene_menu_main_length_textures 2
