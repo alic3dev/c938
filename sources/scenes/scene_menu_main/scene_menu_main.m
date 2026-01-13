@@ -138,11 +138,11 @@ void scene_menu_main_initialize(
   ];
 
   textures_buildings_load(
+    metil,
     texture_loader, (
       scene->textures +
       scene_menu_main_textures_index_buildings
-    ),
-    &metil->paths
+    )
   );
 
   [texture_loader release];
