@@ -86,6 +86,7 @@ void scene_menu_main_poll_custom_menu_item(
   struct metil_object* _Nonnull,
   struct metil_object* _Nonnull,
   struct metil_menu* _Nonnull,
+  unsigned char,
   unsigned char
 );
 

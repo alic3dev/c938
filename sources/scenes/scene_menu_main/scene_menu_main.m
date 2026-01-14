@@ -355,6 +355,7 @@ void scene_menu_main_initialize(
       ]->renderable
     );
 
+
     switch (
       index_metil_group_text_main_renderable
     ) {
@@ -387,54 +388,6 @@ void scene_menu_main_initialize(
 
         break;
       }
-      case scene_menu_main_renderables_group_text_menu_custom_index_length_buildings:
-        metil_object_text_initialize(
-          metil,
-          metil_object_text,
-          "buildings: "
-        );
-
-        break;
-      case scene_menu_main_renderables_group_text_menu_custom_index_multiplier_buildings:
-        metil_object_text_initialize(
-          metil,
-          metil_object_text,
-          "buildings multiplier: "
-        );
-
-        break;
-      case scene_menu_main_renderables_group_text_menu_custom_index_length_enemies:
-        metil_object_text_initialize(
-          metil,
-          metil_object_text,
-          "enemies: "
-        );
-
-        break;
-      case scene_menu_main_renderables_group_text_menu_custom_index_multiplier_enemies:
-        metil_object_text_initialize(
-          metil,
-          metil_object_text,
-          "enemies multiplier: "
-        );
-
-        break;
-      case scene_menu_main_renderables_group_text_menu_custom_index_speed_movement:
-        metil_object_text_initialize(
-          metil,
-          metil_object_text,
-          "speed movement: "
-        );
-
-        break;
-      case scene_menu_main_renderables_group_text_menu_custom_index_multiplier_speed_movement:
-        metil_object_text_initialize(
-          metil,
-          metil_object_text,
-          "speed movement multiplier: "
-        );
-
-        break;
       case scene_menu_main_renderables_group_text_menu_custom_index_menu_back: {
         metil_object_text_initialize(
           metil,
@@ -443,6 +396,29 @@ void scene_menu_main_initialize(
         );
 
         break;
+      }
+      default: {
+        unsigned int index_menu = (
+          index_metil_group_text_main_renderable
+        );
+
+        index_menu = (
+          index_menu -
+          (
+            index_menu > 1
+          )
+        );
+
+        scene_menu_main_poll_custom_menu_item(
+          metil,
+          data->parameters_gameplay,
+          metil_object_text_backing,
+          metil_object_text,
+          &data->menu_main_custom,
+          index_menu,
+          0
+        );
+        continue;
       }
     }
 
@@ -696,7 +672,8 @@ void scene_menu_main_poll(
         metil_object_text_backing,
         metil_object_text,
         menu,
-        index_menu
+        index_menu,
+        1
       );
     }
 
@@ -1030,13 +1007,21 @@ void scene_menu_main_poll_custom_menu_item(
   struct metil_object* metil_object_text_backing,
   struct metil_object* metil_object_text,
   struct metil_menu* metil_menu,
-  unsigned char index_item
+  unsigned char index_item,
+  unsigned char with_checks
 ) {
   struct metil_menu_item_data_scroll* metil_menu_item_data_scroll = (
     metil_menu->items[
       index_item
     ].data_menu_item
   );
+
+  if (
+    index_item == menus_menu_main_custom_index_mode
+  ) { 
+    metil_menu_item_data_scroll->index = 0;
+    return;
+  }
 
   char* text = (
     (void*) 0
@@ -1055,6 +1040,7 @@ void scene_menu_main_poll_custom_menu_item(
   ) {
     case menus_menu_main_custom_index_length_buildings: {
       if (
+        with_checks != 0 &&
         metil_menu_item_data_scroll->index == parameters_gameplay->length_buildings
       ) {
         break;
@@ -1107,6 +1093,7 @@ void scene_menu_main_poll_custom_menu_item(
     }
     case menus_menu_main_custom_index_multiplier_buildings: {
       if (
+        with_checks != 0 &&
         metil_menu_item_data_scroll->index == parameters_gameplay->multiplier_buildings * 100
       ) {
         break;
@@ -1147,6 +1134,7 @@ void scene_menu_main_poll_custom_menu_item(
     }
     case menus_menu_main_custom_index_length_enemies: {
       if (
+        with_checks != 0 &&
         metil_menu_item_data_scroll->index == parameters_gameplay->length_enemies
       ) {
         break;
@@ -1186,6 +1174,7 @@ void scene_menu_main_poll_custom_menu_item(
     }
     case menus_menu_main_custom_index_multiplier_enemies: {
       if (
+        with_checks != 0 &&
         metil_menu_item_data_scroll->index == parameters_gameplay->multiplier_enemies * 100
       ) {
         break;
@@ -1226,6 +1215,7 @@ void scene_menu_main_poll_custom_menu_item(
     }
     case menus_menu_main_custom_index_speed_movement: {
       if (
+        with_checks != 0 &&
         metil_menu_item_data_scroll->index == parameters_gameplay->speed_movement
       ) {
         break;
@@ -1265,6 +1255,7 @@ void scene_menu_main_poll_custom_menu_item(
     }
     case menus_menu_main_custom_index_multiplier_speed_movement: {
       if (
+        with_checks != 0 &&
         metil_menu_item_data_scroll->index == parameters_gameplay->multiplier_speed_movement * 100
       ) {
         break;
