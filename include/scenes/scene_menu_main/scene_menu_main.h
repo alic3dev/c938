@@ -1,11 +1,11 @@
 #ifndef __scenes_scene_menu_main_h
 #define __scenes_scene_menu_main_h
 
+#include <data/parameters_gameplay.h>
 #include <menus/menu_main.h>
 #include <menus/menu_main_custom.h>
 
 #include <metil.h>
-#include <metil_menus/metil_menu.h>
 #include <metil_rendering/metil_renderer_interface.h>
 #include <metil_scenes/metil_scene.h>
 
@@ -14,8 +14,6 @@
 #else
 #include <CoreAudio/CoreAudio.h>
 #endif
-
-#include <stdio.h>
 
 #define scene_menu_main_length_buildings_default 200
 #define scene_menu_main_time_scene_transition 333
@@ -64,21 +62,10 @@ enum scene_menu_main_textures_index {
   scene_menu_main_textures_index_text_backing = 1
 };
 
-struct scene_menu_main_data {
-  struct metil_menu* _Nonnull menu_current;
-  struct metil_menu menu_main;
-  struct metil_menu menu_main_custom;
-
-  unsigned long int time_started;
-
-  float angle;
-
-  FILE* _Nonnull file_audio;
-};
-
 void scene_menu_main_initialize(
   struct metil* _Nonnull,
-  struct metil_scene* _Nonnull
+  struct metil_scene* _Nonnull,
+  struct parameters_gameplay* _Nonnull
 );
 
 void scene_menu_main_poll(

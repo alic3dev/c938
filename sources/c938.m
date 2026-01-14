@@ -1,6 +1,8 @@
 #include <c938.h>
 
 #include <c938_pipeline_index.h>
+#include <data/parameters_gameplay.h>
+#include <data/scene_menu_main_data.h>
 #include <player.h>
 #include <scenes/scene_id.h>
 #include <scenes/scene_menu_main/scene_menu_main.h>
@@ -214,22 +216,46 @@ void c938_renderer_on_initialize(
     c938_pipeline_index_text
   );
 
+  static struct parameters_gameplay* parameters_gameplay = (
+    (void*) 0
+  );
+
+  parameters_gameplay = (
+    malloc(
+      sizeof(
+        struct parameters_gameplay
+      )
+    )
+  );
+
+  parameters_gameplay_initialize(
+    parameters_gameplay,
+    metil->player_defaults.speed_movement
+  );
+
+  metil_termination_on_function_add(
+    &metil->termination,
+    c938_termination,
+    parameters_gameplay
+  );
+
   scene_menu_main_initialize(
     metil,
-    &((struct metil_scene_controller*) metil->scene_controller)->scene
+    &((struct metil_scene_controller*) metil->scene_controller)->scene,
+    parameters_gameplay
   );
 
   metil_scene_controller_on_scene_change_add(
     metil->scene_controller,
     c938_on_scene_change,
-    (void*) 0
+    parameters_gameplay
   );
 }
 
 void c938_on_scene_change(
   struct metil* metil,
   int id_scene,
-  void* data
+  void* parameters_gameplay
 ) {
   struct metil_scene_controller* metil_scene_controller = (
     metil->scene_controller
@@ -251,14 +277,24 @@ void c938_on_scene_change(
     case scene_id_menu_main:
       scene_menu_main_initialize(
         metil,
-        metil_scene
+        metil_scene,
+        parameters_gameplay
       );
       break;
     case scene_id_gameplay:
       scene_gameplay_initialize(
         metil,
-        metil_scene
+        metil_scene,
+        parameters_gameplay
       );
       break;
   }
+}
+
+void c938_termination(
+  void* data
+) {
+  free(
+    data
+  );
 }

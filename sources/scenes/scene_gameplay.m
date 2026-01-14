@@ -1,6 +1,7 @@
 #include <scenes/scene_gameplay.h>
 
 #include <data/enemy_data.h>
+#include <data/parameters_gameplay.h>
 #include <data/player_data.h>
 #include <data/projectile_data.h>
 #include <data/scene_gameplay_data.h>
@@ -46,7 +47,8 @@
 
 void scene_gameplay_initialize(
   struct metil* metil,
-  struct metil_scene* scene
+  struct metil_scene* scene,
+  struct parameters_gameplay* parameters_gameplay
 ) {
   metil->rendering_properties.brightness = (
     metil->configuration.rendering_properties.brightness
@@ -67,6 +69,10 @@ void scene_gameplay_initialize(
 
   struct scene_gameplay_data* scene_gameplay_data = (
     scene->data
+  );
+
+  scene_gameplay_data->parameters = (
+    parameters_gameplay
   );
 
   scene_gameplay_data->length_projectiles = 0;
@@ -273,7 +279,7 @@ void scene_gameplay_initialize(
   scene_gameplay_populate(
     metil,
     scene,
-    scene_gameplay_length_buildings_default
+    scene_gameplay_data->parameters->length_buildings
   );
 
   metil_audio_io_proc_add(
@@ -306,21 +312,21 @@ void scene_gameplay_populate(
     &rand_parameters
   );
 
+  struct scene_gameplay_data* scene_gameplay_data = (
+    scene->data
+  );
+
   scene->player.rotation.x = 0.0f;
   scene->player.rotation.y = 0.0f;
   scene->player.rotation.z = 0.0f;
 
   scene->player.speed_movement = (
-    metil->player_defaults.speed_movement
+    scene_gameplay_data->parameters->speed_movement
   );
 
   scene->player.velocity.x = 0.0f;
   scene->player.velocity.y = 0.0f;
   scene->player.velocity.z = 0.0f;
-
-  struct scene_gameplay_data* scene_gameplay_data = (
-    scene->data
-  );
 
   struct player_data* player_data = (
     scene->player.data
@@ -343,7 +349,9 @@ void scene_gameplay_populate(
     2
   );
 
-  player_data->time = &scene->time;
+  player_data->time = &(
+    scene->time
+  );
 
   scene_gameplay_data->length_projectiles = 0;
 
@@ -562,8 +570,12 @@ void scene_gameplay_poll(
   struct metil* metil,
   struct metil_scene* scene
 ) {
+  struct scene_gameplay_data* scene_gameplay_data = (
+    scene->data
+  );
+
   struct player_data* player_data = (
-    (struct player_data*) scene->player.data
+    scene->player.data
   );
 
   if (
@@ -602,7 +614,7 @@ void scene_gameplay_poll(
     scene_gameplay_populate(
       metil,
       scene,
-      scene_gameplay_length_buildings_default
+      scene_gameplay_data->parameters->length_buildings
     );
 
     return;
@@ -757,7 +769,7 @@ void scene_gameplay_poll(
         scene_gameplay_populate(
           metil,
           scene,
-          scene_gameplay_length_buildings_default
+          scene_gameplay_data->parameters->length_buildings
         );
 
         return;

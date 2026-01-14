@@ -1,5 +1,7 @@
 #include <scenes/scene_menu_main/scene_menu_main.h>
 
+#include <data/parameters_gameplay.h>
+#include <data/scene_menu_main_data.h>
 #include <generate/generate_buildings.h>
 #include <menus/menu_main.h>
 #include <menus/menu_main_custom.h>
@@ -40,7 +42,8 @@
 
 void scene_menu_main_initialize(
   struct metil* metil,
-  struct metil_scene* scene
+  struct metil_scene* scene,
+  struct parameters_gameplay* parameters_gameplay
 ) {
   metil_scene_initialize_with_renderables(
     metil,
@@ -97,6 +100,10 @@ void scene_menu_main_initialize(
 
   struct scene_menu_main_data* data = (
     scene->data
+  );
+
+  data->parameters_gameplay = (
+    parameters_gameplay
   );
 
   data->angle = (

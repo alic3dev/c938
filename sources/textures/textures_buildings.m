@@ -13,17 +13,22 @@ void textures_buildings_load(
   textures[
     0
   ] = [texture_loader
-    newTextureWithContentsOfURL: [NSURL
-      fileURLWithPath:@"preliminary_concrete.png"
+    newTextureWithContentsOfURL: [
+      NSURL
+      fileURLWithPath: @"preliminary_concrete.png"
       isDirectory: 0
-      relativeToURL: [NSURL
-        fileURLWithPath:[NSString
-          stringWithUTF8String: metil_paths->directory_textures
+      relativeToURL: [
+        NSURL
+        fileURLWithPath:[
+          NSString
+          stringWithUTF8String: (
+            metil_paths->directory_textures
+          )
         ]
         isDirectory: 1
       ]
     ]
-    options: (void*)0
-    error: (void*)0
+    options: (void*) 0
+    error: (void*) 0
   ];
 }
