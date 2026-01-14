@@ -16,6 +16,10 @@ struct scene_gameplay_data {
     scene_gameplay_data_length_projectiles_maximum
   ];
 
+  float speed_movement;
+
+  unsigned int length_buildings;
+  unsigned int length_enemies;
   unsigned int length_projectiles;
 
   struct parameters_gameplay* parameters;

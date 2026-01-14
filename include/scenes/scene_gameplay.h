@@ -50,7 +50,7 @@ void scene_gameplay_initialize(
 void scene_gameplay_populate(
   struct metil* _Nonnull,
   struct metil_scene* _Nonnull,
-  unsigned short int
+  unsigned char
 );
 
 void scene_gameplay_poll(
