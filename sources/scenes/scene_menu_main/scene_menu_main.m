@@ -1041,6 +1041,10 @@ void scene_menu_main_poll_custom_menu_item(
     (void*) 0
   );
 
+  unsigned char changed = (
+    0
+  );
+
   switch (
     index_item
   ) {
@@ -1050,6 +1054,8 @@ void scene_menu_main_poll_custom_menu_item(
       ) {
         break;
       }
+
+      changed = 1;
 
       if (
         metil_menu_item_data_scroll->index == 0
@@ -1101,6 +1107,8 @@ void scene_menu_main_poll_custom_menu_item(
         break;
       }
 
+      changed = 1;
+
       parameters_gameplay->multiplier_buildings = (
         (float) metil_menu_item_data_scroll->index /
         100.0f
@@ -1139,6 +1147,8 @@ void scene_menu_main_poll_custom_menu_item(
         break;
       }
 
+      changed = 1;
+
       parameters_gameplay->length_enemies = (
         metil_menu_item_data_scroll->index
       );
@@ -1175,6 +1185,8 @@ void scene_menu_main_poll_custom_menu_item(
       ) {
         break;
       }
+
+      changed = 1;
 
       parameters_gameplay->multiplier_enemies = (
         (float) metil_menu_item_data_scroll->index /
@@ -1214,6 +1226,8 @@ void scene_menu_main_poll_custom_menu_item(
         break;
       }
 
+      changed = 1;
+
       parameters_gameplay->speed_movement = (
         (float) metil_menu_item_data_scroll->index
       );
@@ -1251,6 +1265,8 @@ void scene_menu_main_poll_custom_menu_item(
         break;
       }
 
+      changed = 1;
+
       parameters_gameplay->multiplier_speed_movement = (
         (float) metil_menu_item_data_scroll->index /
         100.0f
@@ -1282,6 +1298,85 @@ void scene_menu_main_poll_custom_menu_item(
 
       break;
     }
+  }
+
+  if (
+    changed != 0
+  ) {
+    metil_object_text_backing->destroy(
+      metil,
+      metil_object_text_backing
+    );
+
+    metil_object_initialize(
+      metil_object_text_backing
+    );
+
+    metil_mesh_box_initialize(
+      &metil_object_text_backing->mesh,
+      (struct math_c_vector3_float) {
+        .x = (
+          metil_object_text->mesh.size.x * 1.25f
+        ),
+        .y = (
+          metil_object_text->mesh.size.y * 1.5f
+        ),
+        .z = (
+          0.5f
+        )
+      }
+    );
+
+     metil_object_text->position.y = (
+      0.025f *
+      (
+        -6.075f -
+        (
+          index_item *
+          4.0f
+        )
+      ) +
+      0.125f
+    );
+
+    metil_object_text_backing->position.y = (
+      metil_object_text->position.y
+    );
+
+    metil_object_text_backing->position.z = 0.5f;
+
+    metil_object_text_backing->rotation.x = -0.025f;
+    metil_object_text_backing->rotation.y = -0.025f;
+
+    metil_object_texture_add(
+      metil_object_text_backing,
+      ((struct metil_scene_controller*) metil->scene_controller)->scene.textures[
+        scene_menu_main_textures_index_text_backing
+      ]
+    );
+
+    metil_object_buffers_initialize(
+      metil_object_text_backing,
+      metil->renderer_interface.metal_device
+    );
+
+    struct metil_renderer_data_object* metil_renderer_data_object = (
+      metil_object_text_backing->buffers_vertex[
+        metil_object_buffer_default_index_data
+      ].buffer.contents
+    );
+
+    metil_renderer_data_object_initialize(
+      metil_renderer_data_object
+    );
+
+    metil_object_text_backing->index_pipeline_render = (
+      c938_pipeline_index_text_backing_menu
+    );
+
+    metil_object_text_backing->positioning = (
+      metil_positioning_static
+    );
   }
 
   clic3_memory_free(
