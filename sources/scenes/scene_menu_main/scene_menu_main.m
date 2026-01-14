@@ -907,6 +907,11 @@ void scene_menu_main_poll(
             "scene_menu_main:starting\n"
           );
 
+          parameters_gameplay_initialize(
+            data->parameters_gameplay,
+            metil->player_defaults.speed_movement
+          );
+
           data->time_started = (
             scene->time
           );
