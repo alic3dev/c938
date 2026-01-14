@@ -1,6 +1,7 @@
 #ifndef __scenes_scene_gameplay_h
 #define __scenes_scene_gameplay_h
 
+#include <data/parameters_gameplay.h>
 #include <data/scene_gameplay_data.h>
 
 #include <metil.h>
@@ -11,8 +12,6 @@
 #else
 #include <CoreAudio/CoreAudio.h>
 #endif
-
-#define scene_gameplay_length_buildings_default 200
 
 #define scene_gameplay_length_renderables 8
 
@@ -44,13 +43,14 @@ enum scene_gameplay_textures {
 
 void scene_gameplay_initialize(
   struct metil* _Nonnull,
-  struct metil_scene* _Nonnull
+  struct metil_scene* _Nonnull,
+  struct parameters_gameplay* _Nonnull
 );
 
 void scene_gameplay_populate(
   struct metil* _Nonnull,
   struct metil_scene* _Nonnull,
-  unsigned short int
+  unsigned char
 );
 
 void scene_gameplay_poll(

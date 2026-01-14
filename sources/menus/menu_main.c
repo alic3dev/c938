@@ -15,11 +15,29 @@ void menu_main_initialize(
     index_menu_item < menus_menu_main_length;
     ++index_menu_item
   ) {
-    metil_menu_item_add(
-      menu,
-      metil_menu_item_type_selection,
-      metil_menu_item_action_select,
-      (void*) 0
-    );
+    switch (
+      index_menu_item
+    ) {
+      case menus_menu_main_index_custom: {
+        metil_menu_item_add(
+          menu,
+          metil_menu_item_type_submenu,
+          metil_menu_item_action_select,
+          (void*) 0
+        );
+
+        break;
+      }
+      default: {
+        metil_menu_item_add(
+          menu,
+          metil_menu_item_type_selection,
+          metil_menu_item_action_select,
+          (void*) 0
+        );
+
+        break;
+      }
+    }
   }
 }
