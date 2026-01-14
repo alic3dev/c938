@@ -25,6 +25,8 @@ void menu_main_initialize(
           metil_menu_item_action_select,
           (void*) 0
         );
+
+        break;
       }
       default: {
         metil_menu_item_add(
@@ -33,6 +35,8 @@ void menu_main_initialize(
           metil_menu_item_action_select,
           (void*) 0
         );
+
+        break;
       }
     }
   }

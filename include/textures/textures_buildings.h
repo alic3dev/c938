@@ -1,15 +1,18 @@
 #ifndef __c938_textures_textures_buildings_h
 #define __c938_textures_textures_buildings_h
 
-#include <metil_paths/metil_paths.h>
+#include <metil.h>
 
 #include <Metal/MTLTexture.h>
 #include <MetalKit/MTKTextureLoader.h>
 
+#define textures_building_seed "jhnqiriocehsda jdfsnf nf dsjaionaonuon8oe9iql3fewm,sm kx i,ce,njdaskljzljvslklhmmwngkxerksetmiunshng,comsjfdgkldjsgajsdfli ksm lfjg,seov,merldjilsdmfigojfksoke,rscgj,omem seflijmj,ocemrjfkgwmlbsekotjnmeo9fidj,lecmorogjbijfvjjvjomiosmlog sgkifp jldofbjismdrlg,obmsgjlvdg,rjmfslgbekjrhk8t843877347583u9t4u63545hghjerigjroeifgiijh9mw8bho8954tu593874767573475366748568994860450946043958740693804050686495986848659868905456968458096548 e94s 8vostcgju8e8rmrxobklilwjelse85vj9btsmev5uocijrsmg9wlv8oe4bsukrtjvmgncl9mw8imbdx8oeomrsljtnobirewtv.j,cgm58reg5ut98mrteoyv4i5rjtubjy9v,jo8ehijucm6,lt8euhlbc48o6iel8mo6irtuy8mom5ei,buvryhvoejlr95cjgem985985emtjpsu948ocwusnetl9em4ubjl8ev5l6c,o948gl5ocfen.9..iebyj,8v5hel4ceo,l58rujvm8onm4umbe8dory9tjiuyjkoelr9otuh9fiytnj865nork48ej5rbe86,emj;kv59gv,e5yirpbt9;,yebirpt,9vyipert89kl4,gueo45m7d8siowhn74ncir8wb34un985uvw348wcuwltcjkt,j4mme8mubtjgjvej8vem5cuthgoelnm4g578inr,uvw4mjes84cmgen4l958xw4dhmtwj839u4heojtw89gto3iurn3rnvwjo9834meuwej5rtkw8347lij8roteucimg859wxo"
+#define textures_building_length_seed 1000
+
 void textures_buildings_load(
+  struct metil* _Nonnull,
   MTKTextureLoader* _Nonnull,
-  _Nonnull id<MTLTexture>* _Nonnull,
-  struct metil_paths* _Nonnull metil_paths
+  _Nonnull id<MTLTexture>* _Nonnull
 );
 
 #endif

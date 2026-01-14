@@ -1,11 +1,12 @@
 #ifndef __scenes_scene_menu_main_h
 #define __scenes_scene_menu_main_h
 
+#include <data/parameters_gameplay.h>
 #include <menus/menu_main.h>
 #include <menus/menu_main_custom.h>
 
 #include <metil.h>
-#include <metil_menus/metil_menu.h>
+#include <metil_object.h>
 #include <metil_rendering/metil_renderer_interface.h>
 #include <metil_scenes/metil_scene.h>
 
@@ -15,8 +16,6 @@
 #include <CoreAudio/CoreAudio.h>
 #endif
 
-#include <stdio.h>
-
 #define scene_menu_main_length_buildings_default 200
 #define scene_menu_main_time_scene_transition 333
 
@@ -25,7 +24,7 @@
 #define scene_menu_main_length_group_renderables_text_main menus_menu_main_length
 #define scene_menu_main_length_group_renderables_text_main_backing scene_menu_main_length_group_renderables_text_main
 
-#define scene_menu_main_length_group_renderables_text_menu_custom 4
+#define scene_menu_main_length_group_renderables_text_menu_custom 10
 #define scene_menu_main_length_group_renderables_text_menu_custom_backing scene_menu_main_length_group_renderables_text_menu_custom
 
 enum scene_menu_main_renderables_index {
@@ -53,7 +52,13 @@ enum scene_menu_main_renderables_group_text_menu_custom_index {
   scene_menu_main_renderables_group_text_menu_custom_index_start = 0,
   scene_menu_main_renderables_group_text_menu_custom_index_mode_target = 1,
   scene_menu_main_renderables_group_text_menu_custom_index_mode_enemies = 2,
-  scene_menu_main_renderables_group_text_menu_custom_index_menu_back = 3
+  scene_menu_main_renderables_group_text_menu_custom_index_length_buildings = 3,
+  scene_menu_main_renderables_group_text_menu_custom_index_multiplier_buildings = 4,
+  scene_menu_main_renderables_group_text_menu_custom_index_length_enemies = 5,
+  scene_menu_main_renderables_group_text_menu_custom_index_multiplier_enemies = 6,
+  scene_menu_main_renderables_group_text_menu_custom_index_speed_movement = 7,
+  scene_menu_main_renderables_group_text_menu_custom_index_multiplier_speed_movement = 8,
+  scene_menu_main_renderables_group_text_menu_custom_index_menu_back = 9
 };
 
 #define scene_menu_main_length_textures 2
@@ -64,26 +69,24 @@ enum scene_menu_main_textures_index {
   scene_menu_main_textures_index_text_backing = 1
 };
 
-struct scene_menu_main_data {
-  struct metil_menu* _Nonnull menu_current;
-  struct metil_menu menu_main;
-  struct metil_menu menu_main_custom;
-
-  unsigned long int time_started;
-
-  float angle;
-
-  FILE* _Nonnull file_audio;
-};
-
 void scene_menu_main_initialize(
   struct metil* _Nonnull,
-  struct metil_scene* _Nonnull
+  struct metil_scene* _Nonnull,
+  struct parameters_gameplay* _Nonnull
 );
 
 void scene_menu_main_poll(
   struct metil* _Nonnull,
   struct metil_scene* _Nonnull
+);
+
+void scene_menu_main_poll_custom_menu_item(
+  struct metil* _Nonnull,
+  struct parameters_gameplay* _Nonnull,
+  struct metil_object* _Nonnull,
+  struct metil_object* _Nonnull,
+  struct metil_menu* _Nonnull,
+  unsigned char
 );
 
 void scene_menu_main_poll_input(

@@ -1,11 +1,16 @@
 #include <scenes/scene_menu_main/scene_menu_main.h>
 
+#include <data/parameters_gameplay.h>
+#include <data/scene_menu_main_data.h>
 #include <generate/generate_buildings.h>
 #include <menus/menu_main.h>
 #include <menus/menu_main_custom.h>
 #include <c938_pipeline_index.h>
 #include <scenes/scene_id.h>
 #include <textures/textures_buildings.h>
+
+#include <clic3_char_arrays.h>
+#include <clic3_memory.h>
 
 #include <metil_audio/metil_audio_io_proc.h>
 #include <metil_audio/metil_audio_io_proc_data.h>
@@ -40,7 +45,8 @@
 
 void scene_menu_main_initialize(
   struct metil* metil,
-  struct metil_scene* scene
+  struct metil_scene* scene,
+  struct parameters_gameplay* parameters_gameplay
 ) {
   metil_scene_initialize_with_renderables(
     metil,
@@ -99,6 +105,10 @@ void scene_menu_main_initialize(
     scene->data
   );
 
+  data->parameters_gameplay = (
+    parameters_gameplay
+  );
+
   data->angle = (
     0.0f
   );
@@ -112,7 +122,8 @@ void scene_menu_main_initialize(
   );
 
   menu_main_custom_initialize(
-    &data->menu_main_custom
+    &data->menu_main_custom,
+    parameters_gameplay
   );
 
   data->menu_current = &(
@@ -138,11 +149,11 @@ void scene_menu_main_initialize(
   ];
 
   textures_buildings_load(
+    metil,
     texture_loader, (
       scene->textures +
       scene_menu_main_textures_index_buildings
-    ),
-    &metil->paths
+    )
   );
 
   [texture_loader release];
@@ -376,6 +387,54 @@ void scene_menu_main_initialize(
 
         break;
       }
+      case scene_menu_main_renderables_group_text_menu_custom_index_length_buildings:
+        metil_object_text_initialize(
+          metil,
+          metil_object_text,
+          "buildings: "
+        );
+
+        break;
+      case scene_menu_main_renderables_group_text_menu_custom_index_multiplier_buildings:
+        metil_object_text_initialize(
+          metil,
+          metil_object_text,
+          "buildings multiplier: "
+        );
+
+        break;
+      case scene_menu_main_renderables_group_text_menu_custom_index_length_enemies:
+        metil_object_text_initialize(
+          metil,
+          metil_object_text,
+          "enemies: "
+        );
+
+        break;
+      case scene_menu_main_renderables_group_text_menu_custom_index_multiplier_enemies:
+        metil_object_text_initialize(
+          metil,
+          metil_object_text,
+          "enemies multiplier: "
+        );
+
+        break;
+      case scene_menu_main_renderables_group_text_menu_custom_index_speed_movement:
+        metil_object_text_initialize(
+          metil,
+          metil_object_text,
+          "speed movement: "
+        );
+
+        break;
+      case scene_menu_main_renderables_group_text_menu_custom_index_multiplier_speed_movement:
+        metil_object_text_initialize(
+          metil,
+          metil_object_text,
+          "speed movement multiplier: "
+        );
+
+        break;
       case scene_menu_main_renderables_group_text_menu_custom_index_menu_back: {
         metil_object_text_initialize(
           metil,
@@ -440,7 +499,7 @@ void scene_menu_main_initialize(
     );
 
     metil_object_text->position.y = (
-      0.05f *
+      0.025f *
       (
         -6.0f -
         (
@@ -452,7 +511,8 @@ void scene_menu_main_initialize(
           ) *
           4.0f
         )
-      )
+      ) +
+      0.125f
     );
 
     metil_object_text_backing->position.y = (
@@ -576,6 +636,18 @@ void scene_menu_main_poll(
     struct metil_object* metil_object_text_backing;
     struct metil_object* metil_object_text;
 
+    unsigned char index_menu = (
+      index_metil_group_text_main_renderable
+    );
+
+    float multiplier_position_y = (
+      0.05f
+    );
+
+    float offset_position_y = (
+      0.0f
+    );
+
     if (
       menu == &data->menu_main
     ) {
@@ -602,6 +674,30 @@ void scene_menu_main_poll(
           index_metil_group_text_main_renderable
         ]->renderable
       );
+
+      index_menu = (
+        index_menu -
+        (
+          index_menu > 1
+        )
+      );
+
+      multiplier_position_y = (
+        0.025f
+      );
+
+      offset_position_y = (
+        0.125f
+      );
+
+      scene_menu_main_poll_custom_menu_item(
+        metil,
+        data->parameters_gameplay,
+        metil_object_text_backing,
+        metil_object_text,
+        menu,
+        index_menu
+      );
     }
 
     struct metil_renderer_data_object* metil_renderer_data_text_backing = (
@@ -615,21 +711,6 @@ void scene_menu_main_poll(
         metil_object_buffer_default_index_data
       ].buffer.contents
     );
-
-    unsigned char index_menu = (
-      index_metil_group_text_main_renderable
-    );
-    
-    if (
-      menu == &data->menu_main_custom
-    ) {
-      index_menu = (
-        index_menu -
-        (
-          index_menu > 1
-        )
-      );
-    }
 
     if (
       menu->index_current == index_menu
@@ -665,14 +746,15 @@ void scene_menu_main_poll(
         metil_object_text->position.x = 0.0f;
 
         metil_object_text->position.y = (
-          0.05f *
+          multiplier_position_y *
           (
             -6.075f -
             (
               index_menu *
               4.0f
             )
-          )
+          ) +
+          offset_position_y
         );
       }
 
@@ -719,14 +801,15 @@ void scene_menu_main_poll(
       metil_object_text->position.x = 0.001f;
 
       metil_object_text->position.y = (
-        0.05f *
+        multiplier_position_y *
         (
           -6.05f -
           (
             index_menu *
             4.0f
           )
-        )
+        ) +
+        offset_position_y
       );
 
       metil_renderer_data_text_backing->color.x = (
@@ -935,6 +1018,375 @@ void scene_menu_main_poll_input(
     &metil->input
   );
 }
+
+void scene_menu_main_poll_custom_menu_item(
+  struct metil* metil,
+  struct parameters_gameplay* parameters_gameplay,
+  struct metil_object* metil_object_text_backing,
+  struct metil_object* metil_object_text,
+  struct metil_menu* metil_menu,
+  unsigned char index_item
+) {
+  struct metil_menu_item_data_scroll* metil_menu_item_data_scroll = (
+    metil_menu->items[
+      index_item
+    ].data_menu_item
+  );
+
+  char* text = (
+    (void*) 0
+  );
+
+  char* value = (
+    (void*) 0
+  );
+
+  unsigned char changed = (
+    0
+  );
+
+  switch (
+    index_item
+  ) {
+    case menus_menu_main_custom_index_length_buildings: {
+      if (
+        metil_menu_item_data_scroll->index == parameters_gameplay->length_buildings
+      ) {
+        break;
+      }
+
+      changed = 1;
+
+      if (
+        metil_menu_item_data_scroll->index == 0
+      ) {
+        metil_menu_item_data_scroll->index = 3;
+      } else if (
+        metil_menu_item_data_scroll->index < 3
+      ) {
+        metil_menu_item_data_scroll->index = (
+          metil_menu_item_data_scroll->length -
+          1
+        );
+      }
+
+      parameters_gameplay->length_buildings = (
+        metil_menu_item_data_scroll->index
+      );
+
+      metil_object_text->destroy(
+        metil,
+        metil_object_text
+      );
+
+      metil_object_initialize(
+        metil_object_text
+      );
+
+      value = clic3_char_array_from_unsigned_long_int(
+        metil_menu_item_data_scroll->index
+      );
+
+      text = clic3_char_arrays_concatenate(
+        "buildings: ",
+        value
+      );
+
+      metil_object_text_initialize(
+        metil,
+        metil_object_text,
+        text
+      );
+
+      break;
+    }
+    case menus_menu_main_custom_index_multiplier_buildings: {
+      if (
+        metil_menu_item_data_scroll->index == parameters_gameplay->multiplier_buildings * 100
+      ) {
+        break;
+      }
+
+      changed = 1;
+
+      parameters_gameplay->multiplier_buildings = (
+        (float) metil_menu_item_data_scroll->index /
+        100.0f
+      );
+
+      metil_object_text->destroy(
+        metil,
+        metil_object_text
+      );
+
+      metil_object_initialize(
+        metil_object_text
+      );
+
+      value = clic3_char_array_from_float(
+        parameters_gameplay->multiplier_buildings
+      );
+
+      text = clic3_char_arrays_concatenate(
+        "length_buildings_multiplier: ",
+        value
+      );
+
+      metil_object_text_initialize(
+        metil,
+        metil_object_text,
+        text
+      );
+
+      break;
+    }
+    case menus_menu_main_custom_index_length_enemies: {
+      if (
+        metil_menu_item_data_scroll->index == parameters_gameplay->length_enemies
+      ) {
+        break;
+      }
+
+      changed = 1;
+
+      parameters_gameplay->length_enemies = (
+        metil_menu_item_data_scroll->index
+      );
+
+      metil_object_text->destroy(
+        metil,
+        metil_object_text
+      );
+
+      metil_object_initialize(
+        metil_object_text
+      );
+
+      value = clic3_char_array_from_unsigned_long_int(
+        metil_menu_item_data_scroll->index
+      );
+
+      text = clic3_char_arrays_concatenate(
+        "enemies: ",
+        value
+      );
+
+      metil_object_text_initialize(
+        metil,
+        metil_object_text,
+        text
+      );
+
+      break;
+    }
+    case menus_menu_main_custom_index_multiplier_enemies: {
+      if (
+        metil_menu_item_data_scroll->index == parameters_gameplay->multiplier_enemies * 100
+      ) {
+        break;
+      }
+
+      changed = 1;
+
+      parameters_gameplay->multiplier_enemies = (
+        (float) metil_menu_item_data_scroll->index /
+        100.0f
+      );
+
+      metil_object_text->destroy(
+        metil,
+        metil_object_text
+      );
+
+      metil_object_initialize(
+        metil_object_text
+      );
+
+      value = clic3_char_array_from_float(
+        parameters_gameplay->multiplier_enemies
+      );
+
+      text = clic3_char_arrays_concatenate(
+        "enemies_multiplier: ",
+        value
+      );
+
+      metil_object_text_initialize(
+        metil,
+        metil_object_text,
+        text
+      );
+
+      break;
+    }
+    case menus_menu_main_custom_index_speed_movement: {
+      if (
+        metil_menu_item_data_scroll->index == parameters_gameplay->speed_movement
+      ) {
+        break;
+      }
+
+      changed = 1;
+
+      parameters_gameplay->speed_movement = (
+        (float) metil_menu_item_data_scroll->index
+      );
+
+      metil_object_text->destroy(
+        metil,
+        metil_object_text
+      );
+
+      metil_object_initialize(
+        metil_object_text
+      );
+
+      value = clic3_char_array_from_float(
+        parameters_gameplay->speed_movement
+      );
+
+      text = clic3_char_arrays_concatenate(
+        "speed_movement: ",
+        value
+      );
+
+      metil_object_text_initialize(
+        metil,
+        metil_object_text,
+        text
+      );
+
+      break;
+    }
+    case menus_menu_main_custom_index_multiplier_speed_movement: {
+      if (
+        metil_menu_item_data_scroll->index == parameters_gameplay->multiplier_speed_movement * 100
+      ) {
+        break;
+      }
+
+      changed = 1;
+
+      parameters_gameplay->multiplier_speed_movement = (
+        (float) metil_menu_item_data_scroll->index /
+        100.0f
+      );
+
+      metil_object_text->destroy(
+        metil,
+        metil_object_text
+      );
+
+      metil_object_initialize(
+        metil_object_text
+      );
+
+      value = clic3_char_array_from_float(
+        parameters_gameplay->multiplier_speed_movement
+      );
+
+      text = clic3_char_arrays_concatenate(
+        "multiplier_speed_movement: ",
+        value
+      );
+
+      metil_object_text_initialize(
+        metil,
+        metil_object_text,
+        text
+      );
+
+      break;
+    }
+  }
+
+  if (
+    changed != 0
+  ) {
+    metil_object_text_backing->destroy(
+      metil,
+      metil_object_text_backing
+    );
+
+    metil_object_initialize(
+      metil_object_text_backing
+    );
+
+    metil_mesh_box_initialize(
+      &metil_object_text_backing->mesh,
+      (struct math_c_vector3_float) {
+        .x = (
+          metil_object_text->mesh.size.x * 1.25f
+        ),
+        .y = (
+          metil_object_text->mesh.size.y * 1.5f
+        ),
+        .z = (
+          0.5f
+        )
+      }
+    );
+
+     metil_object_text->position.y = (
+      0.025f *
+      (
+        -6.075f -
+        (
+          index_item *
+          4.0f
+        )
+      ) +
+      0.125f
+    );
+
+    metil_object_text_backing->position.y = (
+      metil_object_text->position.y
+    );
+
+    metil_object_text_backing->position.z = 0.5f;
+
+    metil_object_text_backing->rotation.x = -0.025f;
+    metil_object_text_backing->rotation.y = -0.025f;
+
+    metil_object_texture_add(
+      metil_object_text_backing,
+      ((struct metil_scene_controller*) metil->scene_controller)->scene.textures[
+        scene_menu_main_textures_index_text_backing
+      ]
+    );
+
+    metil_object_buffers_initialize(
+      metil_object_text_backing,
+      metil->renderer_interface.metal_device
+    );
+
+    struct metil_renderer_data_object* metil_renderer_data_object = (
+      metil_object_text_backing->buffers_vertex[
+        metil_object_buffer_default_index_data
+      ].buffer.contents
+    );
+
+    metil_renderer_data_object_initialize(
+      metil_renderer_data_object
+    );
+
+    metil_object_text_backing->index_pipeline_render = (
+      c938_pipeline_index_text_backing_menu
+    );
+
+    metil_object_text_backing->positioning = (
+      metil_positioning_static
+    );
+  }
+
+  clic3_memory_free(
+    text
+  );
+
+  clic3_memory_free(
+    value
+  );
+}        
 
 void scene_menu_main_destroy(
   struct metil* metil,

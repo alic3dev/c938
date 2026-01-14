@@ -31,4 +31,8 @@ void c938_on_scene_change(
   void* _Nullable
 );
 
+void c938_termination(
+  void* _Nonnull
+);
+
 #endif
