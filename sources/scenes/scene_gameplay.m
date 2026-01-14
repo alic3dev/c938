@@ -181,10 +181,11 @@ void scene_gameplay_initialize(
   ];
 
   textures_buildings_load(
+    metil,
     texture_loader,
-    scene->textures,
-    &metil->paths
+    scene->textures
   );
+
 
   [texture_loader release];
 

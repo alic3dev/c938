@@ -118,6 +118,6 @@ struct data_vertex {
     color_texture[0] * data_vertex.color.r * brightness,
     color_texture[1] * data_vertex.color.g * brightness,
     color_texture[2] * data_vertex.color.b * brightness,
-    color_texture[3] * data_vertex.color.a
+    data_vertex.color.a
   );
 }
