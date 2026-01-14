@@ -344,7 +344,7 @@ void scene_gameplay_populate(
     if (
       (
         (unsigned long int) scene_gameplay_data->length_buildings *
-        (unsigned long int) scene_gameplay_data->parameters->multiplier_buildings
+        (float) scene_gameplay_data->parameters->multiplier_buildings
       ) > 65000
     ) {
       scene_gameplay_data->length_buildings = (
@@ -353,7 +353,7 @@ void scene_gameplay_populate(
     } else if (
       (
         (long int) scene_gameplay_data->length_buildings *
-        (long int) scene_gameplay_data->parameters->multiplier_buildings
+        (float) scene_gameplay_data->parameters->multiplier_buildings
       ) < 3
     ) {
       scene_gameplay_data->length_buildings = 3;
@@ -367,7 +367,7 @@ void scene_gameplay_populate(
     if (
       (
         (unsigned long int) scene_gameplay_data->length_enemies *
-        (unsigned long int) scene_gameplay_data->parameters->multiplier_enemies
+        (float) scene_gameplay_data->parameters->multiplier_enemies
       ) > 65000
     ) {
       scene_gameplay_data->length_enemies = (
@@ -376,7 +376,7 @@ void scene_gameplay_populate(
     } else if (
       (
         (long int) scene_gameplay_data->length_enemies *
-        (long int) scene_gameplay_data->parameters->multiplier_enemies
+        (float) scene_gameplay_data->parameters->multiplier_enemies
       ) < 0
     ) {
       scene_gameplay_data->length_enemies = 0;
