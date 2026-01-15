@@ -1,7 +1,6 @@
 #include <textures/textures_buildings.h>
 
 #include <metil_texture/metil_texture_brightness.h>
-#include <metil_image/metil_image_type.h>
 #include <metil_texture/metil_texture_concrete.h>
 
 #include <Metal/MTLTexture.h>
