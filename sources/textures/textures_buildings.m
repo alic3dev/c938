@@ -52,7 +52,7 @@ void textures_buildings_load(
       metil->renderer_interface.metal_device
     );
 
-    metil_texture_brightness(
+    metil_texture_brightness_linear(
       textures[
         0
       ],
