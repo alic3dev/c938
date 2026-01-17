@@ -1016,28 +1016,21 @@ void scene_menu_main_poll_custom_menu_item(
     ].data_menu_item
   );
 
-  if (
-    index_item == menus_menu_main_custom_index_mode
-  ) { 
-    metil_menu_item_data_scroll->index = 0;
-    return;
-  }
+  char* text = 0;
+  char* value = 0;
 
-  char* text = (
-    (void*) 0
-  );
-
-  char* value = (
-    (void*) 0
-  );
-
-  unsigned char changed = (
-    0
-  );
+  unsigned char changed = 0;
 
   switch (
     index_item
   ) {
+    case menus_menu_main_custom_index_mode: {
+      parameters_gameplay->objective = (
+        metil_menu_item_data_scroll->index
+      );
+
+      break;
+    }
     case menus_menu_main_custom_index_length_buildings: {
       if (
         with_checks != 0 &&
@@ -1094,7 +1087,10 @@ void scene_menu_main_poll_custom_menu_item(
     case menus_menu_main_custom_index_multiplier_buildings: {
       if (
         with_checks != 0 &&
-        metil_menu_item_data_scroll->index == parameters_gameplay->multiplier_buildings * 100
+        metil_menu_item_data_scroll->index == (
+          parameters_gameplay->multiplier_buildings *
+          100
+        )
       ) {
         break;
       }
