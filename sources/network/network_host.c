@@ -98,6 +98,14 @@ unsigned char network_host_listen(
     )
   );
 
+  network_host->length_notification_on = 0;
+
+  network_host->notification_on = (
+    clic3_memory_allocate_raw(
+      0
+    )
+  );
+
   for (
     unsigned int index_thread = 0;
     index_thread < network_host->length_threads;
@@ -112,14 +120,6 @@ unsigned char network_host_listen(
       network_host
     );
   }
-
-  network_host->length_notification_on = 0;
-
-  network_host->notification_on = (
-    clic3_memory_allocate_raw(
-      0
-    )
-  );
 
   return 0;
 }
@@ -161,7 +161,6 @@ void* network_host_thread(
       )
     );
 
-    
     char* char_array_address_client = (
       clic3_memory_allocate_raw(
         address_socket_client.sa_len +
