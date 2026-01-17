@@ -1,12 +1,15 @@
 #include <c938.h>
 
 #include <c938_pipeline_index.h>
+#include <data/c938_data.h>
 #include <data/parameters_gameplay.h>
 #include <data/scene_menu_main_data.h>
 #include <player.h>
 #include <scenes/scene_id.h>
 #include <scenes/scene_menu_main/scene_menu_main.h>
 #include <scenes/scene_gameplay.h>
+
+#include <clic3_memory.h>
 
 #if target_os_ios
 #include <metil_application/metil_application.h>
@@ -21,9 +24,7 @@
 #include <metil_scenes/metil_scene_controller.h>
 
 #if target_os_ios
-char* c938_executable_path = (
-  (void*) 0
-);
+char* c938_executable_path = 0;
 #endif
 
 int main(
@@ -216,46 +217,53 @@ void c938_renderer_on_initialize(
     c938_pipeline_index_text
   );
 
-  static struct parameters_gameplay* parameters_gameplay = (
-    (void*) 0
-  );
-
-  parameters_gameplay = (
-    malloc(
+  metil->data = (
+    clic3_memory_allocate_raw(
       sizeof(
-        struct parameters_gameplay
+        struct c938_data
       )
     )
   );
 
+  struct c938_data* c938_data = (
+    metil->data
+  );
+
+  c938_data_initialize(
+    c938_data
+  );
+
   parameters_gameplay_initialize(
-    parameters_gameplay,
+    &c938_data->parameters_gameplay,
     metil->player_defaults.speed_movement
   );
 
   metil_termination_on_function_add(
     &metil->termination,
     c938_termination,
-    parameters_gameplay
+    c938_data
+  );
+
+  struct metil_scene_controller* metil_scene_controller = (
+    metil->scene_controller
   );
 
   scene_menu_main_initialize(
     metil,
-    &((struct metil_scene_controller*) metil->scene_controller)->scene,
-    parameters_gameplay
+    &metil_scene_controller->scene
   );
 
   metil_scene_controller_on_scene_change_add(
-    metil->scene_controller,
+    metil_scene_controller,
     c938_on_scene_change,
-    parameters_gameplay
+    0
   );
 }
 
 void c938_on_scene_change(
   struct metil* metil,
   int id_scene,
-  void* parameters_gameplay
+  void* data
 ) {
   struct metil_scene_controller* metil_scene_controller = (
     metil->scene_controller
@@ -277,15 +285,13 @@ void c938_on_scene_change(
     case scene_id_menu_main:
       scene_menu_main_initialize(
         metil,
-        metil_scene,
-        parameters_gameplay
+        metil_scene
       );
       break;
     case scene_id_gameplay:
       scene_gameplay_initialize(
         metil,
-        metil_scene,
-        parameters_gameplay
+        metil_scene
       );
       break;
   }
@@ -294,7 +300,11 @@ void c938_on_scene_change(
 void c938_termination(
   void* data
 ) {
-  free(
+  struct c938_data* c938_data = (
     data
+  );
+
+  clic3_memory_free_raw(
+    c938_data
   );
 }

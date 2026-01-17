@@ -1,6 +1,7 @@
 #include <scenes/scene_menu_main/scene_menu_main.h>
 
 #include <c938_pipeline_index.h>
+#include <data/c938_data.h>
 #include <data/parameters_gameplay.h>
 #include <data/scene_menu_main_data.h>
 #include <generate/generate_buildings.h>
@@ -47,9 +48,16 @@
 
 void scene_menu_main_initialize(
   struct metil* metil,
-  struct metil_scene* scene,
-  struct parameters_gameplay* parameters_gameplay
+  struct metil_scene* scene
 ) {
+  struct c938_data* c938_data = (
+    metil->data
+  );
+
+  struct parameters_gameplay* parameters_gameplay = (
+    &c938_data->parameters_gameplay
+  );
+  
   metil_scene_initialize_with_renderables(
     metil,
     scene,
@@ -76,6 +84,15 @@ void scene_menu_main_initialize(
           index_renderable,
           metil_renderable_type_group
         );
+
+        break;
+      case scene_menu_main_renderables_index_group_logging:
+        scene->renderables[
+          index_renderable
+        ].renderable = (
+          &c938_data->logging.group
+        );
+
         break;
       default:
         metil_renderable_initialize_at_index(
@@ -83,6 +100,7 @@ void scene_menu_main_initialize(
           index_renderable,
           metil_renderable_type_object
         );
+
         break;
     }
   }
@@ -1791,6 +1809,11 @@ void scene_menu_main_destroy(
 
   metil_menu_destroy(
     &scene_menu_main_data->menu_main_custom
+  );
+
+  scene->length_renderables = (
+    scene->length_renderables -
+    1
   );
 
   metil_scene_destroy_default(

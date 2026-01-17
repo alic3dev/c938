@@ -21,7 +21,7 @@
 #define scene_menu_main_length_buildings_default 200
 #define scene_menu_main_time_scene_transition 333
 
-#define scene_menu_main_length_renderables 8
+#define scene_menu_main_length_renderables 9
 
 #define scene_menu_main_length_group_renderables_text_main menus_menu_main_length
 #define scene_menu_main_length_group_renderables_text_main_backing scene_menu_main_length_group_renderables_text_main
@@ -40,7 +40,8 @@ enum scene_menu_main_renderables_index {
   scene_menu_main_renderables_index_group_text_menu_custom_backing = 4,
   scene_menu_main_renderables_index_group_text_menu_custom = 5,
   scene_menu_main_renderables_index_group_text_menu_network_backing = 6,
-  scene_menu_main_renderables_index_group_text_menu_network = 7
+  scene_menu_main_renderables_index_group_text_menu_network = 7,
+  scene_menu_main_renderables_index_group_logging = 8
 };
 
 enum scene_menu_main_renderables_group_text_main_index {
@@ -93,8 +94,7 @@ enum scene_menu_main_textures_index {
 
 void scene_menu_main_initialize(
   struct metil* _Nonnull,
-  struct metil_scene* _Nonnull,
-  struct parameters_gameplay* _Nonnull
+  struct metil_scene* _Nonnull
 );
 
 void scene_menu_main_poll(
