@@ -4,6 +4,7 @@
 #include <data/parameters_gameplay.h>
 #include <menus/menu_main.h>
 #include <menus/menu_main_custom.h>
+#include <menus/menu_main_network.h>
 
 #include <metil.h>
 #include <metil_object.h>
@@ -19,7 +20,7 @@
 #define scene_menu_main_length_buildings_default 200
 #define scene_menu_main_time_scene_transition 333
 
-#define scene_menu_main_length_renderables 6
+#define scene_menu_main_length_renderables 8
 
 #define scene_menu_main_length_group_renderables_text_main menus_menu_main_length
 #define scene_menu_main_length_group_renderables_text_main_backing scene_menu_main_length_group_renderables_text_main
@@ -27,13 +28,18 @@
 #define scene_menu_main_length_group_renderables_text_menu_custom 10
 #define scene_menu_main_length_group_renderables_text_menu_custom_backing scene_menu_main_length_group_renderables_text_menu_custom
 
+#define scene_menu_main_length_group_renderables_text_menu_network menus_menu_main_network_length
+#define scene_menu_main_length_group_renderables_text_menu_network_backing scene_menu_main_length_group_renderables_text_menu_network
+
 enum scene_menu_main_renderables_index {
   scene_menu_main_renderables_index_group_buildings = 0,
   scene_menu_main_renderables_index_text_title = 1,
   scene_menu_main_renderables_index_group_text_menu_main_backing = 2,
   scene_menu_main_renderables_index_group_text_menu_main = 3,
   scene_menu_main_renderables_index_group_text_menu_custom_backing = 4,
-  scene_menu_main_renderables_index_group_text_menu_custom = 5
+  scene_menu_main_renderables_index_group_text_menu_custom = 5,
+  scene_menu_main_renderables_index_group_text_menu_network_backing = 6,
+  scene_menu_main_renderables_index_group_text_menu_network = 7
 };
 
 enum scene_menu_main_renderables_group_text_main_index {
@@ -62,6 +68,18 @@ enum scene_menu_main_renderables_group_text_menu_custom_index {
   scene_menu_main_renderables_group_text_menu_custom_index_speed_movement = 7,
   scene_menu_main_renderables_group_text_menu_custom_index_multiplier_speed_movement = 8,
   scene_menu_main_renderables_group_text_menu_custom_index_menu_back = 9
+};
+
+enum scene_menu_main_renderables_group_text_main_network_index {
+  scene_menu_main_renderables_group_text_main_index_menu_network_host = (
+    menus_menu_main_network_index_host
+  ),
+  scene_menu_main_renderables_group_text_main_index_menu_network_join = (
+    menus_menu_main_network_index_join
+  ),
+  scene_menu_main_renderables_group_text_main_index_menu_network_back = (
+    menus_menu_main_network_index_back
+  )
 };
 
 #define scene_menu_main_length_textures 2
