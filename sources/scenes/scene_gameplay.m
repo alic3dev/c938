@@ -405,17 +405,25 @@ void scene_gameplay_populate(
     metil->rendering_properties.camera.height_default
   );
 
-  player_data->index_target_building = (
-    (
-      rand_result.bytes[0] *
-      rand_result.bytes[1] +
-      rand_result.bytes[2]
-    ) % (
-      scene_gameplay_data->length_buildings -
+  if (
+    scene_gameplay_data->parameters->objective == gameplay_objective_target
+  ) {
+    player_data->index_target_building = (
+      (
+        rand_result.bytes[0] *
+        rand_result.bytes[1] +
+        rand_result.bytes[2]
+      ) % (
+        scene_gameplay_data->length_buildings -
+        2
+      ) +
       2
-    ) +
-    2
-  );
+    );
+  } else {
+    player_data->index_target_building = (
+      scene_gameplay_data->length_buildings
+    );
+  }
 
   player_data->time = &(
     scene->time
@@ -833,6 +841,19 @@ void scene_gameplay_poll(
         1
       );
     }
+  }
+
+  if (
+    scene_gameplay_data->parameters->objective == gameplay_objective_enemies &&
+    metil_group_enemies->length == 0
+  ) {
+    scene_gameplay_populate(
+      metil,
+      scene,
+      1
+    );
+
+    return;
   }
 
   metil_scene_poll_default(
