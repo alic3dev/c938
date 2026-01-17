@@ -33,7 +33,7 @@ enum scene_menu_main_renderables_index {
   scene_menu_main_renderables_index_group_text_menu_main_backing = 2,
   scene_menu_main_renderables_index_group_text_menu_main = 3,
   scene_menu_main_renderables_index_group_text_menu_custom_backing = 4,
-  scene_menu_main_renderables_index_group_text_menu_custom = 5,
+  scene_menu_main_renderables_index_group_text_menu_custom = 5
 };
 
 enum scene_menu_main_renderables_group_text_main_index {
@@ -42,6 +42,9 @@ enum scene_menu_main_renderables_group_text_main_index {
   ),
   scene_menu_main_renderables_group_text_main_index_menu_custom = (
     menus_menu_main_index_custom
+  ),
+  scene_menu_main_renderables_group_text_main_index_menu_network = (
+    menus_menu_main_index_network
   ),
   scene_menu_main_renderables_group_text_main_index_menu_exit = (
     menus_menu_main_index_exit

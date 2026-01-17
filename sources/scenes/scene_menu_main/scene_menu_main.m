@@ -237,6 +237,14 @@ void scene_menu_main_initialize(
         );
 
         break;
+      case scene_menu_main_renderables_group_text_main_index_menu_network:
+        metil_object_text_initialize(
+          metil,
+          metil_object_text,
+          "network"
+        );
+
+        break;
       case scene_menu_main_renderables_group_text_main_index_menu_exit:
         metil_object_text_initialize(
           metil,
@@ -303,7 +311,8 @@ void scene_menu_main_initialize(
           index_metil_group_text_main_renderable *
           4.0f
         )
-      )
+      ) +
+      0.15f
     );
 
     metil_object_text_backing->position.y = (
@@ -638,6 +647,10 @@ void scene_menu_main_poll(
           index_metil_group_text_main_renderable
         ]->renderable
       );
+
+      offset_position_y = (
+        0.15f
+      );
     } else {
       metil_object_text_backing = (
         metil_group_text_menu_custom_backing->renderables[
@@ -918,6 +931,11 @@ void scene_menu_main_poll(
             &data->menu_current->stopwatch_input
           );
 
+          break;
+        }
+        case menus_menu_main_index_network: {
+          menu->index_selected = -1;
+          menu->handled = 0;
           break;
         }
         case menus_menu_main_index_exit: {

@@ -18,12 +18,13 @@ void menu_main_initialize(
     switch (
       index_menu_item
     ) {
-      case menus_menu_main_index_custom: {
+      case menus_menu_main_index_custom:
+      case menus_menu_main_index_network: {
         metil_menu_item_add(
           menu,
           metil_menu_item_type_submenu,
           metil_menu_item_action_select,
-          (void*) 0
+          0
         );
 
         break;
@@ -33,7 +34,7 @@ void menu_main_initialize(
           menu,
           metil_menu_item_type_selection,
           metil_menu_item_action_select,
-          (void*) 0
+          0
         );
 
         break;
