@@ -8,7 +8,16 @@
 
 #define c938_network_host_port 3938
 
-typedef void (*network_host_notification_on)(char*);
+enum network_host_notification_type {
+  network_host_notification_type_default = 0,
+  network_host_notification_type_error = 1
+};
+
+typedef void (*network_host_notification_on)(
+  char*,
+  void*,
+  enum network_host_notification_type
+);
 
 struct network_host {
   int socket;
@@ -21,6 +30,7 @@ struct network_host {
   pthread_t* threads;
 
   network_host_notification_on* notification_on;
+  void** notification_on_data;
   unsigned char length_notification_on;
 
   fd_set file_descriptor_socket_set;
@@ -37,12 +47,18 @@ void* network_host_thread(
 
 void network_host_notification_on_add(
   struct network_host*,
-  network_host_notification_on
+  network_host_notification_on,
+  void*
 );
 
 void network_host_notification_send(
   struct network_host*,
-  char*
+  char*,
+  enum network_host_notification_type
+);
+
+void network_host_destroy(
+  struct network_host*
 );
 
 #endif

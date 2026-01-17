@@ -1,15 +1,17 @@
 #include <scenes/scene_menu_main/scene_menu_main.h>
 
+#include <c938_pipeline_index.h>
 #include <data/parameters_gameplay.h>
 #include <data/scene_menu_main_data.h>
 #include <generate/generate_buildings.h>
 #include <menus/menu_main.h>
 #include <menus/menu_main_custom.h>
-#include <c938_pipeline_index.h>
+#include <network/network_host.h>
 #include <scenes/scene_id.h>
 #include <textures/textures_buildings.h>
 
 #include <clic3_char_arrays.h>
+#include <clic3_colours.h>
 #include <clic3_memory.h>
 
 #include <metil_audio/metil_audio_io_proc.h>
@@ -1217,7 +1219,41 @@ void scene_menu_main_poll(
       switch (
         menu->index_selected
       ) {
-        case menus_menu_main_network_index_host:
+        case menus_menu_main_network_index_host: {
+          unsigned char status_network_host_listen = (
+            network_host_listen(
+              &data->network_host,
+              metil->system_information.cores_cpu
+            )
+          );
+
+          if (
+            status_network_host_listen == 0
+          ) {
+            network_host_notification_on_add(
+              &data->network_host,
+              network_host_notification,
+              0
+            );
+
+            network_host_notification_send(
+              &data->network_host,
+              "network_host::online_and_active",
+              network_host_notification_type_default
+            );
+          } else {
+            network_host_notification(
+              "network_host::creation_failed",
+              0,
+              network_host_notification_type_error
+            );
+          }
+
+          menu->index_selected = menus_menu_main_network_index_back;
+          menu->handled = 0;
+
+          break;
+        }
         case menus_menu_main_network_index_join: {
           metil_debug_log(
             metil->configuration.debug_log_level,
@@ -1669,6 +1705,10 @@ void scene_menu_main_destroy(
     scene->data
   );
 
+  network_host_destroy(
+    &scene_menu_main_data->network_host
+  );
+
   metil_menu_destroy(
     &scene_menu_main_data->menu_main
   );
@@ -1680,6 +1720,87 @@ void scene_menu_main_destroy(
   metil_scene_destroy_default(
     metil,
     scene
+  );
+}
+
+void network_host_notification(
+  char* notification,
+  void* data,
+  enum network_host_notification_type network_host_notification_type
+) {
+  FILE* stream_output;
+  const char* color;
+
+  switch (
+    network_host_notification_type
+  ) {
+    case network_host_notification_type_error: {
+      stream_output = (
+        stderr
+      );
+
+      color = clic3_colours_bold_red;
+
+      break;
+    }
+    case network_host_notification_type_default:
+    default: {
+      stream_output = (
+        stdout
+      );
+
+      color = clic3_colours_bold_blue;
+
+      break;
+    }
+  }
+
+  char** notification_parts = (
+    clic3_char_array_split_on_char(
+      notification,
+      ':'
+    )
+  );
+
+  unsigned char index_notification_part = 0;
+
+  while (
+    index_notification_part++ <
+    (unsigned long int)
+    notification_parts[
+      0
+    ]
+  ) {
+    fprintf(
+      stream_output,
+      "%s%s%s",
+      index_notification_part == 1
+      ? color
+      : index_notification_part % 2 == 0
+      ? clic3_colours_bold_foreground
+      : clic3_colours_reset,
+      index_notification_part % 2 == 0
+      ? "::"
+      : "",
+      notification_parts[
+        index_notification_part
+      ]
+    );
+
+    clic3_memory_free_raw(
+      notification_parts[
+        index_notification_part
+      ]
+    );
+  }
+
+  fprintf(
+    stream_output,
+    "\n"
+  );
+
+  clic3_memory_free_raw(
+    notification_parts
   );
 }
 
