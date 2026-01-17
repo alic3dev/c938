@@ -1,5 +1,6 @@
 #include <scenes/scene_gameplay.h>
 
+#include <data/c938_data.h>
 #include <data/enemy_data.h>
 #include <data/parameters_gameplay.h>
 #include <data/player_data.h>
@@ -47,9 +48,16 @@
 
 void scene_gameplay_initialize(
   struct metil* metil,
-  struct metil_scene* scene,
-  struct parameters_gameplay* parameters_gameplay
+  struct metil_scene* scene
 ) {
+  struct c938_data* c938_data = (
+    metil->data
+  );
+
+  struct parameters_gameplay* parameters_gameplay = (
+    &c938_data->parameters_gameplay  
+  );
+
   metil->rendering_properties.brightness = (
     metil->configuration.rendering_properties.brightness
   );

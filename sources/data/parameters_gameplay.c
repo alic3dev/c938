@@ -31,4 +31,8 @@ void parameters_gameplay_initialize(
   parameters_gameplay->multiplier_speed_movement = (
     1.2f
   );
+
+  parameters_gameplay->networked = (
+    parameters_gameplay_networked_none
+  );
 }

@@ -9,6 +9,12 @@ enum gameplay_objective {
   gameplay_objective_enemies = 1
 };
 
+enum parameters_gameplay_networked {
+  parameters_gameplay_networked_none = 0b0000,
+  parameters_gameplay_networked_host = 0b0001,
+  parameters_gameplay_networked_client = 0b0010
+};
+
 struct parameters_gameplay {
   enum gameplay_objective objective;
 
@@ -20,6 +26,8 @@ struct parameters_gameplay {
   float multiplier_buildings;
   float multiplier_enemies;
   float multiplier_speed_movement;
+
+  unsigned char networked;
 };
 
 void parameters_gameplay_initialize(

@@ -43,8 +43,7 @@ enum scene_gameplay_textures {
 
 void scene_gameplay_initialize(
   struct metil* _Nonnull,
-  struct metil_scene* _Nonnull,
-  struct parameters_gameplay* _Nonnull
+  struct metil_scene* _Nonnull
 );
 
 void scene_gameplay_populate(
