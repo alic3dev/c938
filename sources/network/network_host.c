@@ -106,6 +106,12 @@ unsigned char network_host_listen(
     )
   );
 
+  network_host->notification_on_data = (
+    clic3_memory_allocate_raw(
+      0
+    )
+  );
+
   for (
     unsigned int index_thread = 0;
     index_thread < network_host->length_threads;
@@ -129,6 +135,12 @@ void* network_host_thread(
 ) {
   struct network_host* network_host = (
     data
+  );
+
+  network_host_notification_send(
+    network_host,
+    "network_thread::started",
+    network_host_notification_type_default
   );
 
   while (
@@ -216,7 +228,8 @@ void* network_host_thread(
 
     network_host_notification_send(
       network_host,
-      notification
+      notification,
+      network_host_notification_type_default
     );
 
     clic3_memory_free_raw(
@@ -233,7 +246,8 @@ void* network_host_thread(
 
 void network_host_notification_send(
   struct network_host* network_host,
-  char* notification
+  char* notification,
+  enum network_host_notification_type network_host_notification_type
 ) {
   for (
     unsigned char index_notification_on = 0;
@@ -243,24 +257,40 @@ void network_host_notification_send(
     network_host->notification_on[
       index_notification_on
     ](
-      notification
+      notification,
+      network_host->notification_on_data[
+        index_notification_on
+      ],
+      network_host_notification_type
     );
   }
 }
 
 void network_host_notification_on_add(
   struct network_host* network_host,
-  network_host_notification_on notification_on
+  network_host_notification_on notification_on,
+  void* notification_on_data
 ) {
   network_host->length_notification_on = (
     network_host->length_notification_on +
     1
   );
 
-  network_host->notification_on = (
-    clic3_memory_allocate_raw(
+  clic3_memory_reallocate_raw(
+    &network_host->notification_on,
+    (
       sizeof(
         network_host_notification_on
+      ) *
+      network_host->length_notification_on
+    )
+  );
+
+  clic3_memory_reallocate_raw(
+    &network_host->notification_on_data,
+    (
+      sizeof(
+        void*
       ) *
       network_host->length_notification_on
     )
@@ -271,5 +301,59 @@ void network_host_notification_on_add(
     1
   ] = (
     notification_on
+  );
+
+  network_host->notification_on_data[
+    network_host->length_notification_on -
+    1
+  ] = (
+    notification_on_data
+  );
+}
+
+void network_host_destroy(
+  struct network_host* network_host
+) {
+  network_host->online = 0;
+
+  network_host_notification_send(
+    network_host,
+    "network_host::going_offline",
+    network_host_notification_type_default
+  );
+
+  close(
+    network_host->socket
+  );
+
+  for (
+    unsigned char index_thread = 0;
+    index_thread < network_host->length_threads;
+    ++index_thread
+  ) {
+    pthread_cancel(
+      network_host->threads[
+        index_thread
+      ]
+    );
+
+    pthread_join(
+      network_host->threads[
+        index_thread
+      ],
+      0
+    );
+  }
+
+  clic3_memory_free_raw(
+    network_host->threads
+  );
+
+  clic3_memory_free_raw(
+    network_host->notification_on
+  );
+
+  clic3_memory_free_raw(
+    network_host->notification_on_data
   );
 }

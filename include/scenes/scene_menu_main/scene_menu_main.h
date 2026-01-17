@@ -5,6 +5,7 @@
 #include <menus/menu_main.h>
 #include <menus/menu_main_custom.h>
 #include <menus/menu_main_network.h>
+#include <network/network_host.h>
 
 #include <metil.h>
 #include <metil_object.h>
@@ -119,6 +120,12 @@ void scene_menu_main_poll_input(
 void scene_menu_main_destroy(
   struct metil* _Nonnull,
   struct metil_scene* _Nonnull
+);
+
+void network_host_notification(
+  char* _Nonnull,
+  void* _Nullable,
+  enum network_host_notification_type
 );
 
 #if target_os_ios
