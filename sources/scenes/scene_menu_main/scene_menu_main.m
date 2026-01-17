@@ -1176,14 +1176,49 @@ void scene_menu_main_poll(
         menu->index_selected
       ) {
         case menus_menu_main_custom_index_start: {
-          metil_debug_log(
-            metil->configuration.debug_log_level,
-            "scene_menu_main:starting\n"
-          );
+          if (
+            data->parameters_gameplay->networked ==
+            parameters_gameplay_networked_none
+          ) {
+            metil_debug_log(
+              metil->configuration.debug_log_level,
+              "scene_menu_main:starting_custom\n"
+            );
 
-          data->time_started = (
-            scene->time
-          );
+            data->time_started = (
+              scene->time
+            );
+          } else {
+            metil_debug_log(
+              metil->configuration.debug_log_level,
+              "scene_menu_main:starting_network_host\n"
+            );
+
+            unsigned char status_network_host_listen = (
+              network_host_listen(
+                &data->network_host,
+                metil->system_information.cores_cpu
+              )
+            );
+
+            if (
+              status_network_host_listen != 0
+            ) {
+              metil_debug_log(
+                metil->configuration.debug_log_level,
+                "scene_menu_main:network_host:failure_to_start\n"
+              );
+
+              menu->index_selected = -1;
+              menu->handled = 0;
+            } else {
+              metil_scene_controller_scene_change(
+                metil,
+                metil->scene_controller,
+                scene_id_gameplay
+              );
+            }
+          }
 
           break;
         }
@@ -1192,15 +1227,27 @@ void scene_menu_main_poll(
           menu->index_selected = -1;
           menu->handled = 0;
 
-          metil_group_text_main_backing->visible = 1;
-          metil_group_text_main->visible = 1;
-
           metil_group_text_menu_custom_backing->visible = 0;
           metil_group_text_menu_custom->visible = 0;
 
-          data->menu_current = &(
-            data->menu_main
-          );
+          if (
+            data->parameters_gameplay->networked ==
+            parameters_gameplay_networked_none
+          ) {
+            data->menu_current = &(
+              data->menu_main
+            );
+
+            metil_group_text_main_backing->visible = 1;
+            metil_group_text_main->visible = 1;
+          } else {
+            data->menu_current = &(
+              data->menu_main_network
+            );
+
+            metil_group_text_menu_network_backing->visible = 1;
+            metil_group_text_menu_network->visible = 1;
+          }
 
           data->menu_current->index_current = (
             0
@@ -1220,44 +1267,46 @@ void scene_menu_main_poll(
         menu->index_selected
       ) {
         case menus_menu_main_network_index_host: {
-          unsigned char status_network_host_listen = (
-            network_host_listen(
-              &data->network_host,
-              metil->system_information.cores_cpu
-            )
+          data->parameters_gameplay->networked = (
+            parameters_gameplay_networked_host
           );
 
-          if (
-            status_network_host_listen == 0
-          ) {
-            network_host_notification_on_add(
-              &data->network_host,
-              network_host_notification,
-              0
-            );
+          metil_debug_log(
+            metil->configuration.debug_log_level,
+            "setting::parameters_gameplay::networked->{host};\n"
+          );
 
-            network_host_notification_send(
-              &data->network_host,
-              "network_host::online_and_active",
-              network_host_notification_type_default
-            );
-          } else {
-            network_host_notification(
-              "network_host::creation_failed",
-              0,
-              network_host_notification_type_error
-            );
-          }
-
-          menu->index_selected = menus_menu_main_network_index_back;
+          menu->index_selected = -1;
           menu->handled = 0;
+
+          metil_group_text_menu_custom_backing->visible = 1;
+          metil_group_text_menu_custom->visible = 1;
+
+          metil_group_text_menu_network_backing->visible = 0;
+          metil_group_text_menu_network->visible = 0;
+
+          data->menu_current = &(
+            data->menu_main_custom
+          );
+
+          data->menu_current->index_current = (
+            0
+          );
+
+          metil_stopwatch_start(
+            &data->menu_current->stopwatch_input
+          );
 
           break;
         }
         case menus_menu_main_network_index_join: {
+          data->parameters_gameplay->networked = (
+            parameters_gameplay_networked_client
+          );
+          
           metil_debug_log(
             metil->configuration.debug_log_level,
-            "sockets\n"
+            "setting::parameters_gameplay::networked->{client};\n"
           );
 
           menu->index_selected = -1;
@@ -1267,6 +1316,15 @@ void scene_menu_main_poll(
         }
         default:
         case menus_menu_main_network_index_back: {
+          data->parameters_gameplay->networked = (
+            parameters_gameplay_networked_none
+          );
+
+          metil_debug_log(
+            metil->configuration.debug_log_level,
+            "setting::parameters_gameplay::networked->{none};\n"
+          );
+
           menu->index_selected = -1;
           menu->handled = 0;
 
