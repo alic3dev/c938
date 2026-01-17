@@ -1209,9 +1209,27 @@ void scene_menu_main_poll(
                 "scene_menu_main:network_host:failure_to_start\n"
               );
 
+              network_host_notification(
+                "network_host::creation_failed",
+                0,
+                network_host_notification_type_error
+              );
+
               menu->index_selected = -1;
               menu->handled = 0;
             } else {
+              network_host_notification_on_add(
+                &data->network_host,
+                network_host_notification,
+                0
+              );
+
+              network_host_notification_send(
+                &data->network_host,
+                "network_host::online_and_active",
+                network_host_notification_type_default
+              );
+
               metil_scene_controller_scene_change(
                 metil,
                 metil->scene_controller,
