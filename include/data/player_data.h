@@ -23,8 +23,8 @@ struct player_data {
   unsigned char is_jumping;
   unsigned char is_jumping_secondary;
 
-  unsigned short int on_ground;
-  unsigned short int index_target_building;
+  unsigned int on_ground;
+  unsigned int index_target_building;
 
   unsigned char shooting;
 
