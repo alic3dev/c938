@@ -1355,8 +1355,9 @@ void scene_menu_main_poll(
             "setting::parameters_gameplay::networked->{client};\n"
           );
 
-          menu->index_selected = -1;
-          menu->handled = 0;
+          network_client_connect(
+            &c938_data->network_client
+          );
 
           break;
         }
