@@ -1359,6 +1359,10 @@ void scene_menu_main_poll(
             &c938_data->network_client
           );
 
+          data->time_started = (
+            scene->time
+          );
+
           break;
         }
         default:
