@@ -24,7 +24,9 @@ struct network_host {
 
   struct sockaddr_in address_socket;
 
-  unsigned int online;
+  unsigned char online;
+  unsigned char connections_accept;
+  unsigned char initialized;
 
   unsigned int length_threads;
   pthread_t* threads;
@@ -43,6 +45,10 @@ unsigned char network_host_listen(
 
 void* network_host_thread(
   void*
+);
+
+void network_host_connections_accept(
+  struct network_host*
 );
 
 void network_host_notification_on_add(

@@ -84,6 +84,7 @@ unsigned char network_host_listen(
     &network_host->file_descriptor_socket_set
   );
 
+  network_host->connections_accept = 0;
   network_host->online = 1;
 
   network_host->length_threads = (
@@ -94,7 +95,8 @@ unsigned char network_host_listen(
     clic3_memory_allocate_raw(
       sizeof(
         pthread_t
-      )
+      ) *
+      network_host->length_threads
     )
   );
 
@@ -111,6 +113,8 @@ unsigned char network_host_listen(
       0
     )
   );
+
+  network_host->initialized = 1;
 
   for (
     unsigned int index_thread = 0;
@@ -157,7 +161,8 @@ void* network_host_thread(
     );
 
     if (
-      status_select != 1
+      status_select != 1 ||
+      network_host->connections_accept != 1
     ) {
       continue;
     }
@@ -244,6 +249,12 @@ void* network_host_thread(
   return 0;
 }
 
+void network_host_connections_accept(
+  struct network_host* network_host
+) {
+  network_host->connections_accept = 1;
+}
+
 void network_host_notification_send(
   struct network_host* network_host,
   char* notification,
@@ -314,13 +325,14 @@ void network_host_notification_on_add(
 void network_host_destroy(
   struct network_host* network_host
 ) {
-  network_host->online = 0;
+  if (
+    network_host->initialized != 1
+  ) {
+    return;
+  }
 
-  network_host_notification_send(
-    network_host,
-    "network_host::going_offline",
-    network_host_notification_type_default
-  );
+  network_host->connections_accept = 0;
+  network_host->online = 0;
 
   close(
     network_host->socket
@@ -331,12 +343,6 @@ void network_host_destroy(
     index_thread < network_host->length_threads;
     ++index_thread
   ) {
-    pthread_cancel(
-      network_host->threads[
-        index_thread
-      ]
-    );
-
     pthread_join(
       network_host->threads[
         index_thread
