@@ -35,8 +35,17 @@ struct network_host {
   void** notification_on_data;
   unsigned char length_notification_on;
 
+  pthread_mutex_t mutex_notification;
+
   fd_set file_descriptor_socket_set;
 };
+
+unsigned char network_host_listen_with_notification(
+  struct network_host*,
+  unsigned int,
+  network_host_notification_on,
+  void*
+);
 
 unsigned char network_host_listen(
   struct network_host*,

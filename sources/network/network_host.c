@@ -9,9 +9,11 @@
 #include <sys/socket.h>
 #include <unistd.h>
 
-unsigned char network_host_listen(
+unsigned char network_host_listen_with_notification(
   struct network_host* network_host,
-  unsigned int length_threads
+  unsigned int length_threads,
+  network_host_notification_on notification_on,
+  void* notification_on_data
 ) {
   network_host->socket = (
     socket(
@@ -114,7 +116,28 @@ unsigned char network_host_listen(
     )
   );
 
+  pthread_mutex_init(
+    &network_host->mutex_notification,
+    0
+  );
+
+  if (
+    notification_on != 0
+  ) {
+    network_host_notification_on_add(
+      network_host,
+      notification_on,
+      notification_on_data
+    );
+  }
+
   network_host->initialized = 1;
+
+  network_host_notification_send(
+    network_host,
+    "network_host::online_and_active",
+    network_host_notification_type_default
+  );
 
   for (
     unsigned int index_thread = 0;
@@ -132,6 +155,20 @@ unsigned char network_host_listen(
   }
 
   return 0;
+}
+
+unsigned char network_host_listen(
+  struct network_host* network_host,
+  unsigned int length_threads
+) {
+  return (
+    network_host_listen_with_notification(
+      network_host,
+      length_threads,
+      0,
+      0
+    )
+  );
 }
 
 void* network_host_thread(
@@ -253,6 +290,12 @@ void network_host_connections_accept(
   struct network_host* network_host
 ) {
   network_host->connections_accept = 1;
+
+  network_host_notification_send(
+    network_host,
+    "network_host::accepting_connections",
+    network_host_notification_type_default
+  );
 }
 
 void network_host_notification_send(
@@ -260,6 +303,10 @@ void network_host_notification_send(
   char* notification,
   enum network_host_notification_type network_host_notification_type
 ) {
+  pthread_mutex_lock(
+    &network_host->mutex_notification
+  );
+
   for (
     unsigned char index_notification_on = 0;
     index_notification_on < network_host->length_notification_on;
@@ -275,6 +322,10 @@ void network_host_notification_send(
       network_host_notification_type
     );
   }
+
+  pthread_mutex_unlock(
+    &network_host->mutex_notification
+  );
 }
 
 void network_host_notification_on_add(
@@ -282,6 +333,10 @@ void network_host_notification_on_add(
   network_host_notification_on notification_on,
   void* notification_on_data
 ) {
+  pthread_mutex_lock(
+    &network_host->mutex_notification
+  );
+
   network_host->length_notification_on = (
     network_host->length_notification_on +
     1
@@ -319,6 +374,10 @@ void network_host_notification_on_add(
     1
   ] = (
     notification_on_data
+  );
+
+  pthread_mutex_unlock(
+    &network_host->mutex_notification
   );
 }
 
