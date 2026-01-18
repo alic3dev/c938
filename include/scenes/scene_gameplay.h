@@ -13,7 +13,7 @@
 #include <CoreAudio/CoreAudio.h>
 #endif
 
-#define scene_gameplay_length_renderables 8
+#define scene_gameplay_length_renderables 9
 
 enum scene_gameplay_renderables_index {
   scene_gameplay_renderables_index_buildings = 0,
@@ -23,7 +23,8 @@ enum scene_gameplay_renderables_index {
   scene_gameplay_renderables_index_hud_boosted = 4,
   scene_gameplay_renderables_index_hud_jumping = 5,
   scene_gameplay_renderables_index_hud_jumping_secondary = 6,
-  scene_gameplay_renderables_index_crosshair = 7
+  scene_gameplay_renderables_index_crosshair = 7,
+  scene_gameplay_renderables_index_group_logging = 8
 };
 
 enum scene_gameplay_renderables_index_range {

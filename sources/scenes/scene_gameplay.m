@@ -130,6 +130,21 @@ void scene_gameplay_initialize(
           index_renderable,
           metil_renderable_type_group
         );
+
+        break;
+      case scene_gameplay_renderables_index_group_logging:
+        scene->renderables[
+          index_renderable
+        ].type = (
+          metil_renderable_type_group
+        );
+
+        scene->renderables[
+          index_renderable
+        ].renderable = (
+          &c938_data->logging.group
+        );
+
         break;
       default:
         metil_renderable_initialize_at_index(
@@ -137,6 +152,7 @@ void scene_gameplay_initialize(
           index_renderable,
           metil_renderable_type_object
         );
+        
         break;
     }
   }
@@ -662,6 +678,10 @@ void scene_gameplay_poll(
     scene->player.data
   );
 
+  c938_logging_poll(
+    metil
+  );
+
   if (
     player_data->on_ground == (
       player_data->index_target_building +
@@ -956,6 +976,11 @@ void scene_gameplay_destroy(
 
   scene->data = (
     (void*) 0
+  );
+
+  scene->length_renderables = (
+    scene->length_renderables -
+    1
   );
 
   metil_scene_destroy_default(

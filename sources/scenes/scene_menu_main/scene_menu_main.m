@@ -89,6 +89,12 @@ void scene_menu_main_initialize(
       case scene_menu_main_renderables_index_group_logging:
         scene->renderables[
           index_renderable
+        ].type = (
+          metil_renderable_type_group
+        );
+
+        scene->renderables[
+          index_renderable
         ].renderable = (
           &c938_data->logging.group
         );
