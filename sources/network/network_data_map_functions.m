@@ -2,6 +2,7 @@
 
 #include <data/network_data_map.h>
 #include <data/parameters_gameplay.h>
+#include <network/network.h>
 
 #include <clic3_bytes.h>
 #include <clic3_memory.h>
@@ -56,6 +57,7 @@ void network_data_map_set(
   );
 
   network_data_map->length = (
+    1 +
     length_parameters_gameplay +
     length_unsigned_int +
     length_bytes_buildings +
@@ -70,10 +72,17 @@ void network_data_map_set(
     network_data_map->length
   );
 
-  unsigned long int offset_bytes = 0;
+  unsigned long int offset_bytes = 1;
+
+  network_data_map->bytes[0] = (
+    network_command_datamap
+  );
 
   clic3_bytes_copy(
-    network_data_map->bytes,
+    (
+      network_data_map->bytes +
+      offset_bytes
+    ),
     parameters_gameplay,
     length_parameters_gameplay
   );
@@ -84,7 +93,10 @@ void network_data_map_set(
   );
 
   clic3_bytes_copy(
-    network_data_map->bytes,
+    (
+      network_data_map->bytes +
+      offset_bytes
+    ),
     &metil_group_buildings->length,
     length_parameters_gameplay
   );
@@ -135,7 +147,10 @@ void network_data_map_set(
   }
 
   clic3_bytes_copy(
-    network_data_map->bytes,
+    (
+      network_data_map->bytes +
+      offset_bytes
+    ),
     &metil_group_enemies->length,
     length_parameters_gameplay
   );
@@ -202,4 +217,15 @@ void network_data_map_set(
   pthread_mutex_unlock(
     &network_data_map->mutex
   );
+}
+
+void network_data_map_parse(
+  struct network_data_map* network_data_map,
+  struct parameters_gameplay* parameters_gameplay,
+  struct metil_group* metil_group_buildings,
+  struct metil_group* metil_group_enemies,
+  struct math_c_vector3_float* position_starting,
+  unsigned int* target_building
+) {
+
 }

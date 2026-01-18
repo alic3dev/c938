@@ -14,6 +14,12 @@ void network_data_map_initialize(
   struct network_data_map*
 );
 
+void network_data_map_bytes_set(
+  struct network_data_map*,
+  unsigned char*,
+  unsigned int
+);
+
 void network_data_map_destroy(
   struct network_data_map*
 );
