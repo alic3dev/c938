@@ -7,4 +7,9 @@
 
 #define c938_network_port 3938
 
+enum network_command {
+  network_command_initialize = 0x00,
+  network_command_datamap = 0x01
+};
+
 #endif
