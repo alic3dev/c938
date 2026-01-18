@@ -9,9 +9,11 @@
 #include <sys/socket.h>
 #include <unistd.h>
 
-unsigned char network_host_listen(
+unsigned char network_host_listen_with_notification(
   struct network_host* network_host,
-  unsigned int length_threads
+  unsigned int length_threads,
+  network_host_notification_on notification_on,
+  void* notification_on_data
 ) {
   network_host->socket = (
     socket(
@@ -84,6 +86,7 @@ unsigned char network_host_listen(
     &network_host->file_descriptor_socket_set
   );
 
+  network_host->connections_accept = 0;
   network_host->online = 1;
 
   network_host->length_threads = (
@@ -94,7 +97,8 @@ unsigned char network_host_listen(
     clic3_memory_allocate_raw(
       sizeof(
         pthread_t
-      )
+      ) *
+      network_host->length_threads
     )
   );
 
@@ -110,6 +114,29 @@ unsigned char network_host_listen(
     clic3_memory_allocate_raw(
       0
     )
+  );
+
+  pthread_mutex_init(
+    &network_host->mutex_notification,
+    0
+  );
+
+  if (
+    notification_on != 0
+  ) {
+    network_host_notification_on_add(
+      network_host,
+      notification_on,
+      notification_on_data
+    );
+  }
+
+  network_host->initialized = 1;
+
+  network_host_notification_send(
+    network_host,
+    "network_host::online_and_active",
+    network_host_notification_type_default
   );
 
   for (
@@ -128,6 +155,20 @@ unsigned char network_host_listen(
   }
 
   return 0;
+}
+
+unsigned char network_host_listen(
+  struct network_host* network_host,
+  unsigned int length_threads
+) {
+  return (
+    network_host_listen_with_notification(
+      network_host,
+      length_threads,
+      0,
+      0
+    )
+  );
 }
 
 void* network_host_thread(
@@ -157,7 +198,8 @@ void* network_host_thread(
     );
 
     if (
-      status_select != 1
+      status_select != 1 ||
+      network_host->connections_accept != 1
     ) {
       continue;
     }
@@ -244,11 +286,27 @@ void* network_host_thread(
   return 0;
 }
 
+void network_host_connections_accept(
+  struct network_host* network_host
+) {
+  network_host->connections_accept = 1;
+
+  network_host_notification_send(
+    network_host,
+    "network_host::accepting_connections",
+    network_host_notification_type_default
+  );
+}
+
 void network_host_notification_send(
   struct network_host* network_host,
   char* notification,
   enum network_host_notification_type network_host_notification_type
 ) {
+  pthread_mutex_lock(
+    &network_host->mutex_notification
+  );
+
   for (
     unsigned char index_notification_on = 0;
     index_notification_on < network_host->length_notification_on;
@@ -264,6 +322,10 @@ void network_host_notification_send(
       network_host_notification_type
     );
   }
+
+  pthread_mutex_unlock(
+    &network_host->mutex_notification
+  );
 }
 
 void network_host_notification_on_add(
@@ -271,6 +333,10 @@ void network_host_notification_on_add(
   network_host_notification_on notification_on,
   void* notification_on_data
 ) {
+  pthread_mutex_lock(
+    &network_host->mutex_notification
+  );
+
   network_host->length_notification_on = (
     network_host->length_notification_on +
     1
@@ -309,18 +375,23 @@ void network_host_notification_on_add(
   ] = (
     notification_on_data
   );
+
+  pthread_mutex_unlock(
+    &network_host->mutex_notification
+  );
 }
 
 void network_host_destroy(
   struct network_host* network_host
 ) {
-  network_host->online = 0;
+  if (
+    network_host->initialized != 1
+  ) {
+    return;
+  }
 
-  network_host_notification_send(
-    network_host,
-    "network_host::going_offline",
-    network_host_notification_type_default
-  );
+  network_host->connections_accept = 0;
+  network_host->online = 0;
 
   close(
     network_host->socket
@@ -331,12 +402,6 @@ void network_host_destroy(
     index_thread < network_host->length_threads;
     ++index_thread
   ) {
-    pthread_cancel(
-      network_host->threads[
-        index_thread
-      ]
-    );
-
     pthread_join(
       network_host->threads[
         index_thread

@@ -41,16 +41,17 @@ void generate_buildings(
     metil_group_buildings
   );
 
+  metil_group_add_length_initialize(
+    metil_group_buildings,
+    length_buildings,
+    metil_renderable_type_object
+  );
+
   for (
-    unsigned short int index_building = metil_group_buildings->length;
-    index_building < length_buildings;
+    unsigned short int index_building = 0;
+    index_building < metil_group_buildings->length;
     ++index_building
   ) {
-    metil_group_add_initialize(
-      metil_group_buildings,
-      metil_renderable_type_object
-    );
-
     object = metil_group_buildings->renderables[
       index_building
     ]->renderable;
