@@ -3,6 +3,7 @@
 #include <data/c938_data.h>
 
 #include <clic3_bytes.h>
+#include <clic3_char_arrays.h>
 #include <clic3_memory.h>
 
 #include <math_c_minimum.h>
@@ -22,6 +23,13 @@ void c938_logging_initialize(
   );
 
   c938_logging->stopwatches = (
+    clic3_memory_allocate_raw(
+      0
+    )
+  );
+
+  c938_logging->length_buffer_logs = 0;
+  c938_logging->buffer_logs = (
     clic3_memory_allocate_raw(
       0
     )
@@ -50,6 +58,48 @@ void c938_logging_log(
 
   pthread_mutex_lock(
     &c938_logging->mutex
+  );
+
+  c938_logging->length_buffer_logs = (
+    c938_logging->length_buffer_logs +
+    1
+  );
+
+  clic3_memory_reallocate_raw(
+    &c938_logging->buffer_logs,
+    (
+      sizeof(
+        void*
+      ) *
+      c938_logging->length_buffer_logs
+    )
+  );
+
+  c938_logging->buffer_logs[
+    c938_logging->length_buffer_logs -
+    1
+  ] = (
+    clic3_char_arrays_concatenate(
+      log,
+      ""
+    )
+  );
+
+  pthread_mutex_unlock(
+    &c938_logging->mutex
+  );
+}
+
+void c938_render_log(
+  struct metil* metil,
+  char* log
+) {
+  struct c938_data* c938_data = (
+    metil->data
+  );
+
+  struct c938_logging* c938_logging = &(
+    c938_data->logging
   );
 
   struct metil_group* metil_group_logging = &(
@@ -175,6 +225,30 @@ void c938_logging_poll(
   pthread_mutex_lock(
     &c938_logging->mutex
   );
+
+  for (
+    unsigned int index_buffer_log = 0;
+    index_buffer_log < c938_logging->length_buffer_logs;
+    ++index_buffer_log
+  ) {
+    c938_render_log(
+      metil,
+      c938_logging->buffer_logs[
+        index_buffer_log
+      ]
+    );
+  }
+
+  if (
+    c938_logging->length_buffer_logs > 0
+  ) {
+    c938_logging->length_buffer_logs = 0;
+
+    clic3_memory_reallocate_raw(
+      &c938_logging->buffer_logs,
+      0
+    );
+  }
 
   struct metil_group* metil_group_logging = (
     &c938_logging->group
@@ -312,6 +386,22 @@ void c938_logging_destroy(
   struct metil* metil,
   struct c938_logging* c938_logging
 ) {
+  for (
+    unsigned int index_buffer_log = 0;
+    index_buffer_log < c938_logging->length_buffer_logs;
+    ++index_buffer_log
+  ) {
+    clic3_memory_free_raw(
+      c938_logging->buffer_logs[
+        index_buffer_log
+      ]
+    );
+  }
+
+  clic3_memory_free_raw(
+    c938_logging->buffer_logs
+  );
+
   metil_group_destroy(
     metil,
     &c938_logging->group

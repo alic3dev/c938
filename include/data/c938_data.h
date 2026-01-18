@@ -5,6 +5,7 @@
 
 #include <data/parameters_gameplay.h>
 
+#include <network/network_client.h>
 #include <network/network_host.h>
 
 struct c938_data {
@@ -12,6 +13,7 @@ struct c938_data {
 
   struct parameters_gameplay parameters_gameplay;
 
+  struct network_client network_client;
   struct network_host network_host;
 };
 

@@ -1,5 +1,7 @@
 #include <network/network_host.h>
 
+#include <network/network.h>
+
 #include <clic3_char_arrays.h>
 #include <clic3_memory.h>
 
@@ -35,7 +37,7 @@ unsigned char network_host_listen_with_notification(
   
   network_host->address_socket.sin_port = (
     htons(
-      c938_network_host_port
+      c938_network_port
     )
   );
 
@@ -205,7 +207,11 @@ void* network_host_thread(
     }
 
     struct sockaddr address_socket_client;
-    socklen_t length_socket_client;
+    socklen_t length_socket_client = (
+      sizeof(
+        struct sockaddr
+      )
+    );
 
     int socket_client = (
       accept(
@@ -215,24 +221,70 @@ void* network_host_thread(
       )
     );
 
+    if (
+      socket_client < 0
+    ) {
+      continue;
+    }
+
     char* char_array_address_client = (
       clic3_memory_allocate_raw(
-        address_socket_client.sa_len +
         1
       )
     );
 
+    char_array_address_client[0] = '\0';
+
     for (
       unsigned char index_char_array_address_client = 0;
-      index_char_array_address_client < address_socket_client.sa_len;
+      index_char_array_address_client < network_length_address_ipv4;
       ++index_char_array_address_client
     ) {
-      char_array_address_client[
-        index_char_array_address_client
-      ] = (
-        address_socket_client.sa_data[
-          index_char_array_address_client
-        ]
+      char* char_array_address_client_part = (
+        clic3_char_array_from_unsigned_long_int(
+          address_socket_client.sa_data[
+            network_offset_socket_address_data_ipv4 +
+            index_char_array_address_client
+          ]
+        )
+      );
+
+      if (
+        index_char_array_address_client > 0
+      ) {
+        char* char_array_address_client_part_prefixed = (
+          clic3_char_arrays_concatenate(
+            ".",
+            char_array_address_client_part
+          )
+        );
+
+        clic3_memory_free_raw(
+          char_array_address_client_part
+        );
+
+        char_array_address_client_part = (
+          char_array_address_client_part_prefixed
+        );
+      }
+
+      char* char_array_address_client_part_joined = (
+        clic3_char_arrays_concatenate(
+          char_array_address_client,
+          char_array_address_client_part
+        )
+      );
+
+      clic3_memory_free_raw(
+        char_array_address_client_part
+      );
+
+      clic3_memory_free_raw(
+        char_array_address_client
+      );
+
+      char_array_address_client = (
+        char_array_address_client_part_joined
       );
     }
 
@@ -240,15 +292,9 @@ void* network_host_thread(
       address_socket_client.sa_len
     ] = '\0';
 
-    if (
-      socket_client < 0
-    ) {
-      continue;
-    }
-
     char* notification_prefix = (
       clic3_char_arrays_concatenate(
-        "client_connected->{",
+        "network_host::client_connected->{",
         char_array_address_client
       )
     );
@@ -398,6 +444,18 @@ void network_host_destroy(
   );
 
   for (
+    unsigned int index_client = 0;
+    index_client < network_host->length_clients;
+    ++index_client
+  ) {
+    close(
+      network_host->socket_clients[
+        index_client
+      ]
+    );
+  }
+
+  for (
     unsigned char index_thread = 0;
     index_thread < network_host->length_threads;
     ++index_thread
@@ -409,6 +467,10 @@ void network_host_destroy(
       0
     );
   }
+
+  clic3_memory_free_raw(
+    network_host->socket_clients
+  );
 
   clic3_memory_free_raw(
     network_host->threads
