@@ -13,6 +13,9 @@ struct c938_logging {
   struct metil_group group;
   struct metil_stopwatch* _Nonnull stopwatches;
 
+  char* _Nonnull * _Nonnull buffer_logs;
+  unsigned int length_buffer_logs;
+
   float position_y;
   float scale;
 
