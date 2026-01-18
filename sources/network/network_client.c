@@ -211,19 +211,6 @@ void* network_client_receiving_thread(
         break;
       }
       case network_command_datamap: {
-        for (
-          unsigned short int index_byte = 0;
-          index_byte < length_data_received;
-          ++index_byte
-        ) {
-          printf(
-          "%.2x ",
-            data_host[
-              index_byte
-            ]
-          );
-        }
-
         network_data_map_bytes_set(
           &network_client->data_map,
           data_host,

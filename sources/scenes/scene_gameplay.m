@@ -319,6 +319,154 @@ void scene_gameplay_populate(
   struct metil_scene* scene,
   unsigned char reset
 ) {
+  struct c938_data* c938_data = (
+    metil->data
+  );
+
+  struct network_client* network_client = &(
+    c938_data->network_client
+  );
+
+  struct scene_gameplay_data* scene_gameplay_data = (
+    scene->data
+  );
+
+  struct player_data* player_data = (
+    scene->player.data
+  );
+
+  struct metil_group* metil_group_buildings = (
+    scene->renderables[
+      scene_gameplay_renderables_index_buildings
+    ].renderable
+  );
+
+  struct metil_group* metil_group_enemies = (
+    scene->renderables[
+      scene_gameplay_renderables_index_enemies
+    ].renderable
+  );
+
+  struct metil_group* metil_group_projectiles = (
+    scene->renderables[
+      scene_gameplay_renderables_index_projectiles
+    ].renderable
+  );
+
+  metil_group_destroy(
+    metil,
+    metil_group_projectiles
+  );
+
+  metil_group_initialize(
+    metil_group_projectiles
+  );
+
+  scene->player.rotation.x = 0.0f;
+  scene->player.rotation.y = 0.0f;
+  scene->player.rotation.z = 0.0f;
+
+  scene->player.velocity.x = 0.0f;
+  scene->player.velocity.y = 0.0f;
+  scene->player.velocity.z = 0.0f;
+
+  player_data_initialize(
+    player_data,
+    metil->rendering_properties.camera.height_default
+  );
+
+  player_data->time = &(
+    scene->time
+  );
+
+  scene_gameplay_data->length_projectiles = 0;
+
+  for (
+    unsigned char index_projectile = 0;
+    index_projectile < scene_gameplay_data_length_projectiles_maximum;
+    ++index_projectile
+  ) {
+    scene_gameplay_data->fired_projectiles[
+      index_projectile
+    ] = (
+      0
+    );
+  }
+
+  player_data->metal_device = (
+    metil->renderer_interface.metal_device
+  );
+
+  player_data->buildings = (
+    metil_group_buildings
+  );
+
+  player_data->projectiles = (
+    metil_group_projectiles
+  );
+
+  player_data->height = (
+    metil->rendering_properties.camera.height
+  );
+
+  if (
+    (
+      scene_gameplay_data->parameters->networked ==
+      parameters_gameplay_networked_client
+    ) &&
+    network_client->status != network_client_status_quitting &&
+    network_client->status != network_client_status_none
+  ) {
+    unsigned char networked = (
+      scene_gameplay_data->parameters->networked
+    );
+    
+    network_data_map_parse(
+      metil,
+      &network_client->data_map,
+      scene_gameplay_data->parameters,
+      metil_group_buildings,
+      metil_group_enemies,
+      &scene->player.position,
+      &player_data->index_target_building,
+      scene->textures[
+        scene_gameplay_textures_index_buildings
+      ]
+    );
+
+    scene_gameplay_data->parameters->networked = (
+      networked
+    );
+
+    scene_gameplay_data->speed_movement = (
+      scene_gameplay_data->parameters->speed_movement
+    );
+
+    scene->player.speed_movement = (
+      scene_gameplay_data->speed_movement
+    );
+
+    scene_gameplay_data->length_buildings = (
+      scene_gameplay_data->parameters->length_buildings
+    );
+
+    scene_gameplay_data->length_enemies = (
+      scene_gameplay_data->parameters->length_enemies
+    );
+
+    struct metil_object* metil_object_player = (
+      scene->renderables[
+        scene_gameplay_renderables_index_player
+      ].renderable
+    );
+
+    metil_object_player->position.y = (
+      scene->player.position.y
+    );
+
+    return;
+  }
+
   struct rand_parameters rand_parameters;
   struct rand_source rand_source;
   struct rand_result rand_result;
@@ -336,10 +484,6 @@ void scene_gameplay_populate(
     &rand_source,
     &rand_result,
     &rand_parameters
-  );
-
-  struct scene_gameplay_data* scene_gameplay_data = (
-    scene->data
   );
 
   if (
@@ -413,23 +557,6 @@ void scene_gameplay_populate(
     }
   }
 
-  scene->player.rotation.x = 0.0f;
-  scene->player.rotation.y = 0.0f;
-  scene->player.rotation.z = 0.0f;
-
-  scene->player.velocity.x = 0.0f;
-  scene->player.velocity.y = 0.0f;
-  scene->player.velocity.z = 0.0f;
-
-  struct player_data* player_data = (
-    scene->player.data
-  );
-
-  player_data_initialize(
-    player_data,
-    metil->rendering_properties.camera.height_default
-  );
-
   if (
     scene_gameplay_data->parameters->objective == gameplay_objective_target
   ) {
@@ -449,45 +576,6 @@ void scene_gameplay_populate(
       scene_gameplay_data->length_buildings
     );
   }
-
-  player_data->time = &(
-    scene->time
-  );
-
-  scene_gameplay_data->length_projectiles = 0;
-
-  for (
-    unsigned char index_projectile = 0;
-    index_projectile < scene_gameplay_data_length_projectiles_maximum;
-    ++index_projectile
-  ) {
-    scene_gameplay_data->fired_projectiles[
-      index_projectile
-    ] = (
-      0
-    );
-  }
-
-  struct metil_group* metil_group_buildings = (
-    scene->renderables[
-      scene_gameplay_renderables_index_buildings
-    ].renderable
-  );
-
-  struct metil_group* metil_group_projectiles = (
-    scene->renderables[
-      scene_gameplay_renderables_index_projectiles
-    ].renderable
-  );
-
-  metil_group_destroy(
-    metil,
-    metil_group_projectiles
-  );
-
-  metil_group_initialize(
-    metil_group_projectiles
-  );
 
   generate_buildings(
     metil,
@@ -521,28 +609,6 @@ void scene_gameplay_populate(
 
   object->position.y = scene->player.position.y;
 
-  player_data->metal_device = (
-    metil->renderer_interface.metal_device
-  );
-
-  player_data->buildings = (
-    metil_group_buildings
-  );
-
-  player_data->projectiles = (
-    metil_group_projectiles
-  );
-
-  player_data->height = (
-    metil->rendering_properties.camera.height
-  );
-
-  struct metil_group* metil_group_enemies = (
-    scene->renderables[
-      scene_gameplay_renderables_index_enemies
-    ].renderable
-  );
-
   metil_group_destroy(
     metil,
     metil_group_enemies
@@ -554,20 +620,21 @@ void scene_gameplay_populate(
 
   float distance_minimum = 200.0f;
 
+  metil_group_add_length_initialize(
+    metil_group_enemies,
+    scene_gameplay_data->length_enemies,
+    metil_renderable_type_object
+  );
+
   for (
     unsigned int index_enemy = 0;
-    index_enemy < scene_gameplay_data->length_enemies;
+    index_enemy < metil_group_enemies->length;
     ++index_enemy
   ) {
     rand_get(
       &rand_source,
       &rand_result,
       &rand_parameters
-    );
-
-    metil_group_add_initialize(
-      metil_group_enemies,
-      metil_renderable_type_object
     );
 
     struct metil_object* metil_object_enemy = (

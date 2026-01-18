@@ -6,8 +6,11 @@
 
 #include <math_c_vector.h>
 
+#include <metil.h>
 #include <metil_group.h>
 #include <metil_object/metil_object.h>
+
+#include <Metal/MTLTexture.h>
 
 void network_data_map_set(
   struct network_data_map* _Nonnull,
@@ -18,14 +21,15 @@ void network_data_map_set(
   unsigned int
 );
 
-
 void network_data_map_parse(
+  struct metil* _Nonnull,
   struct network_data_map* _Nonnull,
   struct parameters_gameplay* _Nonnull,
   struct metil_group* _Nonnull,
   struct metil_group* _Nonnull,
   struct math_c_vector3_float* _Nonnull,
-  unsigned int* _Nonnull
+  unsigned int* _Nonnull,
+  id<MTLTexture> _Nonnull
 );
 
 #endif
