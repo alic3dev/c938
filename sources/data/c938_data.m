@@ -12,6 +12,9 @@ void c938_data_initialize(
   );
 
   c938_data->network_host.initialized = 0;
+  c938_data->network_client.status = (
+    network_client_status_none
+  );
 }
 
 void c938_data_destroy(
