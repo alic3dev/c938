@@ -532,7 +532,9 @@ void* network_host_client_receiving_thread(
   while (
     network_host->online
   ) {
-    char data_client[50000];
+    char data_client[
+      c938_network_data_transfer_limit
+    ];
     
     long int length_data_client = (
       recv(
@@ -540,7 +542,7 @@ void* network_host_client_receiving_thread(
           index_client
         ],
         data_client,
-        50000,
+        c938_network_data_transfer_limit,
         0
       )
     );
@@ -598,7 +600,7 @@ void* network_host_client_sending_thread(
           &network_host->data_map.mutex
         );
         
-        long int jdslafkj = (
+        long int length_bytes_sent = (
           send(
             network_host->socket_clients[
               index_client
