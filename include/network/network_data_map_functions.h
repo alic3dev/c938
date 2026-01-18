@@ -18,4 +18,14 @@ void network_data_map_set(
   unsigned int
 );
 
+
+void network_data_map_parse(
+  struct network_data_map* _Nonnull,
+  struct parameters_gameplay* _Nonnull,
+  struct metil_group* _Nonnull,
+  struct metil_group* _Nonnull,
+  struct math_c_vector3_float* _Nonnull,
+  unsigned int* _Nonnull
+);
+
 #endif

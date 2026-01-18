@@ -218,3 +218,14 @@ void network_data_map_set(
     &network_data_map->mutex
   );
 }
+
+void network_data_map_parse(
+  struct network_data_map* network_data_map,
+  struct parameters_gameplay* parameters_gameplay,
+  struct metil_group* metil_group_buildings,
+  struct metil_group* metil_group_enemies,
+  struct math_c_vector3_float* position_starting,
+  unsigned int* target_building
+) {
+
+}
