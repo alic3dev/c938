@@ -47,20 +47,6 @@ void generate_buildings(
     metil_renderable_type_object
   );
 
-  for (
-    unsigned int index_building = 0;
-    index_building < metil_group_buildings->length;
-    ++index_building
-  ) {
-    object = metil_group_buildings->renderables[
-      index_building
-    ]->renderable;
-
-    object->index_pipeline_render = (
-      c938_pipeline_index_building
-    );
-  }
-
   struct math_c_vector2_float size_maximum = {
     .x = 0.0f,
     .y = 0.0f
@@ -96,6 +82,10 @@ void generate_buildings(
       metil_group_buildings->renderables[
         index_building
       ]->renderable
+    );
+
+    object->index_pipeline_render = (
+      c938_pipeline_index_building
     );
 
     mesh_building_initialize(
