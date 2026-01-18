@@ -1227,9 +1227,11 @@ void scene_menu_main_poll(
             );
 
             unsigned char status_network_host_listen = (
-              network_host_listen(
+              network_host_listen_with_notification(
                 &c938_data->network_host,
-                metil->system_information.cores_cpu
+                metil->system_information.cores_cpu,
+                network_host_notification,
+                metil
               )
             );
 
@@ -1252,18 +1254,6 @@ void scene_menu_main_poll(
             } else {
               network_host_connections_accept(
                 &c938_data->network_host
-              );
-
-              network_host_notification_on_add(
-                &c938_data->network_host,
-                network_host_notification,
-                metil
-              );
-
-              network_host_notification_send(
-                &c938_data->network_host,
-                "network_host::online_and_active",
-                network_host_notification_type_default
               );
 
               metil_scene_controller_scene_change(
