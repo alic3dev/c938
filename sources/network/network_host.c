@@ -2,6 +2,7 @@
 
 #include <network/network.h>
 
+#include <clic3_bytes.h>
 #include <clic3_char_arrays.h>
 #include <clic3_memory.h>
 
@@ -10,6 +11,8 @@
 #include <pthread.h>
 #include <sys/socket.h>
 #include <unistd.h>
+
+#include <stdio.h>
 
 unsigned char network_host_listen_with_notification(
   struct network_host* network_host,
@@ -92,7 +95,7 @@ unsigned char network_host_listen_with_notification(
   network_host->online = 1;
 
   network_host->length_threads = (
-    length_threads
+    1
   );
 
   network_host->threads = (
@@ -133,6 +136,34 @@ unsigned char network_host_listen_with_notification(
     );
   }
 
+  network_data_map_initialize(
+    &network_host->data_map
+  );
+
+  network_host->socket_clients = (
+    clic3_memory_allocate_raw(
+      0
+    )
+  );
+
+  network_host->clients_command_sending = (
+    clic3_memory_allocate_raw(
+      0
+    )
+  );
+
+  network_host->mutex_clients = (
+    clic3_memory_allocate_raw(
+      0
+    )
+  );
+
+  network_host->mutex_clients_sending = (
+    clic3_memory_allocate_raw(
+      0
+    )
+  );
+
   network_host->initialized = 1;
 
   network_host_notification_send(
@@ -141,21 +172,16 @@ unsigned char network_host_listen_with_notification(
     network_host_notification_type_default
   );
 
-  for (
-    unsigned int index_thread = 0;
-    index_thread < network_host->length_threads;
-    ++index_thread
-  ) {
-    pthread_create(
-      &network_host->threads[
-        index_thread
-      ],
-      0,
-      network_host_thread,
-      network_host
-    );
-  }
-
+  pthread_create(
+    &network_host->threads[
+      network_host->length_threads -
+      1
+    ],
+    0,
+    network_host_routing_thread,
+    network_host
+  );
+  
   return 0;
 }
 
@@ -173,7 +199,7 @@ unsigned char network_host_listen(
   );
 }
 
-void* network_host_thread(
+void* network_host_routing_thread(
   void* data
 ) {
   struct network_host* network_host = (
@@ -324,12 +350,333 @@ void* network_host_thread(
       notification
     );
 
-    close(
+    pthread_mutex_lock(
+      &network_host->mutex_thread
+    );
+
+    network_host->length_threads = (
+      network_host->length_threads +
+      2
+    );
+
+    clic3_memory_reallocate_raw(
+      &network_host->threads,
+      (
+        sizeof(
+          pthread_t
+        ) *
+        network_host->length_threads
+      )
+    );
+
+    static struct network_host_client_thread_data* network_host_client_receiving_thread_data;
+    static struct network_host_client_thread_data* network_host_client_sending_thread_data;
+
+    network_host_client_receiving_thread_data = (
+      clic3_memory_allocate_raw(
+        sizeof(
+          struct network_host_client_thread_data
+        )
+      )
+    );
+
+    network_host_client_sending_thread_data = (
+      clic3_memory_allocate_raw(
+        sizeof(
+          struct network_host_client_thread_data
+        )
+      )
+    );
+
+    network_host_client_receiving_thread_data->network_host = (
+      network_host
+    );
+
+    network_host_client_receiving_thread_data->index_client = (
+      network_host->length_clients
+    );
+
+    clic3_bytes_copy(
+      network_host_client_sending_thread_data,
+      network_host_client_receiving_thread_data,
+      sizeof(
+        struct network_host_client_thread_data
+      )
+    );
+
+    network_host->length_clients = (
+      network_host->length_clients +
+      1
+    );
+
+    clic3_memory_reallocate_raw(
+      &network_host->socket_clients,
+      (
+        sizeof(
+          int
+        ) *
+        network_host->length_clients
+      )
+    );
+
+    clic3_memory_reallocate_raw(
+      &network_host->clients_command_sending,
+      (
+        sizeof(
+          enum network_host_client_command_sending
+        ) *
+        network_host->length_clients
+      )
+    );
+
+    clic3_memory_reallocate_raw(
+      &network_host->mutex_clients,
+      (
+        sizeof(
+          pthread_mutex_t
+        ) *
+        network_host->length_clients
+      )
+    );
+
+    clic3_memory_reallocate_raw(
+      &network_host->mutex_clients_sending,
+      (
+        sizeof(
+          pthread_mutex_t
+        ) *
+        network_host->length_clients
+      )
+    );
+
+    network_host->socket_clients[
+      network_host_client_sending_thread_data->index_client
+    ] = (
       socket_client
+    );
+
+    network_host->clients_command_sending[
+      network_host_client_sending_thread_data->index_client
+    ] = (
+      network_host_client_command_sending_none
+    );
+
+    pthread_mutex_init(
+      &network_host->mutex_clients[
+        network_host_client_sending_thread_data->index_client
+      ],
+      0
+    );
+
+    pthread_mutex_init(
+      &network_host->mutex_clients_sending[
+        network_host_client_sending_thread_data->index_client
+      ],
+      0
+    );
+
+    pthread_mutex_lock(
+      &network_host->mutex_clients_sending[
+        network_host_client_sending_thread_data->index_client
+      ]
+    );
+
+    pthread_create(
+      &network_host->threads[
+        network_host->length_threads -
+        1
+      ],
+      0,
+      network_host_client_receiving_thread,
+      network_host_client_receiving_thread_data
+    );
+
+    pthread_create(
+      &network_host->threads[
+        network_host->length_threads -
+        1
+      ],
+      0,
+      network_host_client_sending_thread,
+      network_host_client_sending_thread_data
+    );
+
+    pthread_mutex_unlock(
+      &network_host->mutex_thread
+    );
+
+    network_host_data_map_client_index_send(
+      network_host,
+      network_host_client_sending_thread_data->index_client
     );
   }
 
   return 0;
+}
+
+void* network_host_client_receiving_thread(
+  void* data
+) {
+  struct network_host_client_thread_data* network_host_client_thread_data = (
+    data
+  );
+
+  struct network_host* network_host = (
+    network_host_client_thread_data->network_host
+  );
+
+  unsigned int index_client = (
+    network_host_client_thread_data->index_client
+  );
+
+  while (
+    network_host->online
+  ) {
+    char data_client[50000];
+    
+    long int length_data_client = (
+      recv(
+        network_host->socket_clients[
+          index_client
+        ],
+        data_client,
+        50000,
+        0
+      )
+    );
+  }
+
+  clic3_memory_free_raw(
+    network_host_client_thread_data
+  );
+
+  return 0;
+}
+
+void* network_host_client_sending_thread(
+  void* data
+) {
+  struct network_host_client_thread_data* network_host_client_thread_data = (
+    data
+  );
+
+  struct network_host* network_host = (
+    network_host_client_thread_data->network_host
+  );
+
+  unsigned int index_client = (
+    network_host_client_thread_data->index_client
+  );
+
+  unsigned char quitting = 0;
+
+  while (
+    network_host->online &&
+    quitting == 0
+  ) {
+    pthread_mutex_lock(
+      &network_host->mutex_clients_sending[
+        index_client
+      ]
+    );
+
+    enum network_host_client_command_sending network_host_client_command_sending = (
+      network_host->clients_command_sending[
+        index_client
+      ]
+    );
+
+    switch(
+      network_host_client_command_sending
+    ) {
+      case network_host_client_command_sending_quitting: {
+        quitting = 1;
+        break;
+      }
+      case network_host_client_command_sending_data_map: {
+        pthread_mutex_lock(
+          &network_host->data_map.mutex
+        );
+        
+        long int jdslafkj = (
+          send(
+            network_host->socket_clients[
+              index_client
+            ],
+            network_host->data_map.bytes,
+            network_host->data_map.length,
+            0
+          )
+        );
+
+        pthread_mutex_unlock(
+          &network_host->data_map.mutex
+        );
+      }
+      case network_host_client_command_sending_none:
+      default: {
+        break;
+      }
+    }
+
+    pthread_mutex_unlock(
+      &network_host->mutex_clients[
+        index_client
+      ]
+    );
+  }
+
+  clic3_memory_free_raw(
+    network_host_client_thread_data
+  );
+
+  return 0;
+}
+
+void network_host_data_map_client_index_send(
+  struct network_host* network_host,
+  unsigned int index_client
+) {
+  pthread_mutex_lock(
+    &network_host->mutex_clients[
+      index_client
+    ]
+  );
+
+  network_host->clients_command_sending[
+    index_client
+  ] = (
+    network_host_client_command_sending_data_map
+  );
+
+  pthread_mutex_unlock(
+    &network_host->mutex_clients_sending[
+      index_client
+    ]
+  );
+}
+
+void network_host_data_map_send(
+  struct network_host* network_host
+) {
+  pthread_mutex_lock(
+    &network_host->mutex_thread
+  );
+
+  for (
+    unsigned int index_client = 0;
+    index_client < network_host->length_clients;
+    ++index_client
+  ) {
+    network_host_data_map_client_index_send(
+      network_host,
+      index_client
+    );
+  }
+
+  pthread_mutex_unlock(
+    &network_host->mutex_thread
+  );
 }
 
 void network_host_connections_accept(
@@ -448,6 +795,18 @@ void network_host_destroy(
     index_client < network_host->length_clients;
     ++index_client
   ) {
+    network_host->clients_command_sending[
+      index_client
+    ] = (
+      network_host_client_command_sending_quitting
+    );
+
+    pthread_mutex_unlock(
+      &network_host->mutex_clients_sending[
+        index_client
+      ]
+    );
+
     close(
       network_host->socket_clients[
         index_client
@@ -468,8 +827,50 @@ void network_host_destroy(
     );
   }
 
+  for (
+    unsigned int index_client = 0;
+    index_client < network_host->length_clients;
+    ++index_client
+  ) {
+    pthread_mutex_destroy(
+      &network_host->mutex_clients[
+        index_client
+      ]
+    );
+
+    pthread_mutex_destroy(
+      &network_host->mutex_clients_sending[
+        index_client
+      ]
+    );
+  }
+
+  pthread_mutex_destroy(
+    &network_host->mutex_notification
+  );
+
+  pthread_mutex_destroy(
+    &network_host->mutex_thread
+  );
+
+  network_data_map_destroy(
+    &network_host->data_map
+  );
+
   clic3_memory_free_raw(
     network_host->socket_clients
+  );
+
+  clic3_memory_free_raw(
+    network_host->clients_command_sending
+  );
+
+  clic3_memory_free_raw(
+    network_host->mutex_clients
+  );
+
+  clic3_memory_free_raw(
+    network_host->mutex_clients_sending
   );
 
   clic3_memory_free_raw(

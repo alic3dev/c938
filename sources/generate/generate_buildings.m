@@ -25,8 +25,8 @@ void generate_buildings(
   struct metil* metil,
   id<MTLDevice> metal_device,
   struct metil_group* metil_group_buildings,
-  unsigned short int length_buildings,
-  unsigned short int index_target_building,
+  unsigned int length_buildings,
+  unsigned int index_target_building,
   id<MTLTexture> texture
 ) {
   struct metil_object* object = (void*) 0;
@@ -48,7 +48,7 @@ void generate_buildings(
   );
 
   for (
-    unsigned short int index_building = 0;
+    unsigned int index_building = 0;
     index_building < metil_group_buildings->length;
     ++index_building
   ) {
@@ -82,7 +82,7 @@ void generate_buildings(
   );
 
   for (
-    unsigned char index_building = 1;
+    unsigned int index_building = 1;
     index_building < length_buildings;
     ++index_building
   ) {

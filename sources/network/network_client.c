@@ -86,6 +86,41 @@ unsigned char network_client_connect(
 
   printf("connected\n");
 
+  char data_host[50000];
+
+  long int length_data_received = (
+    recv(
+      network_client->socket,
+      data_host,
+      50000,
+      0
+    )
+  );
+
+  if (
+    length_data_received > 50000
+  ) {
+    return 3;
+  }
+
+  for (
+    unsigned short int index_byte = 0;
+    index_byte < length_data_received;
+    ++index_byte
+  ) {
+    printf(
+      "%.2x ",
+      data_host[
+        index_byte
+      ]
+    );
+  }
+
+  printf(
+    "\nreceived->{%li::bytes};\n",
+    length_data_received
+  );
+
   close(
     network_client->socket
   );

@@ -1,5 +1,6 @@
 #include <scenes/scene_gameplay.h>
 
+#include <c938_pipeline_index.h>
 #include <data/c938_data.h>
 #include <data/enemy_data.h>
 #include <data/parameters_gameplay.h>
@@ -9,12 +10,12 @@
 #include <generate/generate_buildings.h>
 #include <mesh/mesh_hud_item.h>
 #include <mesh/mesh_player.h>
+#include <network/network_data_map_functions.h>
+#include <network/network_host.h>
 #include <objects/object_crosshair.h>
 #include <objects/object_enemy.h>
-#include <c938_pipeline_index.h>
 #include <player.h>
-#include <data/player_data.h>
-#include <data/projectile_data.h>
+
 #include <textures/textures_buildings.h>
 
 #include <metil.h>
@@ -664,6 +665,32 @@ void scene_gameplay_populate(
     &rand_result,
     &rand_source
   );
+
+  if (
+    scene_gameplay_data->parameters->networked ==
+    parameters_gameplay_networked_host
+  ) {
+    struct c938_data* c938_data = (
+      metil->data
+    );
+
+    struct network_host* network_host = (
+      &c938_data->network_host
+    );
+
+    network_data_map_set(
+      &network_host->data_map,
+      scene_gameplay_data->parameters,
+      metil_group_buildings,
+      metil_group_enemies,
+      &scene->player.position,
+      player_data->index_target_building
+    );
+
+    network_host_data_map_send(
+      network_host
+    );
+  }
 }
 
 void scene_gameplay_poll(
