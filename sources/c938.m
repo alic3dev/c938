@@ -241,7 +241,7 @@ void c938_renderer_on_initialize(
   metil_termination_on_function_add(
     &metil->termination,
     c938_termination,
-    c938_data
+    metil
   );
 
   struct metil_scene_controller* metil_scene_controller = (
@@ -300,8 +300,17 @@ void c938_on_scene_change(
 void c938_termination(
   void* data
 ) {
-  struct c938_data* c938_data = (
+  struct metil* metil = (
     data
+  );
+
+  struct c938_data* c938_data = (
+    metil->data
+  );
+
+  c938_data_destroy(
+    metil,
+    c938_data
   );
 
   clic3_memory_free_raw(

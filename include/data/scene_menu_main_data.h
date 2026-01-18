@@ -21,8 +21,6 @@ struct scene_menu_main_data {
   FILE* _Nonnull file_audio;
 
   struct parameters_gameplay* _Nonnull parameters_gameplay;
-
-  struct network_host network_host;
 };
 
 #endif

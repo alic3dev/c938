@@ -715,8 +715,16 @@ void scene_menu_main_poll(
   struct metil* metil,
   struct metil_scene* scene
 ) {
+  struct c938_data* c938_data = (
+    metil->data
+  );
+
   struct scene_menu_main_data* data = (
     scene->data
+  );
+
+  c938_logging_poll(
+    metil
   );
 
   data->angle = fmod((
@@ -1214,7 +1222,7 @@ void scene_menu_main_poll(
 
             unsigned char status_network_host_listen = (
               network_host_listen(
-                &data->network_host,
+                &c938_data->network_host,
                 metil->system_information.cores_cpu
               )
             );
@@ -1229,21 +1237,25 @@ void scene_menu_main_poll(
 
               network_host_notification(
                 "network_host::creation_failed",
-                0,
+                metil,
                 network_host_notification_type_error
               );
 
               menu->index_selected = -1;
-              menu->handled = 0;
+              menu->handled = 1;
             } else {
+              network_host_connections_accept(
+                &c938_data->network_host
+              );
+
               network_host_notification_on_add(
-                &data->network_host,
+                &c938_data->network_host,
                 network_host_notification,
-                0
+                metil
               );
 
               network_host_notification_send(
-                &data->network_host,
+                &c938_data->network_host,
                 "network_host::online_and_active",
                 network_host_notification_type_default
               );
@@ -1253,6 +1265,8 @@ void scene_menu_main_poll(
                 metil->scene_controller,
                 scene_id_gameplay
               );
+
+              return;
             }
           }
 
@@ -1798,11 +1812,7 @@ void scene_menu_main_destroy(
   struct scene_menu_main_data* scene_menu_main_data = (
     scene->data
   );
-
-  network_host_destroy(
-    &scene_menu_main_data->network_host
-  );
-
+  
   metil_menu_destroy(
     &scene_menu_main_data->menu_main
   );
@@ -1827,6 +1837,23 @@ void network_host_notification(
   void* data,
   enum network_host_notification_type network_host_notification_type
 ) {
+  struct metil* metil = (
+    data
+  );
+
+  struct c938_data* c938_data = (
+    metil->data
+  );
+
+  struct c938_logging* c938_logging = (
+    &c938_data->logging
+  );
+
+  c938_logging_log(
+    metil,
+    notification
+  );
+
   FILE* stream_output;
   const char* color;
 
