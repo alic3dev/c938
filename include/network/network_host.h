@@ -6,8 +6,6 @@
 #include <sys/socket.h>
 #include <unistd.h>
 
-#define c938_network_host_port 3938
-
 enum network_host_notification_type {
   network_host_notification_type_default = 0,
   network_host_notification_type_error = 1
@@ -21,6 +19,9 @@ typedef void (*network_host_notification_on)(
 
 struct network_host {
   int socket;
+  
+  int* socket_clients;
+  unsigned int length_clients;
 
   struct sockaddr_in address_socket;
 
