@@ -1,7 +1,7 @@
 #ifndef __c938_logging_h
 #define __c938_logging_h
 
-#define c938_logging_time_display_length 10000
+#define c938_logging_time_display_length 3938
 
 #include <metil.h>
 #include <metil_group.h>
@@ -12,6 +12,9 @@
 struct c938_logging {
   struct metil_group group;
   struct metil_stopwatch* _Nonnull stopwatches;
+
+  float position_y;
+  float scale;
 
   pthread_mutex_t mutex;
 };

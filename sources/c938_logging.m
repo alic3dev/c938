@@ -2,7 +2,11 @@
 
 #include <data/c938_data.h>
 
+#include <clic3_bytes.h>
 #include <clic3_memory.h>
+
+#include <math_c_minimum.h>
+#include <math_c_vector.h>
 
 #include <metil.h>
 #include <metil_group.h>
@@ -22,6 +26,9 @@ void c938_logging_initialize(
       0
     )
   );
+
+  c938_logging->position_y = 1.0f;
+  c938_logging->scale = 0.5f;
 
   pthread_mutex_init(
     &c938_logging->mutex,
@@ -88,6 +95,67 @@ void c938_logging_log(
     log
   );
 
+  for (
+    unsigned char index_vertex = 0;
+    index_vertex < metil_object_log->mesh.length_vertices;
+    ++index_vertex
+  ) {
+    struct math_c_vector4_float* vertices = (
+      metil_object_log->buffers_vertex[
+        metil_object_buffer_default_index_vertices
+      ].buffer.contents
+    );
+
+    vertices[
+      index_vertex
+    ].x = (
+      (
+        vertices[
+          index_vertex
+        ].x +
+        metil_object_log->mesh.size.x /
+        2.0f
+      ) *
+      c938_logging->scale
+    );
+
+    vertices[
+      index_vertex
+    ].y = (
+      (
+        vertices[
+          index_vertex
+        ].y -
+        metil_object_log->mesh.size.y /
+        2.0f
+      ) *
+      c938_logging->scale
+    );
+  }
+
+  metil_object_log->position.x = (
+    -1.0f
+  );
+
+  metil_object_log->mesh.size.x = (
+    metil_object_log->mesh.size.x *
+    c938_logging->scale
+  );
+
+  metil_object_log->mesh.size.y = (
+    metil_object_log->mesh.size.y *
+    c938_logging->scale
+  );
+
+  metil_object_log->position.y = (
+    c938_logging->position_y
+  );
+
+  c938_logging->position_y = (
+    c938_logging->position_y -
+    metil_object_log->mesh.size.y
+  );
+
   pthread_mutex_unlock(
     &c938_logging->mutex
   );
@@ -138,62 +206,96 @@ void c938_logging_poll(
     );
 
     float time_elapsed_percentage = (
-      (float) time_elapsed /
-      (float) c938_logging_time_display_length
+      math_c_minimum_float(
+        (
+          (float) time_elapsed /
+          (float) c938_logging_time_display_length
+        ),
+        1.0f
+      )
     );
 
     if (
-      // time_elapsed_percentage > 1.0f
-      0
+      time_elapsed >= c938_logging_time_display_length
     ) {
-      // printf("WHAT\n");
-      // metil_group_destroy_renderable_at_index(
-      //   metil,
-      //   metil_group_logging,
-      //   index_log
-      // );
+      c938_logging->position_y = (
+        c938_logging->position_y +
+        metil_object_log->mesh.size.y
+      );
 
-      // for (
-      //   unsigned int index_stopwatch = index_log;
-      //   index_stopwatch < metil_group_logging->length;
-      //   ++index_stopwatch
-      // ) {
-      //   c938_logging->stopwatches[
-      //     index_log
-      //   ] = (
-      //     c938_logging->stopwatches[
-      //       index_log +
-      //       1
-      //     ]
-      //   );
-      // }
+      for (
+        unsigned short int index_log_positioning = (
+          index_log +
+          1
+        );
+        index_log_positioning < metil_group_logging->length;
+        ++index_log_positioning
+      ) {
+        struct metil_object* metil_object_log_positioning = (
+           metil_group_logging->renderables[
+            index_log_positioning
+          ]->renderable
+        );
 
-      // clic3_memory_reallocate_raw(
-      //   &c938_logging->stopwatches,
-      //   (
-      //     sizeof(
-      //       struct metil_stopwatch
-      //     ) *
-      //     metil_group_logging->length
-      //   )
-      // );
+        metil_object_log_positioning->position.y = (
+          metil_object_log_positioning->position.y +
+          metil_object_log->mesh.size.y
+        );
+      }
 
-      // continue;
+      metil_group_destroy_renderable_at_index(
+        metil,
+        metil_group_logging,
+        index_log
+      );
+      
+      for (
+        unsigned int index_stopwatch = index_log;
+        index_stopwatch < metil_group_logging->length;
+        ++index_stopwatch
+      ) {
+        clic3_bytes_copy(
+          &c938_logging->stopwatches[
+            index_stopwatch
+          ],
+          &c938_logging->stopwatches[
+            index_stopwatch +
+            1
+          ],
+          sizeof(
+            struct metil_stopwatch
+          )
+        );
+      }
+
+      clic3_memory_reallocate_raw(
+        &c938_logging->stopwatches,
+        (
+          sizeof(
+            struct metil_stopwatch
+          ) *
+          metil_group_logging->length
+        )
+      );
+
+      continue;
     }
 
-    metil_object_log->position.x = (
-      metil_object_log->position.x + 0.01f
-    );    
+    struct metil_renderer_data_object* data = (
+      metil_object_log->buffers_vertex[
+        metil_object_buffer_default_index_data
+      ].buffer.contents
+    );
 
-    // struct metil_renderer_data_object* data = (
-    //   metil_object_log->buffers_vertex[
-    //     metil_object_buffer_default_index_data
-    //   ].buffer.contents
-    // );
+    data->color.w = (
+      1.0f -
+      time_elapsed_percentage
+    );
 
-    // data->color.w = (
-    //   time_elapsed_percentage
-    // );
+    data->color.y = (
+      1.0f -
+      time_elapsed_percentage
+    );
 
     index_log = (
       index_log +
