@@ -252,6 +252,8 @@ endif
 strip=strip
 strip_flags=-x
 
+lldb=lldb
+
 metal=xcrun -sdk macosx metal
 metal_ar=xcrun -sdk macosx metal-ar
 metallib=xcrun -sdk macosx metallib
@@ -385,7 +387,11 @@ else
 endif
 else
 run:
+ifeq (${debug},1)
+	cd ${dir ${file_output}} && ${lldb} ./${shell basename ${file_output}}
+else
 	cd ${dir ${file_output}} && ./${shell basename ${file_output}}
+endif
 endif
 
 pull_content: ${directory_textures} ${files_content_textures}
