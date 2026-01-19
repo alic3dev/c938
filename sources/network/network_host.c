@@ -1,5 +1,6 @@
 #include <network/network_host.h>
 
+#include <network/data/network_data_packet.h>
 #include <network/network.h>
 
 #include <clic3_bytes.h>
@@ -599,17 +600,21 @@ void* network_host_client_sending_thread(
         pthread_mutex_lock(
           &network_host->data_map.mutex
         );
-        
+
         long int length_bytes_sent = (
-          send(
+          network_data_packet_send(
+            network_host->data_map.packet,
             network_host->socket_clients[
               index_client
-            ],
-            network_host->data_map.bytes,
-            network_host->data_map.length,
-            0
+            ]
           )
         );
+        
+        if (
+          length_bytes_sent != network_host->data_map.packet->length
+        ) {
+          // failed to send
+        }
 
         pthread_mutex_unlock(
           &network_host->data_map.mutex

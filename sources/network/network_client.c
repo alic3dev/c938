@@ -1,6 +1,6 @@
 #include <network/network_client.h>
 
-#include <data/network_data_map.h>
+#include <network/data/network_data_map.h>
 #include <network/network.h>
 
 #include <clic3_memory.h>
@@ -200,26 +200,39 @@ void* network_client_receiving_thread(
       return 0;
     }
 
-    enum network_command network_command = (
-      data_host[0]
+    static struct network_data_packet* network_data_packet;
+    
+    network_data_packet = (
+      clic3_memory_allocate_raw(
+        sizeof(
+          struct network_data_packet
+        )
+      )
+    );
+
+    network_data_packet_initialize_from_bytes(
+      network_data_packet,
+      data_host,
+      length_data_received
     );
 
     switch (
-      network_command
+      network_data_packet->command
     ) {
-      case network_command_initialize: {
-        break;
-      }
       case network_command_datamap: {
-        network_data_map_bytes_set(
+        network_data_map_packet_set(
           &network_client->data_map,
-          data_host,
-          length_data_received
+          network_data_packet
         );
 
         break;
       }
+      case network_command_initialize:
       default: {
+        clic3_memory_free_raw(
+          network_data_packet
+        );
+
         break;
       }
     }

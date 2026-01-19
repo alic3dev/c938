@@ -1,7 +1,7 @@
 #ifndef __c938_network_network_client_h
 #define __c938_network_network_client_h
 
-#include <data/network_data_map.h>
+#include <network/data/network_data_map.h>
 #include <network/network.h>
 
 #include <netdb.h>
@@ -19,7 +19,8 @@ enum network_client_status {
 
 enum network_client_command_sending {
   network_client_command_sending_quitting = 0,
-  network_client_command_sending_none = 1
+  network_client_command_sending_none = 1,
+  network_client_command_sending_poll = 2
 };
 
 struct network_client {
