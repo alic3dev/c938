@@ -157,7 +157,7 @@ unsigned char network_data_packet_bytes_add(
 
   return 0;
 }
-#include <stdio.h>
+
 unsigned char network_data_packet_read(
   struct network_data_packet* network_data_packet,
   void* to,
@@ -187,12 +187,6 @@ unsigned char network_data_packet_read(
     ),
     length
   );
-
-  for (
-    unsigned int i = 0; i < length; ++i
-  ) {
-    printf("%.2x ", ((unsigned char*) network_data_packet->bytes)[i]);
-  }
 
   network_data_packet->offset = (
     network_data_packet->offset +
