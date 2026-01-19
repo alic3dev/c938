@@ -167,7 +167,7 @@ unsigned char network_data_packet_read(
     network_data_packet->offset ==
     network_data_packet->length
   ) {
-    network_data_packet->offset = 0;
+    network_data_packet->offset = 1;
   }
 
   if (
