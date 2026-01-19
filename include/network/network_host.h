@@ -2,6 +2,7 @@
 #define __network_host_h
 
 #include <network/data/network_data_map.h>
+#include <notification/notification_manager.h>
 
 #include <netinet/in.h>
 #include <pthread.h>
@@ -12,12 +13,6 @@ enum network_host_notification_type {
   network_host_notification_type_default = 0,
   network_host_notification_type_error = 1
 };
-
-typedef void (*network_host_notification_on)(
-  char*,
-  void*,
-  enum network_host_notification_type
-);
 
 enum network_host_client_command_sending {
   network_host_client_command_sending_quitting = 0,
@@ -41,14 +36,11 @@ struct network_host {
   unsigned int length_threads;
   pthread_t* threads;
 
-  network_host_notification_on* notification_on;
-  void** notification_on_data;
-  unsigned char length_notification_on;
-
   pthread_mutex_t* mutex_clients;
   pthread_mutex_t* mutex_clients_sending;
-  pthread_mutex_t mutex_notification;
   pthread_mutex_t mutex_thread;
+
+  struct notification_manager notification_manager;
 
   fd_set file_descriptor_socket_set;
 
@@ -63,7 +55,7 @@ struct network_host_client_thread_data {
 unsigned char network_host_listen_with_notification(
   struct network_host*,
   unsigned int,
-  network_host_notification_on,
+  notification_manager_notification_on,
   void*
 );
 
@@ -95,18 +87,6 @@ void network_host_data_map_send(
 
 void network_host_connections_accept(
   struct network_host*
-);
-
-void network_host_notification_on_add(
-  struct network_host*,
-  network_host_notification_on,
-  void*
-);
-
-void network_host_notification_send(
-  struct network_host*,
-  char*,
-  enum network_host_notification_type
 );
 
 void network_host_destroy(
