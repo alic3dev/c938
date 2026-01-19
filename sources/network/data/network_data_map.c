@@ -1,5 +1,8 @@
 #include <network/data/network_data_map.h>
 
+#include <network/data/network_data_packet.h>
+#include <network/network_command.h>
+
 #include <clic3_bytes.h>
 #include <clic3_memory.h>
 
@@ -8,13 +11,19 @@
 void network_data_map_initialize(
   struct network_data_map* network_data_map
 ) {
-  network_data_map->bytes = (
+  network_data_map->packet = (
     clic3_memory_allocate_raw(
-      0
+      sizeof(
+        struct network_data_packet
+      )
     )
   );
 
-  network_data_map->length = 0;
+  network_data_packet_initialize(
+    network_data_map->packet,
+    network_command_datamap,
+    0
+  );
 
   pthread_mutex_init(
     &network_data_map->mutex,
@@ -22,30 +31,22 @@ void network_data_map_initialize(
   );
 }
 
-void network_data_map_bytes_set(
+void network_data_map_packet_set(
   struct network_data_map* network_data_map,
-  unsigned char* bytes,
-  unsigned int length
+  struct network_data_packet* network_data_packet
 ) {
   pthread_mutex_lock(
     &network_data_map->mutex
   );
 
-  network_data_map->length = (
-    length
+  clic3_memory_free_raw(
+    network_data_map->packet
   );
 
-  clic3_memory_reallocate_raw(
-    &network_data_map->bytes,
-    network_data_map->length
+  network_data_map->packet = (
+    network_data_packet
   );
-
-  clic3_bytes_copy(
-    network_data_map->bytes,
-    bytes,
-    network_data_map->length
-  );
-
+  
   pthread_mutex_unlock(
     &network_data_map->mutex
   );
@@ -54,7 +55,11 @@ void network_data_map_bytes_set(
 void network_data_map_destroy(
   struct network_data_map* network_data_map
 ) {
+  network_data_packet_destroy(
+    network_data_map->packet
+  );
+
   clic3_memory_free_raw(
-    network_data_map->bytes
+    network_data_map->packet
   );
 }

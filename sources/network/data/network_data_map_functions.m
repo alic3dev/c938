@@ -1,6 +1,7 @@
 #include <network/data/network_data_map_functions.h>
 
 #include <c938_pipeline_index.h>
+#include <data/data_length.h>
 #include <data/enemy_data.h>
 #include <network/data/network_data_map.h>
 #include <data/parameters_gameplay.h>
@@ -35,95 +36,51 @@ void network_data_map_set(
     &network_data_map->mutex
   );
 
-  unsigned long int length_math_c_vector3_float = (
-    sizeof(
-      struct math_c_vector3_float
-    )
-  );
-
-  unsigned long int length_parameters_gameplay = (
-    sizeof(
-      struct parameters_gameplay
-    ) -
-    1
-  );
-  
-  unsigned long int length_unsigned_int = (
-    sizeof(
-      unsigned int
-    )
-  );
-
-  unsigned long int length_float = (
-    sizeof(
-      float
-    )
-  );
-
   unsigned long int length_bytes_buildings = (
     metil_group_buildings->length *
-    length_math_c_vector3_float *
+    data_length_math_c_vector3_float *
     2
   );
 
   unsigned long int length_bytes_enemies = (
     (
       metil_group_enemies->length *
-      length_math_c_vector3_float
+      data_length_math_c_vector3_float
     ) + (
       metil_group_enemies->length *
-      length_float
+      data_length_float
     )
   );
 
-  network_data_map->length = (
-    1 +
-    length_parameters_gameplay +
-    length_unsigned_int +
-    length_bytes_buildings +
-    length_unsigned_int +
-    length_bytes_enemies +
-    length_math_c_vector3_float +
-    length_unsigned_int
+  unsigned int length = (
+    data_length_parameters_gameplay +  // gameplay parameters
+    data_length_unsigned_int +         // length of buildings
+    length_bytes_buildings +           // building positions + sizes
+    data_length_unsigned_int +         // length of enemies
+    length_bytes_enemies +             // enemy positions + speeds
+    data_length_math_c_vector3_float + // starting position
+    data_length_unsigned_int           // target building index
   );
 
-  clic3_memory_reallocate_raw(
-    &network_data_map->bytes,
-    network_data_map->length
+  struct network_data_packet* network_data_packet = (
+    network_data_map->packet
   );
 
-  unsigned long int offset_bytes = 1;
-
-  network_data_map->bytes[0] = (
-    network_command_datamap
+  network_data_packet_reallocate(
+    network_data_packet,
+    length
   );
 
-  clic3_bytes_copy(
-    (
-      network_data_map->bytes +
-      offset_bytes
-    ),
+  network_data_packet_bytes_add(
+    network_data_packet,
     parameters_gameplay,
-    length_parameters_gameplay
+    data_length_parameters_gameplay
   );
 
-  offset_bytes = (
-    offset_bytes +
-    length_parameters_gameplay
-  );
-
-  clic3_bytes_copy(
-    (
-      network_data_map->bytes +
-      offset_bytes
-    ),
+  network_data_packet_bytes_add(
+    network_data_packet,
     &metil_group_buildings->length,
-    length_parameters_gameplay
-  );
-
-  offset_bytes = (
-    offset_bytes +
-    length_unsigned_int
+    data_length_unsigned_int
   );
 
   for (
@@ -137,47 +94,23 @@ void network_data_map_set(
       ]->renderable
     );
 
-    clic3_bytes_copy(
-      (
-        network_data_map->bytes +
-        offset_bytes
-      ),
+    network_data_packet_bytes_add(
+      network_data_packet,
       &metil_object_building->position,
-      length_math_c_vector3_float
+      data_length_math_c_vector3_float
     );
 
-    offset_bytes = (
-      offset_bytes +
-      length_math_c_vector3_float
-    );
-
-    clic3_bytes_copy(
-      (
-        network_data_map->bytes +
-        offset_bytes
-      ),
+    network_data_packet_bytes_add(
+      network_data_packet,
       &metil_object_building->mesh.size,
-      length_math_c_vector3_float
-    );
-
-    offset_bytes = (
-      offset_bytes +
-      length_math_c_vector3_float
+      data_length_math_c_vector3_float
     );
   }
 
-  clic3_bytes_copy(
-    (
-      network_data_map->bytes +
-      offset_bytes
-    ),
+  network_data_packet_bytes_add(
+    network_data_packet,
     &metil_group_enemies->length,
-    length_parameters_gameplay
-  );
-
-  offset_bytes = (
-    offset_bytes +
-    length_unsigned_int
+    data_length_unsigned_int
   );
 
   for (
@@ -191,67 +124,35 @@ void network_data_map_set(
       ]->renderable
     );
 
-    clic3_bytes_copy(
-      (
-        network_data_map->bytes +
-        offset_bytes
-      ),
-      &metil_object_enemy->position,
-      length_math_c_vector3_float
-    );
-
-    offset_bytes = (
-      offset_bytes +
-      length_math_c_vector3_float
-    );
-
     struct enemy_data* enemy_data = (
       metil_object_enemy->buffers_vertex[
         metil_object_buffer_default_index_data
       ].buffer.contents
     );
 
-    clic3_bytes_copy(
-      (
-        network_data_map->bytes +
-        offset_bytes
-      ),
-      &enemy_data->speed,
-      length_float
+    network_data_packet_bytes_add(
+      network_data_packet,
+      &metil_object_enemy->position,
+      data_length_math_c_vector3_float
     );
-
-    offset_bytes = (
-      offset_bytes +
-      length_float
+    
+    network_data_packet_bytes_add(
+      network_data_packet,
+      &enemy_data->speed,
+      data_length_float
     );
   }
 
-  clic3_bytes_copy(
-    (
-      network_data_map->bytes +
-      offset_bytes
-    ),
+  network_data_packet_bytes_add(
+    network_data_packet,
     position_starting,
-    length_math_c_vector3_float
+    data_length_math_c_vector3_float
   );
 
-  offset_bytes = (
-    offset_bytes +
-    length_math_c_vector3_float
-  );
-
-  clic3_bytes_copy(
-    (
-      network_data_map->bytes +
-      offset_bytes
-    ),
+  network_data_packet_bytes_add(
+    network_data_packet,
     &target_building,
-    length_unsigned_int
-  );
-
-  offset_bytes = (
-    offset_bytes +
-    length_unsigned_int
+    data_length_unsigned_int
   );
 
   pthread_mutex_unlock(
@@ -273,31 +174,6 @@ void network_data_map_parse(
     &network_data_map->mutex
   );
 
-  unsigned long int length_math_c_vector3_float = (
-    sizeof(
-      struct math_c_vector3_float
-    )
-  );
-
-  unsigned long int length_parameters_gameplay = (
-    sizeof(
-      struct parameters_gameplay
-    ) -
-    1
-  );
-  
-  unsigned long int length_unsigned_int = (
-    sizeof(
-      unsigned int
-    )
-  );
-
-  unsigned long int length_float = (
-    sizeof(
-      float
-    )
-  );
-
   metil_group_destroy(
     metil,
     metil_group_buildings
@@ -316,37 +192,23 @@ void network_data_map_parse(
     metil_group_enemies
   );
 
-  unsigned long int offset_bytes = 1;
+  struct network_data_packet* network_data_packet = (
+    network_data_map->packet
+  );
 
-  clic3_bytes_copy(
+  network_data_packet_read(
+    network_data_packet,
     parameters_gameplay,
-    (
-      network_data_map->bytes +
-      offset_bytes
-    ),
-    length_parameters_gameplay
-  );
-
-  offset_bytes = (
-    offset_bytes +
-    length_parameters_gameplay
+    data_length_parameters_gameplay
   );
 
   unsigned int length_buildings;
   unsigned int length_enemies;
 
-  clic3_bytes_copy(
+  network_data_packet_read(
+    network_data_packet,
     &length_buildings,
-    (
-      network_data_map->bytes +
-      offset_bytes
-    ),
-    length_unsigned_int
-  );
-
-  offset_bytes = (
-    offset_bytes +
-    length_unsigned_int
+    data_length_unsigned_int
   );
 
   metil_group_add_length_initialize(
@@ -368,32 +230,16 @@ void network_data_map_parse(
 
     struct math_c_vector3_float size_building;
 
-    clic3_bytes_copy(
+    network_data_packet_read(
+      network_data_packet,
       &metil_object_building->position,
-      (
-        network_data_map->bytes +
-        offset_bytes
-      ),
-      length_math_c_vector3_float
+      data_length_math_c_vector3_float
     );
 
-    offset_bytes = (
-      offset_bytes +
-      length_math_c_vector3_float
-    );
-
-    clic3_bytes_copy(
+    network_data_packet_read(
+      network_data_packet,
       &size_building,
-      (
-        network_data_map->bytes +
-        offset_bytes
-      ),
-      length_math_c_vector3_float
-    );
-
-    offset_bytes = (
-      offset_bytes +
-      length_math_c_vector3_float
+      data_length_math_c_vector3_float
     );
 
     metil_object_building->index_pipeline_render = (
@@ -429,18 +275,10 @@ void network_data_map_parse(
     metil_object_building_data->color.w = 1.0f;
   }
 
-  clic3_bytes_copy(
+  network_data_packet_read(
+    network_data_packet,
     &length_enemies,
-    (
-      network_data_map->bytes +
-      offset_bytes
-    ),
-    length_unsigned_int
-  );
-
-  offset_bytes = (
-    offset_bytes +
-    length_unsigned_int
+    data_length_unsigned_int
   );
 
   metil_group_add_length_initialize(
@@ -463,32 +301,16 @@ void network_data_map_parse(
     struct math_c_vector3_float position_enemy;
     float speed_enemy;
 
-    clic3_bytes_copy(
+    network_data_packet_read(
+      network_data_packet,
       &position_enemy,
-      (
-        network_data_map->bytes +
-        offset_bytes
-      ),
-      length_math_c_vector3_float
+      data_length_math_c_vector3_float
     );
 
-    offset_bytes = (
-      offset_bytes +
-      length_math_c_vector3_float
-    );
-
-    clic3_bytes_copy(
+    network_data_packet_read(
+      network_data_packet,
       &speed_enemy,
-      (
-        network_data_map->bytes +
-        offset_bytes
-      ),
-      length_float
-    );
-
-    offset_bytes = (
-      offset_bytes +
-      length_float
+      data_length_float
     );
 
     object_enemy_initialize(
@@ -500,32 +322,16 @@ void network_data_map_parse(
     );
   }
 
-  clic3_bytes_copy(
+  network_data_packet_read(
+    network_data_packet,
     position_starting,
-    (
-      network_data_map->bytes +
-      offset_bytes
-    ),
-    length_math_c_vector3_float
+    data_length_math_c_vector3_float
   );
 
-  offset_bytes = (
-    offset_bytes +
-    length_math_c_vector3_float
-  );
-
-  clic3_bytes_copy(
+  network_data_packet_read(
+    network_data_packet,
     target_building,
-    (
-      network_data_map->bytes +
-      offset_bytes
-    ),
-    length_unsigned_int
-  );
-
-  offset_bytes = (
-    offset_bytes +
-    length_unsigned_int
+    data_length_unsigned_int
   );
 
   if (
