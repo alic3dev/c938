@@ -1,8 +1,8 @@
-#include <network/network_data_map_functions.h>
+#include <network/data/network_data_map_functions.h>
 
 #include <c938_pipeline_index.h>
 #include <data/enemy_data.h>
-#include <data/network_data_map.h>
+#include <network/data/network_data_map.h>
 #include <data/parameters_gameplay.h>
 #include <mesh/mesh_building.h>
 #include <network/network.h>

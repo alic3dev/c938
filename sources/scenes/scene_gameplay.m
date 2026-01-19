@@ -10,7 +10,7 @@
 #include <generate/generate_buildings.h>
 #include <mesh/mesh_hud_item.h>
 #include <mesh/mesh_player.h>
-#include <network/network_data_map_functions.h>
+#include <network/data/network_data_map_functions.h>
 #include <network/network_host.h>
 #include <objects/object_crosshair.h>
 #include <objects/object_enemy.h>

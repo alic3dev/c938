@@ -1,4 +1,4 @@
-#include <data/network_data_map.h>
+#include <network/data/network_data_map.h>
 
 #include <clic3_bytes.h>
 #include <clic3_memory.h>

@@ -1,6 +1,6 @@
 #include <network/network_client.h>
 
-#include <data/network_data_map.h>
+#include <network/data/network_data_map.h>
 #include <network/network.h>
 
 #include <clic3_memory.h>

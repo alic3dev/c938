@@ -1,7 +1,7 @@
-#ifndef __network_network_data_map_h
-#define __network_network_data_map_h
+#ifndef __network_data_network_data_map_h
+#define __network_data_network_data_map_h
 
-#include <data/network_data_map.h>
+#include <network/data/network_data_map.h>
 #include <data/parameters_gameplay.h>
 
 #include <math_c_vector.h>

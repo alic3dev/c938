@@ -1,7 +1,7 @@
 #ifndef __network_host_h
 #define __network_host_h
 
-#include <data/network_data_map.h>
+#include <network/data/network_data_map.h>
 
 #include <netinet/in.h>
 #include <pthread.h>
