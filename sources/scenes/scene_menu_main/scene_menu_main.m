@@ -1245,8 +1245,8 @@ void scene_menu_main_poll(
 
               network_host_notification(
                 "network_host::creation_failed",
-                metil,
-                network_host_notification_type_error
+                network_host_notification_type_error,
+                metil
               );
 
               menu->index_selected = -1;
@@ -1835,11 +1835,15 @@ void scene_menu_main_destroy(
 
 void network_host_notification(
   char* notification,
-  void* data,
-  enum network_host_notification_type network_host_notification_type
+  unsigned char id,
+  void* data
 ) {
   struct metil* metil = (
     data
+  );
+
+  enum network_host_notification_type network_host_notification_type =  (
+    id
   );
 
   struct c938_data* c938_data = (

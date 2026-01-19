@@ -127,8 +127,8 @@ void scene_menu_main_destroy(
 
 void network_host_notification(
   char* _Nonnull,
-  void* _Nullable,
-  enum network_host_notification_type
+  unsigned char,
+  void* _Nullable
 );
 
 #if target_os_ios
