@@ -19,8 +19,8 @@ unsigned char network_client_connect(
     network_client_status_initializing
   );
 
-  network_client->command_sending = (
-    network_command_no_operation
+  network_client->status_game = (
+    network_client_status_game_loading
   );
 
   network_client->socket = (
@@ -35,7 +35,11 @@ unsigned char network_client_connect(
     network_client->socket < 0
   ) {
     network_client->status = (
-      network_client_status_none
+      network_client_status_disconnected
+    );
+
+    network_client->status_game = (
+      network_client_status_game_disconnected
     );
 
     return 1;
@@ -96,7 +100,7 @@ unsigned char network_client_connect(
     );
 
     network_client->status = (
-      network_client_status_none
+      network_client_status_disconnected
     );
 
     return 2;

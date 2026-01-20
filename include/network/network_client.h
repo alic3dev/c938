@@ -4,6 +4,7 @@
 #include <network/data/network_data_map.h>
 #include <network/network.h>
 #include <network/network_client_status.h>
+#include <network/network_client_status_game.h>
 #include <network/network_command.h>
 
 #include <netdb.h>
@@ -16,6 +17,7 @@ struct network_client {
   int socket;
 
   enum network_client_status status;
+  enum network_client_status_game status_game;
 
   unsigned char address_ipv4[
     network_length_address_ipv4

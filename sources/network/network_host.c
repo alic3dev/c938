@@ -597,6 +597,10 @@ void network_host_data_map_client_index_send(
     &network_host_client->mutex
   );
 
+  network_host_client->status_game = (
+    network_client_status_game_loading
+  );
+
   network_host_client->command_sending = (
     network_command_data_map
   );
