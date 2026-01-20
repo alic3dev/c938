@@ -361,12 +361,12 @@ void c938_logging_poll(
       ].buffer.contents
     );
 
-    data->color.w = (
+    data->colour.w = (
       1.0f -
       time_elapsed_percentage
     );
 
-    data->color.y = (
+    data->colour.y = (
       1.0f -
       time_elapsed_percentage
     );

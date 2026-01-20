@@ -269,10 +269,10 @@ void network_data_map_parse(
       ].buffer.contents
     );
     
-    metil_object_building_data->color.x = 1.0f;
-    metil_object_building_data->color.y = 1.0f;
-    metil_object_building_data->color.z = 1.0f;
-    metil_object_building_data->color.w = 1.0f;
+    metil_object_building_data->colour.x = 1.0f;
+    metil_object_building_data->colour.y = 1.0f;
+    metil_object_building_data->colour.z = 1.0f;
+    metil_object_building_data->colour.w = 1.0f;
   }
 
   network_data_packet_read(
@@ -349,10 +349,10 @@ void network_data_map_parse(
       ].buffer.contents
     );
 
-    metil_object_building_data->color.x = 0.0f;
-    metil_object_building_data->color.y = 0.0f;
-    metil_object_building_data->color.z = 1.0f;
-    metil_object_building_data->color.w = 1.0f;
+    metil_object_building_data->colour.x = 0.0f;
+    metil_object_building_data->colour.y = 0.0f;
+    metil_object_building_data->colour.z = 1.0f;
+    metil_object_building_data->colour.w = 1.0f;
   }
 
   pthread_mutex_unlock(

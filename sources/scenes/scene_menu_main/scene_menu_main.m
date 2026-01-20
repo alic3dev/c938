@@ -968,7 +968,7 @@ void scene_menu_main_poll(
         );
       }
 
-      metil_renderer_data_text_backing->color.x = (
+      metil_renderer_data_text_backing->colour.x = (
         0.8f
       );
 
@@ -980,32 +980,32 @@ void scene_menu_main_poll(
         menu == &data->menu_main_network &&
         index_menu == menus_menu_main_network_index_back
       ) {
-        metil_renderer_data_text_backing->color.y = (
+        metil_renderer_data_text_backing->colour.y = (
           0.4f
         );
 
-        metil_renderer_data_text_backing->color.z = (
+        metil_renderer_data_text_backing->colour.z = (
           0.4f
         );
       } else {
-        metil_renderer_data_text_backing->color.y = (
+        metil_renderer_data_text_backing->colour.y = (
           0.8f
         );
 
-        metil_renderer_data_text_backing->color.z = (
+        metil_renderer_data_text_backing->colour.z = (
           0.8f
         );
       }
 
-      metil_renderer_data_text->color.x = (
+      metil_renderer_data_text->colour.x = (
         0.8f
       );
 
-      metil_renderer_data_text->color.y = (
+      metil_renderer_data_text->colour.y = (
         0.8f
       );
 
-      metil_renderer_data_text->color.z = (
+      metil_renderer_data_text->colour.z = (
         0.8f
       );
     } else {
@@ -1026,7 +1026,7 @@ void scene_menu_main_poll(
         offset_position_y
       );
 
-      metil_renderer_data_text_backing->color.x = (
+      metil_renderer_data_text_backing->colour.x = (
         1.0f
       );
 
@@ -1038,32 +1038,32 @@ void scene_menu_main_poll(
         menu == &data->menu_main_network &&
         index_menu == menus_menu_main_network_index_back
       ) {
-        metil_renderer_data_text_backing->color.y = (
+        metil_renderer_data_text_backing->colour.y = (
           0.5f
         );
 
-        metil_renderer_data_text_backing->color.z = (
+        metil_renderer_data_text_backing->colour.z = (
           0.5f
         );
       } else {
-        metil_renderer_data_text_backing->color.y = (
+        metil_renderer_data_text_backing->colour.y = (
           1.0f
         );
 
-        metil_renderer_data_text_backing->color.z = (
+        metil_renderer_data_text_backing->colour.z = (
           1.0f
         );
       }
 
-      metil_renderer_data_text->color.x = (
+      metil_renderer_data_text->colour.x = (
         1.0f
       );
 
-      metil_renderer_data_text->color.y = (
+      metil_renderer_data_text->colour.y = (
         1.0f
       );
 
-      metil_renderer_data_text->color.z = (
+      metil_renderer_data_text->colour.z = (
         1.0f
       );
     }
