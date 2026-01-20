@@ -14,7 +14,7 @@ struct enemy_data {
 
   struct math_c_vector3_float position_previous;
 
-  struct math_c_vector3_float color;
+  struct math_c_vector3_float colour;
 
   matrix_float4x4 view_model_matrix_projection;
 };

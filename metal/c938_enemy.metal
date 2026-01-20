@@ -8,7 +8,7 @@
 struct data_vertex {
   float4 position [[position]];
   float brightness;
-  float4 color;
+  float4 colour;
 };
 
 [[vertex]] struct data_vertex c938_enemy_vertex(
@@ -45,10 +45,10 @@ struct data_vertex {
     (float) enemy_data->life_maximum
   );
 
-  data_vertex.color = float4(
-    enemy_data->color.x * metal::fmin(percentage_life * 2.0f, 1.0f),
-    enemy_data->color.y * percentage_life,
-    enemy_data->color.z * percentage_life,
+  data_vertex.colour = float4(
+    enemy_data->colour.x * metal::fmin(percentage_life * 2.0f, 1.0f),
+    enemy_data->colour.y * percentage_life,
+    enemy_data->colour.z * percentage_life,
     1.0f
   );
 
@@ -60,9 +60,9 @@ struct data_vertex {
   metal::texture2d<half> texture [[texture(0)]]
 ) {
   return float4(
-    data_vertex.color.r * data_vertex.brightness,
-    data_vertex.color.g * data_vertex.brightness,
-    data_vertex.color.b * data_vertex.brightness,
-    data_vertex.color.a
+    data_vertex.colour.r * data_vertex.brightness,
+    data_vertex.colour.g * data_vertex.brightness,
+    data_vertex.colour.b * data_vertex.brightness,
+    data_vertex.colour.a
   );
 }

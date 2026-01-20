@@ -54,9 +54,9 @@ void object_enemy_initialize(
     ].buffer.contents
   );
 
-  enemy_data->color.x = 1.0f;
-  enemy_data->color.y = 1.0f;
-  enemy_data->color.z = 1.0f;
+  enemy_data->colour.x = 1.0f;
+  enemy_data->colour.y = 1.0f;
+  enemy_data->colour.z = 1.0f;
 
   enemy_data->speed = speed;
 

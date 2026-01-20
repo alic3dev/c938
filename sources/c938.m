@@ -85,22 +85,22 @@ void c938_renderer_on_initialize(
     @"c938_vertex"
   );
 
-  metil->renderer_interface.rendering_properties->color_clear.x = (
+  metil->renderer_interface.rendering_properties->colour_clear.x = (
     0.0f *
     metil->rendering_properties.brightness
   );
   
-  metil->renderer_interface.rendering_properties->color_clear.y = (
+  metil->renderer_interface.rendering_properties->colour_clear.y = (
     0.0f *
     metil->rendering_properties.brightness
   );
 
-  metil->renderer_interface.rendering_properties->color_clear.z = (
+  metil->renderer_interface.rendering_properties->colour_clear.z = (
     0.0f *
     metil->rendering_properties.brightness
   );
 
-  metil->renderer_interface.rendering_properties->color_clear.w = (
+  metil->renderer_interface.rendering_properties->colour_clear.w = (
     1.0f
   );
 

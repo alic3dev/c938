@@ -262,15 +262,15 @@ void generate_buildings(
     if (
       index_building == index_target_building
     ) {
-      data->color.x = 0.0f;
-      data->color.y = 0.0f;
-      data->color.z = 1.0f;
-      data->color.w = 1.0f;
+      data->colour.x = 0.0f;
+      data->colour.y = 0.0f;
+      data->colour.z = 1.0f;
+      data->colour.w = 1.0f;
     } else {
-      data->color.x = 1.0f;
-      data->color.y = 1.0f;
-      data->color.z = 1.0f;
-      data->color.w = 1.0f;
+      data->colour.x = 1.0f;
+      data->colour.y = 1.0f;
+      data->colour.z = 1.0f;
+      data->colour.w = 1.0f;
     }
 
     struct math_c_vector2_float limits = {
