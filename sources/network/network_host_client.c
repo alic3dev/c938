@@ -1,13 +1,27 @@
 #include <network/network_host_client.h>
 
+#include <clic3_char_arrays.h>
+#include <clic3_memory.h>
+
 #include <unistd.h>
 
 void network_host_client_initialize(
   struct network_host_client* network_host_client,
-  int network_host_client_socket
+  int network_host_client_socket,
+  unsigned int index
 ) {
   network_host_client->socket = (
     network_host_client_socket
+  );
+
+  network_host_client->index = (
+    index
+  );
+
+  network_host_client->char_array_index = (
+    clic3_char_array_from_unsigned_long_int(
+      index
+    )
   );
 
   pthread_mutex_init(
@@ -46,5 +60,9 @@ void network_host_client_destroy(
 
   pthread_mutex_destroy(
     &network_host_client->mutex_sending
+  );
+
+  clic3_memory_free_raw(
+    network_host_client->char_array_index
   );
 }
