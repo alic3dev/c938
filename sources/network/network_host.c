@@ -519,6 +519,41 @@ void* network_host_client_receiving_thread(
 
         break;
       }
+      case network_command_data_map: {
+        network_host_client->status_game = (
+          network_client_status_game_loading
+        );
+
+        char* notification_prefix = (
+          clic3_char_arrays_concatenate(
+            "network_host_client::requested_data_map->{",
+            network_host_client->char_array_index
+          )
+        );
+
+        char* notification = (
+          clic3_char_arrays_concatenate(
+            notification_prefix,
+            "};"
+          )
+        );
+
+        notification_manager_send(
+          &network_host->notification_manager,
+          notification,
+          network_host_notification_type_default
+        );
+
+        clic3_memory_free_raw(
+          notification_prefix
+        );
+
+        clic3_memory_free_raw(
+          notification
+        );
+
+        break;
+      }
       case network_command_no_operation:
       default: {
         break;
