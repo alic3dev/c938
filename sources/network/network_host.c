@@ -310,9 +310,9 @@ void* network_host_routing_thread(
       network_host_notification_type_default
     );
 
-    // clic3_memory_free_raw(
-    //   notification
-    // );
+    clic3_memory_free_raw(
+      notification
+    );
 
     pthread_mutex_lock(
       &network_host->mutex_thread
