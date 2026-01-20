@@ -94,6 +94,10 @@ void scene_gameplay_initialize(
 
   scene_gameplay_data->length_projectiles = 0;
 
+  scene_gameplay_data->action_data_map = (
+    scene_gameplay_data_action_data_map_none
+  );
+
   for (
     unsigned char index_projectile = 0;
     index_projectile < scene_gameplay_data_length_projectiles_maximum;
@@ -330,23 +334,18 @@ void scene_gameplay_initialize(
     scene_gameplay_data->parameters->networked !=
     parameters_gameplay_networked_none
   ) {
-    pthread_mutex_init(
-      &scene_gameplay_data->mutex_data_map,
-      0
-    );
-
     struct c938_data* c938_data = (
       metil->data
-    );
-
-    struct network_host* network_host = (
-      &c938_data->network_host
     );
 
     if (
       scene_gameplay_data->parameters->networked ==
       parameters_gameplay_networked_host
     ) {
+      struct network_host* network_host = (
+        &c938_data->network_host
+      );
+
       notification_manager_notification_on_add(
         &network_host->notification_manager,
         scene_gameplay_network_host_notification_on,
@@ -356,8 +355,12 @@ void scene_gameplay_initialize(
       scene_gameplay_data->parameters->networked ==
       parameters_gameplay_networked_client
     ) {
+      struct network_client* network_client = (
+        &c938_data->network_client
+      );
+
       notification_manager_notification_on_add(
-        &network_host->notification_manager,
+        &network_client->notification_manager,
         scene_gameplay_network_client_notification_on,
         metil
       );
@@ -378,6 +381,14 @@ void scene_gameplay_network_client_notification_on(
     data
   );
 
+  struct c938_data* c938_data = (
+    metil->data
+  );
+
+  struct network_client* network_client = &(
+    c938_data->network_client
+  );
+
   struct metil_scene_controller* metil_scene_controller = (
     metil->scene_controller
   );
@@ -394,12 +405,8 @@ void scene_gameplay_network_client_notification_on(
     notification_id
   ) {
     case network_client_notification_type_data_map_sent: {
-      pthread_mutex_lock(
-        &scene_gameplay_data->mutex_data_map
-      );
-
-      pthread_mutex_unlock(
-        &scene_gameplay_data->mutex_data_map
+      scene_gameplay_data->action_data_map = (
+        scene_gameplay_data_action_data_map_parse
       );
       break;
     }
@@ -421,6 +428,14 @@ void scene_gameplay_network_host_notification_on(
     data
   );
 
+  struct c938_data* c938_data = (
+    metil->data
+  );
+
+  struct network_host* network_host = &(
+    c938_data->network_host
+  );
+
   struct metil_scene_controller* metil_scene_controller = (
     metil->scene_controller
   );
@@ -437,12 +452,8 @@ void scene_gameplay_network_host_notification_on(
     notification_id
   ) {
     case network_host_notification_type_data_map_requested: {
-      pthread_mutex_lock(
-        &scene_gameplay_data->mutex_data_map
-      );
-
-      pthread_mutex_unlock(
-        &scene_gameplay_data->mutex_data_map
+      scene_gameplay_data->action_data_map = (
+        scene_gameplay_data_action_data_map_set
       );
       break;
     }
@@ -927,20 +938,91 @@ void scene_gameplay_populate(
 
 void scene_gameplay_poll(
   struct metil* metil,
-  struct metil_scene* scene
+  struct metil_scene* metil_scene_gameplay
 ) {
   struct scene_gameplay_data* scene_gameplay_data = (
-    scene->data
+    metil_scene_gameplay->data
   );
 
   struct player_data* player_data = (
-    scene->player.data
+    metil_scene_gameplay->player.data
+  );
+
+  struct metil_group* metil_group_enemies = (
+    metil_scene_gameplay->renderables[
+      scene_gameplay_renderables_index_enemies
+    ].renderable
+  );
+
+  struct metil_group* metil_group_projectiles = (
+    metil_scene_gameplay->renderables[
+      scene_gameplay_renderables_index_projectiles
+    ].renderable
   );
 
   c938_logging_poll(
     metil
   );
 
+  if (
+    scene_gameplay_data->parameters->networked !=
+    parameters_gameplay_networked_none
+  ) {
+    struct c938_data* c938_data = (
+      metil->data
+    );
+
+    struct network_client* network_client = &(
+      c938_data->network_client
+    );
+
+    struct network_host* network_host = &(
+      c938_data->network_host
+    );
+
+    struct metil_group* metil_group_buildings = (
+      metil_scene_gameplay->renderables[
+        scene_gameplay_renderables_index_buildings
+      ].renderable
+    );
+
+    switch (
+      scene_gameplay_data->action_data_map
+    ) {
+      case scene_gameplay_data_action_data_map_parse: {
+        scene_gameplay_populate(
+          metil,
+          metil_scene_gameplay,
+          1
+        );
+
+        break;
+      }
+      case scene_gameplay_data_action_data_map_set: {
+        network_data_map_set(
+          &network_host->data_map,
+          scene_gameplay_data->parameters,
+          metil_group_buildings,
+          metil_group_enemies,
+          &metil_scene_gameplay->player.position,
+          player_data->index_target_building
+        );
+
+        network_host_data_map_send(
+          network_host
+        );
+        break;
+      }
+      default: {
+        break;
+      }
+    }
+
+    scene_gameplay_data->action_data_map = (
+      scene_gameplay_data_action_data_map_none
+    );
+  }
+  
   if (
     player_data->on_ground == (
       player_data->index_target_building +
@@ -949,37 +1031,25 @@ void scene_gameplay_poll(
   ) {
     scene_gameplay_populate(
       metil,
-      scene,
+      metil_scene_gameplay,
       0
     );
 
     return;
   } else if (
-    scene->player.position.y <= 10.0f
+    metil_scene_gameplay->player.position.y <= 10.0f
   ) {
     scene_gameplay_populate(
       metil,
-      scene,
+      metil_scene_gameplay,
       1
     );
 
     return;
   }
 
-  struct metil_group* metil_group_projectiles = (
-    scene->renderables[
-      scene_gameplay_renderables_index_projectiles
-    ].renderable
-  );
-
-  struct metil_group* metil_group_enemies = (
-    scene->renderables[
-      scene_gameplay_renderables_index_enemies
-    ].renderable
-  );
-
   float time_delta_percent = (
-    (float) scene->time_delta /
+    (float) metil_scene_gameplay->time_delta /
     1000.0f
   );
 
@@ -1052,7 +1122,7 @@ void scene_gameplay_poll(
     );
 
     projectile_data->time_current = (
-      scene->time
+      metil_scene_gameplay->time
     );
 
     projectile_data->time_delta_percent = (
@@ -1089,14 +1159,14 @@ void scene_gameplay_poll(
     );
 
     if (
-      scene->player.position.x >= metil_object_enemy->position.x - (metil_object_enemy->mesh.size.x / 2.0f) &&
-      scene->player.position.x <= metil_object_enemy->position.x + (metil_object_enemy->mesh.size.x / 2.0f) &&
+      metil_scene_gameplay->player.position.x >= metil_object_enemy->position.x - (metil_object_enemy->mesh.size.x / 2.0f) &&
+      metil_scene_gameplay->player.position.x <= metil_object_enemy->position.x + (metil_object_enemy->mesh.size.x / 2.0f) &&
 
-      (scene->player.position.y + player_data->height) >= metil_object_enemy->position.y - (metil_object_enemy->mesh.size.y / 2.0f) &&
-      (scene->player.position.y + player_data->height) <= metil_object_enemy->position.y + (metil_object_enemy->mesh.size.y / 2.0f) &&
+      (metil_scene_gameplay->player.position.y + player_data->height) >= metil_object_enemy->position.y - (metil_object_enemy->mesh.size.y / 2.0f) &&
+      (metil_scene_gameplay->player.position.y + player_data->height) <= metil_object_enemy->position.y + (metil_object_enemy->mesh.size.y / 2.0f) &&
 
-      scene->player.position.z >= metil_object_enemy->position.z - (metil_object_enemy->mesh.size.z / 2.0f) &&
-      scene->player.position.z <= metil_object_enemy->position.z + (metil_object_enemy->mesh.size.z / 2.0f)
+      metil_scene_gameplay->player.position.z >= metil_object_enemy->position.z - (metil_object_enemy->mesh.size.z / 2.0f) &&
+      metil_scene_gameplay->player.position.z <= metil_object_enemy->position.z + (metil_object_enemy->mesh.size.z / 2.0f)
     ) {
       player_data->life = (
         player_data->life -
@@ -1114,7 +1184,7 @@ void scene_gameplay_poll(
       ) {
         scene_gameplay_populate(
           metil,
-          scene,
+          metil_scene_gameplay,
           1
         );
 
@@ -1136,7 +1206,7 @@ void scene_gameplay_poll(
   ) {
     scene_gameplay_populate(
       metil,
-      scene,
+      metil_scene_gameplay,
       1
     );
 
@@ -1145,21 +1215,21 @@ void scene_gameplay_poll(
 
   metil_scene_poll_default(
     metil,
-    scene
+    metil_scene_gameplay
   );
 
   struct metil_object* object = (
-    scene->renderables[
+    metil_scene_gameplay->renderables[
       scene_gameplay_renderables_index_player
     ].renderable
   );
 
-  object->position.x = scene->player.position.x;
-  object->position.y = scene->player.position.y;
-  object->position.z = scene->player.position.z;
+  object->position.x = metil_scene_gameplay->player.position.x;
+  object->position.y = metil_scene_gameplay->player.position.y;
+  object->position.z = metil_scene_gameplay->player.position.z;
 
   object = (
-    scene->renderables[
+    metil_scene_gameplay->renderables[
       scene_gameplay_renderables_index_hud_boosted
     ].renderable
   );
@@ -1174,7 +1244,7 @@ void scene_gameplay_poll(
     player_data->is_boosted == 1
   ) {
     unsigned long int delta_time_boost = (
-      scene->time_input -
+      metil_scene_gameplay->time_input -
       player_data->time_boost
     );
 
@@ -1188,7 +1258,7 @@ void scene_gameplay_poll(
   }
 
   object = (
-    scene->renderables[
+    metil_scene_gameplay->renderables[
       scene_gameplay_renderables_index_hud_jumping
     ].renderable
   );
@@ -1204,7 +1274,7 @@ void scene_gameplay_poll(
   );
 
   object = (
-    scene->renderables[
+    metil_scene_gameplay->renderables[
       scene_gameplay_renderables_index_hud_jumping_secondary
     ].renderable
   );
@@ -1232,19 +1302,6 @@ void scene_gameplay_destroy(
   struct scene_gameplay_data* scene_gameplay_data = (
     metil_scene_gameplay->data
   );
-
-  if (
-    scene_gameplay_data->parameters->networked !=
-    parameters_gameplay_networked_none
-  ) {
-    struct scene_gameplay_data* scene_gameplay_data = (
-      metil_scene_gameplay->data
-    );
-
-    pthread_mutex_destroy(
-      &scene_gameplay_data->mutex_data_map
-    );
-  }
 
   clic3_memory_free_raw(
     metil_scene_gameplay->data

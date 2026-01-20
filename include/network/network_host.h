@@ -19,7 +19,7 @@ enum network_host_notification_type {
 struct network_host {
   int socket;
 
-  struct network_host_client* clients;
+  struct network_host_client** clients;
   unsigned int length_clients;
 
   struct sockaddr_in address_socket;
@@ -42,6 +42,7 @@ struct network_host {
 
 struct network_host_client_thread_data {
   struct network_host* network_host;
+  struct network_host_client* network_host_client;
   unsigned int index_client;
 };
 

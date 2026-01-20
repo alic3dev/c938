@@ -358,14 +358,6 @@ void* network_host_routing_thread(
       network_host->length_clients
     );
 
-    clic3_bytes_copy(
-      network_host_client_sending_thread_data,
-      network_host_client_receiving_thread_data,
-      sizeof(
-        struct network_host_client_thread_data
-      )
-    );
-
     network_host->length_clients = (
       network_host->length_clients +
       1
@@ -375,13 +367,23 @@ void* network_host_routing_thread(
       &network_host->clients,
       (
         sizeof(
-          struct network_host_client
+          struct network_host_client*
         ) *
         network_host->length_clients
       )
     );
 
-    struct network_host_client* network_host_client = &(
+    network_host->clients[
+      network_host_client_receiving_thread_data->index_client
+    ] = (
+      clic3_memory_allocate_raw(
+        sizeof(
+          struct network_host_client
+        )
+      )
+    );
+
+    struct network_host_client* network_host_client = (
       network_host->clients[
         network_host_client_receiving_thread_data->index_client
       ]
@@ -393,10 +395,22 @@ void* network_host_routing_thread(
       network_host_client_receiving_thread_data->index_client
     );
 
+    network_host_client_receiving_thread_data->network_host_client = (
+      network_host_client
+    );
+
+    clic3_bytes_copy(
+      network_host_client_sending_thread_data,
+      network_host_client_receiving_thread_data,
+      sizeof(
+        struct network_host_client_thread_data
+      )
+    );
+
     pthread_create(
       &network_host->threads[
         network_host->length_threads -
-        1
+        2
       ],
       0,
       network_host_client_receiving_thread,
@@ -437,10 +451,8 @@ void* network_host_client_receiving_thread(
     network_host_client_thread_data->network_host
   );
 
-  struct network_host_client* network_host_client = &(
-    network_host->clients[
-      network_host_client_thread_data->index_client
-    ]
+  struct network_host_client* network_host_client = (
+    network_host_client_thread_data->network_host_client
   );
 
   while (
@@ -471,6 +483,8 @@ void* network_host_client_receiving_thread(
       network_host_client->status = (
         network_client_status_disconnected
       );
+
+      continue;
     }
 
     struct network_data_packet network_data_packet;
@@ -492,6 +506,41 @@ void* network_host_client_receiving_thread(
         char* notification_prefix = (
           clic3_char_arrays_concatenate(
             "network_host_client::load_complete->{",
+            network_host_client->char_array_index
+          )
+        );
+
+        char* notification = (
+          clic3_char_arrays_concatenate(
+            notification_prefix,
+            "};"
+          )
+        );
+
+        notification_manager_send(
+          &network_host->notification_manager,
+          notification,
+          network_host_notification_type_default
+        );
+
+        clic3_memory_free_raw(
+          notification_prefix
+        );
+
+        clic3_memory_free_raw(
+          notification
+        );
+
+        break;
+      }
+      case network_command_data_map: {
+        network_host_client->status_game = (
+          network_client_status_game_loading
+        );
+
+        char* notification_prefix = (
+          clic3_char_arrays_concatenate(
+            "network_host_client::requested_data_map->{",
             network_host_client->char_array_index
           )
         );
@@ -548,10 +597,8 @@ void* network_host_client_sending_thread(
     network_host_client_thread_data->network_host
   );
 
-  struct network_host_client* network_host_client = &(
-    network_host->clients[
-      network_host_client_thread_data->index_client
-    ]
+  struct network_host_client* network_host_client = (
+    network_host_client_thread_data->network_host_client
   );
 
   unsigned char quitting = 0;
@@ -633,7 +680,7 @@ void network_host_data_map_client_index_send(
   struct network_host* network_host,
   unsigned int index_client
 ) {
-  struct network_host_client* network_host_client = &(
+  struct network_host_client* network_host_client = (
     network_host->clients[
       index_client
     ]
@@ -720,7 +767,7 @@ void network_host_destroy(
     index_client < network_host->length_clients;
     ++index_client
   ) {
-    struct network_host_client* network_host_client = &(
+    struct network_host_client* network_host_client = (
       network_host->clients[
         index_client
       ]
@@ -759,13 +806,17 @@ void network_host_destroy(
     index_client < network_host->length_clients;
     ++index_client
   ) {
-    struct network_host_client* network_host_client = &(
+    struct network_host_client* network_host_client = (
       network_host->clients[
         index_client
       ]
     );
 
     network_host_client_destroy(
+      network_host_client
+    );
+
+    clic3_memory_free_raw(
       network_host_client
     );
   }
