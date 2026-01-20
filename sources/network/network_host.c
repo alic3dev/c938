@@ -16,9 +16,20 @@
 #include <sys/socket.h>
 #include <unistd.h>
 
+unsigned char network_host_listen(
+  struct network_host* network_host
+) {
+  return (
+    network_host_listen_with_notification(
+      network_host,
+      0,
+      0
+    )
+  );
+}
+
 unsigned char network_host_listen_with_notification(
   struct network_host* network_host,
-  unsigned int length_threads,
   notification_manager_notification_on notification_on,
   void* notification_on_data
 ) {
@@ -109,6 +120,16 @@ unsigned char network_host_listen_with_notification(
     )
   );
 
+  network_data_map_initialize(
+    &network_host->data_map
+  );
+
+  network_host->clients = (
+    clic3_memory_allocate_raw(
+      0
+    )
+  );
+
   notification_manager_initialize(
     &network_host->notification_manager
   );
@@ -122,16 +143,6 @@ unsigned char network_host_listen_with_notification(
       notification_on_data
     );
   }
-
-  network_data_map_initialize(
-    &network_host->data_map
-  );
-
-  network_host->clients = (
-    clic3_memory_allocate_raw(
-      0
-    )
-  );
 
   network_host->initialized = 1;
 
@@ -152,20 +163,6 @@ unsigned char network_host_listen_with_notification(
   );
   
   return 0;
-}
-
-unsigned char network_host_listen(
-  struct network_host* network_host,
-  unsigned int length_threads
-) {
-  return (
-    network_host_listen_with_notification(
-      network_host,
-      length_threads,
-      0,
-      0
-    )
-  );
 }
 
 void* network_host_routing_thread(

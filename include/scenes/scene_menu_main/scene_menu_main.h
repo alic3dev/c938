@@ -125,10 +125,22 @@ void scene_menu_main_destroy(
   struct metil_scene* _Nonnull
 );
 
+void network_client_notification(
+  char* _Nonnull,
+  unsigned char,
+  void* _Nonnull
+);
+
 void network_host_notification(
   char* _Nonnull,
   unsigned char,
-  void* _Nullable
+  void* _Nonnull
+);
+
+void network_notification_log_to_stream(
+  FILE* _Nonnull,
+  const char* _Nonnull,
+  char* _Nonnull
 );
 
 #if target_os_ios

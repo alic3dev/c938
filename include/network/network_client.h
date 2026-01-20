@@ -6,12 +6,19 @@
 #include <network/network_client_status.h>
 #include <network/network_client_status_game.h>
 #include <network/network_command.h>
+#include <notification/notification_manager.h>
 
 #include <netdb.h>
 #include <netinet/in.h>
 #include <pthread.h>
 #include <sys/socket.h>
 #include <unistd.h>
+
+enum network_client_notification_type {
+  network_client_notification_type_default = 0,
+  network_client_notification_type_error = 1,
+  network_client_notification_type_data_map_sent = 2
+};
 
 struct network_client {
   int socket;
@@ -24,6 +31,8 @@ struct network_client {
   ];
 
   struct sockaddr_in address_host;
+
+  struct notification_manager notification_manager;
 
   struct network_data_map data_map;
 
@@ -44,6 +53,12 @@ struct network_client_thread_data {
 
 unsigned char network_client_connect(
   struct network_client*
+);
+
+unsigned char network_client_connect_with_notification(
+  struct network_client*,
+  notification_manager_notification_on,
+  void*
 );
 
 void* network_client_receiving_thread(

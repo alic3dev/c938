@@ -2,6 +2,7 @@
 
 #include <network/data/network_data_map.h>
 #include <network/network.h>
+#include <notification/notification_manager.h>
 
 #include <clic3_memory.h>
 
@@ -14,6 +15,20 @@
 
 unsigned char network_client_connect(
   struct network_client* network_client
+) {
+  return (
+    network_client_connect_with_notification(
+      network_client,
+      0,
+      0
+    )
+  );
+}
+
+unsigned char network_client_connect_with_notification(
+  struct network_client* network_client,
+  notification_manager_notification_on notification_on,
+  void* notification_on_data
 ) {
   network_client->status = (
     network_client_status_initializing
@@ -171,6 +186,20 @@ unsigned char network_client_connect(
     0
   );
 
+  notification_manager_initialize(
+    &network_client->notification_manager
+  );
+
+  if (
+    notification_on != 0
+  ) {
+    notification_manager_notification_on_add(
+      &network_client->notification_manager,
+      notification_on,
+      notification_on_data
+    );
+  }
+
   pthread_create(
     &network_client->thread_receiving,
     0,
@@ -252,6 +281,12 @@ void* network_client_receiving_thread(
         network_data_map_packet_set(
           &network_client->data_map,
           network_data_packet
+        );
+
+        notification_manager_send(
+          &network_client->notification_manager,
+          "network_client::received_data_map",
+          network_client_notification_type_data_map_sent
         );
 
         break;
