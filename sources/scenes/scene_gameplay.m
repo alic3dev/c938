@@ -11,12 +11,16 @@
 #include <mesh/mesh_hud_item.h>
 #include <mesh/mesh_player.h>
 #include <network/data/network_data_map_functions.h>
+#include <network/network_client.h>
+#include <network/network_client_status.h>
+#include <network/network_command.h>
 #include <network/network_host.h>
 #include <objects/object_crosshair.h>
 #include <objects/object_enemy.h>
 #include <player.h>
-
 #include <textures/textures_buildings.h>
+
+#include <clic3_memory.h>
 
 #include <metil.h>
 #include <metil_audio/metil_audio_io_proc.h>
@@ -469,6 +473,27 @@ void scene_gameplay_populate(
 
     metil_object_player->position.y = (
       scene->player.position.y
+    );
+
+    static struct network_data_packet* network_data_packet;
+
+    network_data_packet = (
+      clic3_memory_allocate_raw(
+        sizeof(
+          struct network_data_packet
+        )
+      )
+    );
+
+    network_data_packet_initialize(
+      network_data_packet,
+      network_command_data_map_loaded,
+      0
+    );
+
+    network_client_send(
+      network_client,
+      network_data_packet
     );
 
     return;

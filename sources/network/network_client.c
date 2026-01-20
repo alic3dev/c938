@@ -19,8 +19,8 @@ unsigned char network_client_connect(
     network_client_status_initializing
   );
 
-  network_client->command_sending = (
-    network_command_no_operation
+  network_client->status_game = (
+    network_client_status_game_loading
   );
 
   network_client->socket = (
@@ -35,7 +35,11 @@ unsigned char network_client_connect(
     network_client->socket < 0
   ) {
     network_client->status = (
-      network_client_status_none
+      network_client_status_disconnected
+    );
+
+    network_client->status_game = (
+      network_client_status_game_disconnected
     );
 
     return 1;
@@ -96,7 +100,7 @@ unsigned char network_client_connect(
     );
 
     network_client->status = (
-      network_client_status_none
+      network_client_status_disconnected
     );
 
     return 2;
@@ -148,8 +152,23 @@ unsigned char network_client_connect(
     0
   );
 
+  pthread_mutex_init(
+    &network_client->mutex_network_data_packets_outgoing,
+    0
+  );
+
   pthread_mutex_lock(
     &network_client->mutex_sending
+  );
+
+  network_client->network_data_packets_outgoing = (
+    clic3_memory_allocate_raw(
+      0
+    )
+  );
+
+  network_client->length_network_data_packets_outgoing = (
+    0
   );
 
   pthread_create(
@@ -238,6 +257,7 @@ void* network_client_receiving_thread(
         break;
       }
       case network_command_initialize:
+      case network_command_no_operation:
       default: {
         clic3_memory_free_raw(
           network_data_packet
@@ -280,22 +300,97 @@ void* network_client_sending_thread(
       &network_client->mutex_sending
     );
 
-    switch (
-      network_client->command_sending
-    ) {
-      case network_command_disconnecting: {
-        network_client->status = (
-          network_client->status |
-          network_client_status_disconnecting
-        );
+    unsigned int index_network_data_packet_outgoing = 0;
 
-        break;
+    for (
+      ;
+      (
+        index_network_data_packet_outgoing <
+        network_client->length_network_data_packets_outgoing
+      );
+      ++index_network_data_packet_outgoing
+    ) {
+      pthread_mutex_lock(
+        &network_client->mutex_network_data_packets_outgoing
+      );
+
+      struct network_data_packet* network_data_packet_outgoing = (
+        network_client->network_data_packets_outgoing[
+          index_network_data_packet_outgoing
+        ]
+      );
+
+      pthread_mutex_unlock(
+        &network_client->mutex_network_data_packets_outgoing
+      );
+
+      switch (
+        network_data_packet_outgoing->command
+      ) {
+        case network_command_data_map_loaded: {
+          network_client->status_game = (
+            network_client_status_game_loaded
+          );
+
+          break;
+        }
+        case network_command_disconnecting: {
+          network_client->status = (
+            network_client->status |
+            network_client_status_disconnecting
+          );
+
+          break;
+        }
+        case network_command_no_operation:
+        default: {
+          break;
+        }
       }
-      case network_command_no_operation:
-      default: {
-        break;
+
+      if (
+        (
+          network_client->status &
+          network_client_status_disconnecting
+        ) == 0
+      ) {
+        network_data_packet_send(
+          network_data_packet_outgoing,
+          network_client->socket
+        );
       }
+
+      network_data_packet_destroy(
+        network_data_packet_outgoing
+      );
+
+      clic3_memory_free_raw(
+        network_data_packet_outgoing
+      );
     }
+
+    pthread_mutex_lock(
+      &network_client->mutex_network_data_packets_outgoing
+    );
+
+    network_client->length_network_data_packets_outgoing = (
+      network_client->length_network_data_packets_outgoing -
+      index_network_data_packet_outgoing
+    );
+
+    clic3_memory_reallocate_raw(
+      &network_client->network_data_packets_outgoing,
+      (
+        sizeof(
+          void*
+        ) *
+        network_client->length_network_data_packets_outgoing
+      )
+    );
+
+    pthread_mutex_unlock(
+      &network_client->mutex_network_data_packets_outgoing
+    );
   }
   
   clic3_memory_free(
@@ -303,6 +398,45 @@ void* network_client_sending_thread(
   );
 
   return 0;
+}
+
+void network_client_send(
+  struct network_client* network_client,
+  struct network_data_packet* network_data_packet
+) {
+  pthread_mutex_lock(
+    &network_client->mutex_network_data_packets_outgoing
+  );
+
+  network_client->length_network_data_packets_outgoing = (
+    network_client->length_network_data_packets_outgoing +
+    1
+  );
+
+  clic3_memory_reallocate_raw(
+    &network_client->network_data_packets_outgoing,
+    (
+      sizeof(
+        void*
+      ) *
+      network_client->length_network_data_packets_outgoing
+    )
+  );
+
+  network_client->network_data_packets_outgoing[
+    network_client->length_network_data_packets_outgoing -
+    1
+  ] = (
+    network_data_packet
+  );
+
+  pthread_mutex_unlock(
+    &network_client->mutex_network_data_packets_outgoing
+  );
+
+  pthread_mutex_unlock(
+    &network_client->mutex_sending
+  );
 }
 
 void network_client_destroy(
@@ -322,6 +456,10 @@ void network_client_destroy(
 
   pthread_mutex_unlock(
     &network_client->mutex_sending
+  );
+
+  pthread_mutex_unlock(
+    &network_client->mutex_network_data_packets_outgoing
   );
 
   close(
@@ -346,7 +484,35 @@ void network_client_destroy(
     &network_client->mutex_sending
   );
 
+  pthread_mutex_destroy(
+    &network_client->mutex_network_data_packets_outgoing
+  );
+
   network_data_map_destroy(
     &network_client->data_map
+  );
+
+  for (
+    unsigned int index_network_data_packet_outgoing = 0;
+    index_network_data_packet_outgoing < network_client->length_network_data_packets_outgoing;
+    ++index_network_data_packet_outgoing
+  ) {
+    struct network_data_packet* network_data_packet_outgoing = (
+      network_client->network_data_packets_outgoing[
+        index_network_data_packet_outgoing
+      ]
+    );
+
+    network_data_packet_destroy(
+      network_data_packet_outgoing
+    );
+
+    clic3_memory_free_raw(
+      network_data_packet_outgoing
+    );
+  }
+
+  clic3_memory_free_raw(
+    network_client->network_data_packets_outgoing
   );
 }
