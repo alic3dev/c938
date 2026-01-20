@@ -32,8 +32,10 @@ struct network_client {
 
   pthread_mutex_t mutex;
   pthread_mutex_t mutex_sending;
+  pthread_mutex_t mutex_network_data_packets_outgoing;
 
-  enum network_command command_sending;
+  struct network_data_packet** network_data_packets_outgoing;
+  unsigned int length_network_data_packets_outgoing;
 };
 
 struct network_client_thread_data {
@@ -50,6 +52,11 @@ void* network_client_receiving_thread(
 
 void* network_client_sending_thread(
   void*
+);
+
+void network_client_send(
+  struct network_client*,
+  struct network_data_packet*
 );
 
 void network_client_destroy(
