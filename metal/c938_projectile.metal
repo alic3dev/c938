@@ -8,7 +8,7 @@
 struct data_vertex {
   float4 position [[position]];
   float brightness;
-  float4 color;
+  float4 colour;
 };
 
 [[vertex]] struct data_vertex c938_projectile_vertex(
@@ -56,10 +56,10 @@ struct data_vertex {
     )
   );
 
-  data_vertex.color = float4(
-    projectile_data->color.x,
-    projectile_data->color.y,
-    projectile_data->color.z,
+  data_vertex.colour = float4(
+    projectile_data->colour.x,
+    projectile_data->colour.y,
+    projectile_data->colour.z,
     (1.0f - percentage_lifespan) *
     metal::fmin(
       id_vertex,
@@ -75,9 +75,9 @@ struct data_vertex {
   metal::texture2d<half> texture [[texture(0)]]
 ) {
   return float4(
-    data_vertex.color.r * data_vertex.brightness,
-    data_vertex.color.g * data_vertex.brightness,
-    data_vertex.color.b * data_vertex.brightness,
-    data_vertex.color.a
+    data_vertex.colour.r * data_vertex.brightness,
+    data_vertex.colour.g * data_vertex.brightness,
+    data_vertex.colour.b * data_vertex.brightness,
+    data_vertex.colour.a
   );
 }
