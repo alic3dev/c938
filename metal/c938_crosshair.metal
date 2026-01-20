@@ -6,7 +6,7 @@
 
 struct data_vertex {
   float4 position [[position]];
-  float4 color;
+  float4 colour;
 };
 
 [[vertex]] struct data_vertex c938_crosshair_vertex(
@@ -34,10 +34,10 @@ struct data_vertex {
     positions[id_vertex]
   );
 
-  data_vertex.color.r = data_object->color.x;
-  data_vertex.color.g = data_object->color.y;
-  data_vertex.color.b = data_object->color.z;
-  data_vertex.color.a = data_object->color.w;
+  data_vertex.colour.r = data_object->colour.x;
+  data_vertex.colour.g = data_object->colour.y;
+  data_vertex.colour.b = data_object->colour.z;
+  data_vertex.colour.a = data_object->colour.w;
 
   return data_vertex;
 }
@@ -46,9 +46,9 @@ struct data_vertex {
   data_vertex data_vertex [[stage_in]]
 ) {
   return float4(
-    data_vertex.color.r,
-    data_vertex.color.g,
-    data_vertex.color.b,
-    data_vertex.color.a
+    data_vertex.colour.r,
+    data_vertex.colour.g,
+    data_vertex.colour.b,
+    data_vertex.colour.a
   );
 }

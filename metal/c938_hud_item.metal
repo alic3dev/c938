@@ -7,7 +7,7 @@
 struct data_vertex {
   float4 position [[position]];
   float brightness;
-  float3 color;
+  float3 colour;
 };
 
 [[vertex]] struct data_vertex c938_hud_item_vertex(
@@ -37,9 +37,9 @@ struct data_vertex {
 
   data_vertex.brightness = data_frame->brightness_text;
 
-  data_vertex.color.r = (float) (2000 - data_object->noise) / 2000.0f;
-  data_vertex.color.g = (float) data_object->noise / 2000.0f;
-  data_vertex.color.b = (float) (data_object->noise % 2000) / 2000.0f;
+  data_vertex.colour.r = (float) (2000 - data_object->noise) / 2000.0f;
+  data_vertex.colour.g = (float) data_object->noise / 2000.0f;
+  data_vertex.colour.b = (float) (data_object->noise % 2000) / 2000.0f;
 
   return data_vertex;
 }
@@ -48,9 +48,9 @@ struct data_vertex {
   data_vertex data_vertex [[stage_in]]
 ) {
   return float4(
-    data_vertex.color.r * data_vertex.brightness,
-    data_vertex.color.g * data_vertex.brightness,
-    data_vertex.color.b * data_vertex.brightness,
+    data_vertex.colour.r * data_vertex.brightness,
+    data_vertex.colour.g * data_vertex.brightness,
+    data_vertex.colour.b * data_vertex.brightness,
     1.0f
   );
 }

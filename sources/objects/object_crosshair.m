@@ -47,8 +47,8 @@ void object_crosshair_initialize(
     ].buffer.contents
   );
 
-  data->color.x = 1.0f;
-  data->color.y = 1.0f;
-  data->color.z = 1.0f;
-  data->color.w = 1.0f;
+  data->colour.x = 1.0f;
+  data->colour.y = 1.0f;
+  data->colour.z = 1.0f;
+  data->colour.w = 1.0f;
 }

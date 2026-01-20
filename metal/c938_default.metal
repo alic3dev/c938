@@ -52,7 +52,7 @@ struct data_vertex {
     metal::mip_filter::linear
   );
 
-  float4 color_texture = float4(
+  float4 colour_texture = float4(
     texture.sample(
       sampler_texture,
       data_vertex.position_texture
@@ -60,9 +60,9 @@ struct data_vertex {
   );
 
   return float4(
-    color_texture[0] * data_vertex.brightness,
-    color_texture[1] * data_vertex.brightness,
-    color_texture[2] * data_vertex.brightness,
-    color_texture[3]
+    colour_texture[0] * data_vertex.brightness,
+    colour_texture[1] * data_vertex.brightness,
+    colour_texture[2] * data_vertex.brightness,
+    colour_texture[3]
   );
 }

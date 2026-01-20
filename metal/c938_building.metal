@@ -8,7 +8,7 @@ struct data_vertex {
   float4 position [[position]];
   float2 position_texture;
   float brightness;
-  float4 color;
+  float4 colour;
   float distance;
 };
 
@@ -49,11 +49,11 @@ struct data_vertex {
     : 1.0f
   ) : 0.013f);
 
-  data_vertex.color = float4(
-    data_object->color.x,
-    data_object->color.y,
-    data_object->color.z,
-    data_object->color.w
+  data_vertex.colour = float4(
+    data_object->colour.x,
+    data_object->colour.y,
+    data_object->colour.z,
+    data_object->colour.w
   );
 
   data_vertex.distance = metal::distance(
@@ -107,7 +107,7 @@ struct data_vertex {
     metal::s_address::repeat
   );
 
-  float4 color_texture = float4(
+  float4 colour_texture = float4(
     texture.sample(
       sampler_texture,
       data_vertex.position_texture / 100.0f
@@ -115,9 +115,9 @@ struct data_vertex {
   );
 
   return float4(
-    color_texture[0] * data_vertex.color.r * brightness,
-    color_texture[1] * data_vertex.color.g * brightness,
-    color_texture[2] * data_vertex.color.b * brightness,
-    data_vertex.color.a
+    colour_texture[0] * data_vertex.colour.r * brightness,
+    colour_texture[1] * data_vertex.colour.g * brightness,
+    colour_texture[2] * data_vertex.colour.b * brightness,
+    data_vertex.colour.a
   );
 }

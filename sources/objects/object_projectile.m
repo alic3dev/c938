@@ -53,9 +53,9 @@ void object_projectile_initialize(
     ].buffer.contents
   );
 
-  projectile_data->color.x = 0.7f;
-  projectile_data->color.y = 0.3f;
-  projectile_data->color.z = 1.0f;
+  projectile_data->colour.x = 0.7f;
+  projectile_data->colour.y = 0.3f;
+  projectile_data->colour.z = 1.0f;
 
   projectile_data->time_fired = time_fired;
   projectile_data->time_current = time_fired;
