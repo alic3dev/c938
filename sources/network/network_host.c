@@ -2,6 +2,9 @@
 
 #include <network/data/network_data_packet.h>
 #include <network/network.h>
+#include <network/network_client_status.h>
+#include <network/network_client_status_game.h>
+#include <network/network_command.h>
 
 #include <clic3_bytes.h>
 #include <clic3_char_arrays.h>
@@ -12,8 +15,6 @@
 #include <pthread.h>
 #include <sys/socket.h>
 #include <unistd.h>
-
-#include <stdio.h>
 
 unsigned char network_host_listen_with_notification(
   struct network_host* network_host,
@@ -385,14 +386,14 @@ void* network_host_routing_thread(
 
     struct network_host_client* network_host_client = &(
       network_host->clients[
-        network_host->length_clients -
-        1
+        network_host_client_receiving_thread_data->index_client
       ]
     );
 
     network_host_client_initialize(
       network_host_client,
-      socket_client
+      socket_client,
+      network_host_client_receiving_thread_data->index_client
     );
 
     pthread_create(
@@ -481,6 +482,54 @@ void* network_host_client_receiving_thread(
       &network_data_packet,
       data_received_client,
       length_data_received_client
+    );
+
+    switch (
+      network_data_packet.command
+    ) {
+      case network_command_data_map_loaded: {
+        network_host_client->status_game = (
+          network_client_status_game_loaded
+        );
+
+        char* notification_prefix = (
+          clic3_char_arrays_concatenate(
+            "network_host_client::load_complete->{",
+            network_host_client->char_array_index
+          )
+        );
+
+        char* notification = (
+          clic3_char_arrays_concatenate(
+            notification_prefix,
+            "};"
+          )
+        );
+
+        notification_manager_send(
+          &network_host->notification_manager,
+          notification,
+          network_host_notification_type_default
+        );
+
+        clic3_memory_free_raw(
+          notification_prefix
+        );
+
+        clic3_memory_free_raw(
+          notification
+        );
+
+        break;
+      }
+      case network_command_no_operation:
+      default: {
+        break;
+      }
+    }
+
+    network_data_packet_destroy(
+      &network_data_packet
     );
   }
 
