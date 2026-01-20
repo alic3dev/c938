@@ -126,25 +126,7 @@ unsigned char network_host_listen_with_notification(
     &network_host->data_map
   );
 
-  network_host->socket_clients = (
-    clic3_memory_allocate_raw(
-      0
-    )
-  );
-
-  network_host->clients_command_sending = (
-    clic3_memory_allocate_raw(
-      0
-    )
-  );
-
-  network_host->mutex_clients = (
-    clic3_memory_allocate_raw(
-      0
-    )
-  );
-
-  network_host->mutex_clients_sending = (
+  network_host->clients = (
     clic3_memory_allocate_raw(
       0
     )
@@ -396,75 +378,25 @@ void* network_host_routing_thread(
     );
 
     clic3_memory_reallocate_raw(
-      &network_host->socket_clients,
+      &network_host->clients,
       (
         sizeof(
-          int
+          struct network_host_client
         ) *
         network_host->length_clients
       )
     );
 
-    clic3_memory_reallocate_raw(
-      &network_host->clients_command_sending,
-      (
-        sizeof(
-          enum network_host_client_command_sending
-        ) *
-        network_host->length_clients
-      )
-    );
-
-    clic3_memory_reallocate_raw(
-      &network_host->mutex_clients,
-      (
-        sizeof(
-          pthread_mutex_t
-        ) *
-        network_host->length_clients
-      )
-    );
-
-    clic3_memory_reallocate_raw(
-      &network_host->mutex_clients_sending,
-      (
-        sizeof(
-          pthread_mutex_t
-        ) *
-        network_host->length_clients
-      )
-    );
-
-    network_host->socket_clients[
-      network_host_client_sending_thread_data->index_client
-    ] = (
-      socket_client
-    );
-
-    network_host->clients_command_sending[
-      network_host_client_sending_thread_data->index_client
-    ] = (
-      network_host_client_command_sending_none
-    );
-
-    pthread_mutex_init(
-      &network_host->mutex_clients[
-        network_host_client_sending_thread_data->index_client
-      ],
-      0
-    );
-
-    pthread_mutex_init(
-      &network_host->mutex_clients_sending[
-        network_host_client_sending_thread_data->index_client
-      ],
-      0
-    );
-
-    pthread_mutex_lock(
-      &network_host->mutex_clients_sending[
-        network_host_client_sending_thread_data->index_client
+    struct network_host_client* network_host_client = &(
+      network_host->clients[
+        network_host->length_clients -
+        1
       ]
+    );
+
+    network_host_client_initialize(
+      network_host_client,
+      socket_client
     );
 
     pthread_create(
@@ -511,26 +443,48 @@ void* network_host_client_receiving_thread(
     network_host_client_thread_data->network_host
   );
 
-  unsigned int index_client = (
-    network_host_client_thread_data->index_client
+  struct network_host_client* network_host_client = &(
+    network_host->clients[
+      network_host_client_thread_data->index_client
+    ]
   );
 
   while (
-    network_host->online
+    network_host->online &&
+    (
+      network_host_client->status & (
+        network_client_status_disconnected |
+        network_client_status_disconnecting
+      )
+    ) == 0
   ) {
-    char data_client[
+    char data_received_client[
       c938_network_data_transfer_limit
     ];
     
-    long int length_data_client = (
+    long int length_data_received_client = (
       recv(
-        network_host->socket_clients[
-          index_client
-        ],
-        data_client,
+        network_host_client->socket,
+        data_received_client,
         c938_network_data_transfer_limit,
         0
       )
+    );
+
+    if (
+      length_data_received_client <= 0
+    ) {
+      network_host_client->status = (
+        network_client_status_disconnected
+      );
+    }
+
+    struct network_data_packet network_data_packet;
+
+    network_data_packet_initialize_from_bytes(
+      &network_data_packet,
+      data_received_client,
+      length_data_received_client
     );
   }
 
@@ -552,69 +506,77 @@ void* network_host_client_sending_thread(
     network_host_client_thread_data->network_host
   );
 
-  unsigned int index_client = (
-    network_host_client_thread_data->index_client
+  struct network_host_client* network_host_client = &(
+    network_host->clients[
+      network_host_client_thread_data->index_client
+    ]
   );
 
   unsigned char quitting = 0;
 
   while (
-    network_host->online &&
-    quitting == 0
+    network_host->online == 1 &&
+    (
+      network_host_client->status & (
+        network_client_status_disconnected |
+        network_client_status_disconnecting
+      )
+    ) == 0
   ) {
     pthread_mutex_lock(
-      &network_host->mutex_clients_sending[
-        index_client
-      ]
+      &network_host_client->mutex_sending
     );
 
-    enum network_host_client_command_sending network_host_client_command_sending = (
-      network_host->clients_command_sending[
-        index_client
-      ]
-    );
+    if (
+      network_host->online == 0 ||
+      (
+        network_host_client->status & (
+          network_client_status_disconnected |
+          network_client_status_disconnecting
+        )
+      ) != 0
+    ) {
+      pthread_mutex_unlock(
+        &network_host_client->mutex
+      );
+
+      break;
+    }
 
     switch(
-      network_host_client_command_sending
+      network_host_client->command_sending
     ) {
-      case network_host_client_command_sending_quitting: {
+      case network_command_disconnecting: {
         quitting = 1;
+        
         break;
       }
-      case network_host_client_command_sending_data_map: {
-        pthread_mutex_lock(
-          &network_host->data_map.mutex
-        );
-
+      case network_command_data_map: {
         long int length_bytes_sent = (
           network_data_packet_send(
             network_host->data_map.packet,
-            network_host->socket_clients[
-              index_client
-            ]
+            network_host_client->socket
           )
         );
         
         if (
           length_bytes_sent != network_host->data_map.packet->length
         ) {
-          // failed to send
+          network_host_client->status = (
+            network_client_status_disconnected
+          );
         }
 
-        pthread_mutex_unlock(
-          &network_host->data_map.mutex
-        );
+        break;
       }
-      case network_host_client_command_sending_none:
+      case network_command_no_operation:
       default: {
         break;
       }
     }
 
     pthread_mutex_unlock(
-      &network_host->mutex_clients[
-        index_client
-      ]
+      &network_host_client->mutex
     );
   }
 
@@ -629,22 +591,22 @@ void network_host_data_map_client_index_send(
   struct network_host* network_host,
   unsigned int index_client
 ) {
-  pthread_mutex_lock(
-    &network_host->mutex_clients[
+  struct network_host_client* network_host_client = &(
+    network_host->clients[
       index_client
     ]
   );
 
-  network_host->clients_command_sending[
-    index_client
-  ] = (
-    network_host_client_command_sending_data_map
+  pthread_mutex_lock(
+    &network_host_client->mutex
+  );
+
+  network_host_client->command_sending = (
+    network_command_data_map
   );
 
   pthread_mutex_unlock(
-    &network_host->mutex_clients_sending[
-      index_client
-    ]
+    &network_host_client->mutex_sending
   );
 }
 
@@ -653,6 +615,10 @@ void network_host_data_map_send(
 ) {
   pthread_mutex_lock(
     &network_host->mutex_thread
+  );
+
+  pthread_mutex_lock(
+    &network_host->data_map.mutex
   );
 
   for (
@@ -665,6 +631,10 @@ void network_host_data_map_send(
       index_client
     );
   }
+
+  pthread_mutex_unlock(
+    &network_host->data_map.mutex
+  );
 
   pthread_mutex_unlock(
     &network_host->mutex_thread
@@ -704,22 +674,24 @@ void network_host_destroy(
     index_client < network_host->length_clients;
     ++index_client
   ) {
-    network_host->clients_command_sending[
-      index_client
-    ] = (
-      network_host_client_command_sending_quitting
+    struct network_host_client* network_host_client = &(
+      network_host->clients[
+        index_client
+      ]
+    );
+
+    network_host_client->command_sending = (
+      network_command_disconnecting
     );
 
     pthread_mutex_unlock(
-      &network_host->mutex_clients_sending[
-        index_client
-      ]
+      &network_host_client->mutex_sending
     );
 
+    // the socket will likely close before quit command is sent,
+    // will think about this at a later point in time
     close(
-      network_host->socket_clients[
-        index_client
-      ]
+      network_host_client->socket
     );
   }
 
@@ -741,16 +713,14 @@ void network_host_destroy(
     index_client < network_host->length_clients;
     ++index_client
   ) {
-    pthread_mutex_destroy(
-      &network_host->mutex_clients[
+    struct network_host_client* network_host_client = &(
+      network_host->clients[
         index_client
       ]
     );
 
-    pthread_mutex_destroy(
-      &network_host->mutex_clients_sending[
-        index_client
-      ]
+    network_host_client_destroy(
+      network_host_client
     );
   }
 
@@ -767,19 +737,7 @@ void network_host_destroy(
   );
 
   clic3_memory_free_raw(
-    network_host->socket_clients
-  );
-
-  clic3_memory_free_raw(
-    network_host->clients_command_sending
-  );
-
-  clic3_memory_free_raw(
-    network_host->mutex_clients
-  );
-
-  clic3_memory_free_raw(
-    network_host->mutex_clients_sending
+    network_host->clients
   );
 
   clic3_memory_free_raw(

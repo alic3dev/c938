@@ -414,8 +414,15 @@ void scene_gameplay_populate(
       scene_gameplay_data->parameters->networked ==
       parameters_gameplay_networked_client
     ) &&
-    network_client->status != network_client_status_quitting &&
-    network_client->status != network_client_status_none
+    (
+      (
+        network_client->status & (
+          network_client_status_disconnecting |
+          network_client_status_disconnected
+        )
+      ) == 0 &&
+      network_client->status != network_client_status_none
+    )
   ) {
     unsigned char networked = (
       scene_gameplay_data->parameters->networked
