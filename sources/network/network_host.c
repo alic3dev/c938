@@ -396,7 +396,7 @@ void* network_host_routing_thread(
     pthread_create(
       &network_host->threads[
         network_host->length_threads -
-        1
+        2
       ],
       0,
       network_host_client_receiving_thread,
