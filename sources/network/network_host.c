@@ -282,10 +282,6 @@ void* network_host_routing_thread(
       );
     }
 
-    char_array_address_client[
-      address_socket_client.sa_len
-    ] = '\0';
-
     char* notification_prefix = (
       clic3_char_arrays_concatenate(
         "network_host::client_connected->{",
@@ -314,9 +310,9 @@ void* network_host_routing_thread(
       network_host_notification_type_default
     );
 
-    clic3_memory_free_raw(
-      notification
-    );
+    // clic3_memory_free_raw(
+    //   notification
+    // );
 
     pthread_mutex_lock(
       &network_host->mutex_thread
