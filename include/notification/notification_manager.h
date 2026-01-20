@@ -27,6 +27,11 @@ void notification_manager_notification_on_add(
   void*
 );
 
+void notification_manager_notification_on_remove(
+  struct notification_manager*,
+  notification_manager_notification_on
+);
+
 void notification_manager_send(
   struct notification_manager*,
   char*,

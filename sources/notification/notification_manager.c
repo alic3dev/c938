@@ -82,6 +82,89 @@ void notification_manager_notification_on_add(
   );
 }
 
+void notification_manager_notification_on_remove(
+  struct notification_manager* notification_manager,
+  notification_manager_notification_on notification_manager_notification_on
+) {
+  pthread_mutex_lock(
+    &notification_manager->mutex_notification
+  );
+
+  for (
+    unsigned int index_notification_on = 0;
+    index_notification_on < notification_manager->length_notification_on_functions;
+  ) {
+    if (
+      notification_manager->notification_on_functions[
+        index_notification_on
+      ] == (
+        notification_manager_notification_on
+      )
+    ) {
+      for (
+        unsigned int index_shift_notification_on = index_notification_on;
+        index_shift_notification_on < (
+          notification_manager->length_notification_on_functions -
+          1
+        );
+        ++index_shift_notification_on
+      ) {
+        notification_manager->notification_on_functions[
+          index_shift_notification_on
+        ] = (
+          notification_manager->notification_on_functions[
+            index_shift_notification_on +
+            1
+          ]
+        );
+
+        notification_manager->notification_on_functions_data[
+          index_shift_notification_on
+        ] = (
+          notification_manager->notification_on_functions_data[
+            index_shift_notification_on +
+            1
+          ]
+        );
+      }
+
+      notification_manager->length_notification_on_functions = (
+        notification_manager->length_notification_on_functions -
+        1
+      );
+
+      clic3_memory_reallocate_raw(
+        &notification_manager->notification_on_functions,
+        (
+          sizeof(
+            notification_manager_notification_on
+          ) *
+          notification_manager->length_notification_on_functions
+        )
+      );
+
+      clic3_memory_reallocate_raw(
+        &notification_manager->notification_on_functions_data,
+        (
+          sizeof(
+            void*
+          ) *
+          notification_manager->length_notification_on_functions
+        )
+      );
+    }
+
+    index_notification_on = (
+      index_notification_on +
+      1
+    );
+  }
+
+  pthread_mutex_unlock(
+    &notification_manager->mutex_notification
+  );
+}
+
 void notification_manager_send(
   struct notification_manager* notification_manager,
   char* message,
