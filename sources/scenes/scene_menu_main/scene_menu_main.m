@@ -1229,7 +1229,6 @@ void scene_menu_main_poll(
             unsigned char status_network_host_listen = (
               network_host_listen_with_notification(
                 &c938_data->network_host,
-                metil->system_information.cores_cpu,
                 network_host_notification,
                 metil
               )
@@ -1355,8 +1354,10 @@ void scene_menu_main_poll(
             "setting::parameters_gameplay::networked->{client};\n"
           );
 
-          network_client_connect(
-            &c938_data->network_client
+          network_client_connect_with_notification(
+            &c938_data->network_client,
+            network_client_notification,
+            metil
           );
 
           data->time_started = (
@@ -1833,17 +1834,22 @@ void scene_menu_main_destroy(
   );
 }
 
-void network_host_notification(
+void network_client_notification(
   char* notification,
-  unsigned char id,
+  unsigned char id_notification,
   void* data
 ) {
   struct metil* metil = (
     data
   );
 
-  enum network_host_notification_type network_host_notification_type =  (
-    id
+  c938_logging_log(
+    metil,
+    notification
+  );
+
+  enum network_client_notification_type network_client_notification_type =  (
+    id_notification
   );
 
   struct c938_data* c938_data = (
@@ -1854,13 +1860,64 @@ void network_host_notification(
     &c938_data->logging
   );
 
+  FILE* stream_output = (
+    stdout
+  );
+
+  const char* colour;
+
+  switch (
+    network_client_notification_type
+  ) {
+    case network_client_notification_type_error: {
+      stream_output = (
+        stderr
+      );
+
+      colour = clic3_colours_bold_red;
+
+      break;
+    }
+    case network_client_notification_type_data_map_sent: {
+      colour = clic3_colours_bold_green;
+
+      break;
+    }
+    case network_client_notification_type_default:
+    default: {
+      colour = clic3_colours_bold_blue;
+
+      break;
+    }
+  }
+
+  network_notification_log_to_stream(
+    stream_output,
+    colour,
+    notification
+  );
+}
+
+void network_host_notification(
+  char* notification,
+  unsigned char id_notification,
+  void* data
+) {
+  struct metil* metil = (
+    data
+  );
+
   c938_logging_log(
     metil,
     notification
   );
 
+  enum network_host_notification_type network_host_notification_type =  (
+    id_notification
+  );
+
   FILE* stream_output;
-  const char* color;
+  const char* colour;
 
   switch (
     network_host_notification_type
@@ -1870,7 +1927,7 @@ void network_host_notification(
         stderr
       );
 
-      color = clic3_colours_bold_red;
+      colour = clic3_colours_bold_red;
 
       break;
     }
@@ -1880,12 +1937,32 @@ void network_host_notification(
         stdout
       );
 
-      color = clic3_colours_bold_blue;
+      colour = clic3_colours_bold_blue;
 
       break;
     }
   }
 
+  struct c938_data* c938_data = (
+    metil->data
+  );
+
+  struct c938_logging* c938_logging = (
+    &c938_data->logging
+  );
+
+  network_notification_log_to_stream(
+    stream_output,
+    colour,
+    notification
+  );
+}
+
+void network_notification_log_to_stream(
+  FILE* stream_output,
+  const char* colour,
+  char* notification
+) {
   char** notification_parts = (
     clic3_char_array_split_on_char(
       notification,
@@ -1906,7 +1983,7 @@ void network_host_notification(
       stream_output,
       "%s%s%s",
       index_notification_part == 1
-      ? color
+      ? colour
       : index_notification_part % 2 == 0
       ? clic3_colours_bold_foreground
       : clic3_colours_reset,

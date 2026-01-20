@@ -12,7 +12,8 @@
 
 enum network_host_notification_type {
   network_host_notification_type_default = 0,
-  network_host_notification_type_error = 1
+  network_host_notification_type_error = 1,
+  network_host_notification_type_data_map_requested = 2
 };
 
 struct network_host {
@@ -46,14 +47,12 @@ struct network_host_client_thread_data {
 
 unsigned char network_host_listen_with_notification(
   struct network_host*,
-  unsigned int,
   notification_manager_notification_on,
   void*
 );
 
 unsigned char network_host_listen(
-  struct network_host*,
-  unsigned int
+  struct network_host*
 );
 
 void* network_host_routing_thread(

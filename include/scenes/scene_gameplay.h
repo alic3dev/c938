@@ -47,6 +47,18 @@ void scene_gameplay_initialize(
   struct metil_scene* _Nonnull
 );
 
+void scene_gameplay_network_client_notification_on(
+  char* _Nonnull,
+  unsigned char,
+  void* _Nonnull
+);
+
+void scene_gameplay_network_host_notification_on(
+  char* _Nonnull,
+  unsigned char,
+  void* _Nonnull
+);
+
 void scene_gameplay_populate(
   struct metil* _Nonnull,
   struct metil_scene* _Nonnull,

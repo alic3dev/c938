@@ -49,7 +49,7 @@
 #include <UIKit/UIKit.h>
 #endif
 
-#include <stdlib.h>
+#include <pthread.h>
 
 void scene_gameplay_initialize(
   struct metil* metil,
@@ -76,8 +76,12 @@ void scene_gameplay_initialize(
     scene_gameplay_length_renderables
   );
 
-  scene->data = malloc(
-    sizeof(struct scene_gameplay_data)
+  scene->data = (
+    clic3_memory_allocate_raw(
+      sizeof(
+        struct scene_gameplay_data
+      )
+    )
   );
 
   struct scene_gameplay_data* scene_gameplay_data = (
@@ -108,9 +112,11 @@ void scene_gameplay_initialize(
 
   static struct player_data* player_data;
 
-  player_data = malloc(
-    sizeof(
-      struct player_data
+  player_data = (
+    clic3_memory_allocate_raw(
+      sizeof(
+        struct player_data
+      )
     )
   );
 
@@ -198,10 +204,14 @@ void scene_gameplay_initialize(
   }
 
   scene->length_textures = 1;
-  scene->textures = realloc(
-    scene->textures,
-    sizeof(id<MTLTexture>) *
-    scene->length_textures
+  clic3_memory_reallocate_raw(
+    &scene->textures,
+    (
+      sizeof(
+        id<MTLTexture>
+      ) *
+      scene->length_textures
+    )
   );
 
   MTKTextureLoader* texture_loader = [
@@ -214,7 +224,6 @@ void scene_gameplay_initialize(
     texture_loader,
     scene->textures
   );
-
 
   [texture_loader release];
 
@@ -316,6 +325,130 @@ void scene_gameplay_initialize(
     &metil->audio,
     scene_gameplay_io_proc
   );
+
+  if (
+    scene_gameplay_data->parameters->networked !=
+    parameters_gameplay_networked_none
+  ) {
+    pthread_mutex_init(
+      &scene_gameplay_data->mutex_data_map,
+      0
+    );
+
+    struct c938_data* c938_data = (
+      metil->data
+    );
+
+    struct network_host* network_host = (
+      &c938_data->network_host
+    );
+
+    if (
+      scene_gameplay_data->parameters->networked ==
+      parameters_gameplay_networked_host
+    ) {
+      notification_manager_notification_on_add(
+        &network_host->notification_manager,
+        scene_gameplay_network_host_notification_on,
+        metil
+      );
+    } else if (
+      scene_gameplay_data->parameters->networked ==
+      parameters_gameplay_networked_client
+    ) {
+      notification_manager_notification_on_add(
+        &network_host->notification_manager,
+        scene_gameplay_network_client_notification_on,
+        metil
+      );
+    }
+  }
+}
+
+void scene_gameplay_network_client_notification_on(
+  char* message,
+  unsigned char notification_id,
+  void* data
+) {
+  enum network_client_notification_type network_client_notification_type = (
+    notification_id
+  );
+
+  struct metil* metil = (
+    data
+  );
+
+  struct metil_scene_controller* metil_scene_controller = (
+    metil->scene_controller
+  );
+
+  struct metil_scene* metil_scene_gameplay = &(
+    metil_scene_controller->scene
+  );
+
+  struct scene_gameplay_data* scene_gameplay_data = (
+    metil_scene_gameplay->data
+  );
+
+  switch (
+    notification_id
+  ) {
+    case network_client_notification_type_data_map_sent: {
+      pthread_mutex_lock(
+        &scene_gameplay_data->mutex_data_map
+      );
+
+      pthread_mutex_unlock(
+        &scene_gameplay_data->mutex_data_map
+      );
+      break;
+    }
+    default:
+      break;
+  }
+}
+
+void scene_gameplay_network_host_notification_on(
+  char* message,
+  unsigned char notification_id,
+  void* data
+) {
+  enum network_host_notification_type network_host_notification_type = (
+    notification_id
+  );
+
+  struct metil* metil = (
+    data
+  );
+
+  struct metil_scene_controller* metil_scene_controller = (
+    metil->scene_controller
+  );
+
+  struct metil_scene* metil_scene_gameplay = &(
+    metil_scene_controller->scene
+  );
+
+  struct scene_gameplay_data* scene_gameplay_data = (
+    metil_scene_gameplay->data
+  );
+
+  switch (
+    notification_id
+  ) {
+    case network_host_notification_type_data_map_requested: {
+      pthread_mutex_lock(
+        &scene_gameplay_data->mutex_data_map
+      );
+
+      pthread_mutex_unlock(
+        &scene_gameplay_data->mutex_data_map
+      );
+      break;
+    }
+    default:
+      break;
+  }
 }
 
 void scene_gameplay_populate(
@@ -1089,33 +1222,48 @@ void scene_gameplay_poll(
 
 void scene_gameplay_destroy(
   struct metil* metil,
-  struct metil_scene* scene
+  struct metil_scene* metil_scene_gameplay
 ) {
   metil_audio_io_proc_remove(
     &metil->audio,
     scene_gameplay_io_proc
   );
 
-  free(
-    scene->data
+  struct scene_gameplay_data* scene_gameplay_data = (
+    metil_scene_gameplay->data
   );
 
-  scene->data = (
-    (void*) 0
+  if (
+    scene_gameplay_data->parameters->networked !=
+    parameters_gameplay_networked_none
+  ) {
+    struct scene_gameplay_data* scene_gameplay_data = (
+      metil_scene_gameplay->data
+    );
+
+    pthread_mutex_destroy(
+      &scene_gameplay_data->mutex_data_map
+    );
+  }
+
+  clic3_memory_free_raw(
+    metil_scene_gameplay->data
   );
 
-  scene->length_renderables = (
-    scene->length_renderables -
+  metil_scene_gameplay->data = 0;
+
+  metil_scene_gameplay->length_renderables = (
+    metil_scene_gameplay->length_renderables -
     1
   );
 
   metil_scene_destroy_default(
     metil,
-    scene
+    metil_scene_gameplay
   );
 }
 
-
+// todo: put these in gameplay data or something
 unsigned int b = 100;
 unsigned int d = 1000;
 
@@ -1137,11 +1285,16 @@ float scene_gameplay_io_proc_value_get(
       ]
     );
 
-    unsigned long int v = time_current - time_fired;
+    unsigned long int v = (
+      time_current -
+      time_fired
+    );
 
     float a = 0.0f;
     
-    if (v <= b) {
+    if (
+      v <= b
+    ) {
       a = (float) (
         b - v
       ) / (((float) b) / 2.0f) - 1.0f;

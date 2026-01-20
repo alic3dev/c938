@@ -5,6 +5,8 @@
 
 #include <metil_menus/metil_menu.h>
 
+#include <pthread.h>
+
 #define scene_gameplay_data_length_projectiles_maximum 200
 
 struct scene_gameplay_data {
@@ -23,6 +25,8 @@ struct scene_gameplay_data {
   unsigned int length_projectiles;
 
   struct parameters_gameplay* parameters;
+
+  pthread_mutex_t mutex_data_map;
 };
 
 #endif
