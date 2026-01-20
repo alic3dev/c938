@@ -2,6 +2,7 @@
 #define __network_host_h
 
 #include <network/data/network_data_map.h>
+#include <network/network_host_client.h>
 #include <notification/notification_manager.h>
 
 #include <netinet/in.h>
@@ -14,17 +15,10 @@ enum network_host_notification_type {
   network_host_notification_type_error = 1
 };
 
-enum network_host_client_command_sending {
-  network_host_client_command_sending_quitting = 0,
-  network_host_client_command_sending_none = 1,
-  network_host_client_command_sending_data_map = 2
-};
-
 struct network_host {
   int socket;
-  
-  int* socket_clients;
-  enum network_host_client_command_sending* clients_command_sending;
+
+  struct network_host_client* clients;
   unsigned int length_clients;
 
   struct sockaddr_in address_socket;
@@ -36,8 +30,6 @@ struct network_host {
   unsigned int length_threads;
   pthread_t* threads;
 
-  pthread_mutex_t* mutex_clients;
-  pthread_mutex_t* mutex_clients_sending;
   pthread_mutex_t mutex_thread;
 
   struct notification_manager notification_manager;

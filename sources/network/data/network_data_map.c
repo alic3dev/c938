@@ -21,7 +21,7 @@ void network_data_map_initialize(
 
   network_data_packet_initialize(
     network_data_map->packet,
-    network_command_datamap,
+    network_command_data_map,
     0
   );
 

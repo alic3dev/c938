@@ -16,11 +16,11 @@ unsigned char network_client_connect(
   struct network_client* network_client
 ) {
   network_client->status = (
-    network_client_status_none
+    network_client_status_initializing
   );
 
   network_client->command_sending = (
-    network_client_command_sending_none
+    network_command_no_operation
   );
 
   network_client->socket = (
@@ -34,6 +34,10 @@ unsigned char network_client_connect(
   if (
     network_client->socket < 0
   ) {
+    network_client->status = (
+      network_client_status_none
+    );
+
     return 1;
   }
 
@@ -91,6 +95,10 @@ unsigned char network_client_connect(
       network_client->socket
     );
 
+    network_client->status = (
+      network_client_status_none
+    );
+
     return 2;
   }
 
@@ -99,7 +107,6 @@ unsigned char network_client_connect(
   );
 
   network_client->status = (
-    network_client->status |
     network_client_status_initialized |
     network_client_status_connected
   );
@@ -174,7 +181,10 @@ void* network_client_receiving_thread(
   );
 
   while (
-    network_client->status != network_client_status_quitting
+    (
+      network_client->status &
+      network_client_status_disconnecting
+    ) == 0
   ) {
     pthread_mutex_lock(
       &network_client->mutex
@@ -219,7 +229,7 @@ void* network_client_receiving_thread(
     switch (
       network_data_packet->command
     ) {
-      case network_command_datamap: {
+      case network_command_data_map: {
         network_data_map_packet_set(
           &network_client->data_map,
           network_data_packet
@@ -260,11 +270,11 @@ void* network_client_sending_thread(
     network_client_thread_data->network_client
   );
 
-  unsigned int quitting = 0;
-
   while (
-    network_client->status != network_client_status_quitting &&
-    quitting == 0
+    (
+      network_client->status &
+      network_client_status_disconnecting
+    ) == 0
   ) {
     pthread_mutex_lock(
       &network_client->mutex_sending
@@ -273,12 +283,15 @@ void* network_client_sending_thread(
     switch (
       network_client->command_sending
     ) {
-      case network_client_command_sending_quitting: {
-        quitting = 1;
+      case network_command_disconnecting: {
+        network_client->status = (
+          network_client->status |
+          network_client_status_disconnecting
+        );
 
         break;
       }
-      case network_client_command_sending_none:
+      case network_command_no_operation:
       default: {
         break;
       }
@@ -296,12 +309,16 @@ void network_client_destroy(
   struct network_client* network_client
 ) {
   if (
-    network_client->status == network_client_status_none
+    network_client->status ==
+    network_client_status_none
   ) {
     return;
   }
 
-  network_client->status = network_client_status_quitting;
+  network_client->status = (
+    network_client->status |
+    network_client_status_disconnecting
+  );
 
   pthread_mutex_unlock(
     &network_client->mutex_sending
