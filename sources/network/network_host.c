@@ -682,8 +682,6 @@ void* network_host_client_sending_thread(
     network_host_client_thread_data->network_host_client
   );
 
-  unsigned char quitting = 0;
-
   while (
     network_host->online == 1 &&
     (
@@ -698,7 +696,10 @@ void* network_host_client_sending_thread(
     );
 
     if (
-      network_host->online == 0 ||
+      (
+        network_host->online == 0 && 
+        network_host_client->command_sending != network_command_disconnecting
+      ) ||
       (
         network_host_client->status & (
           network_client_status_disconnected |
@@ -717,7 +718,30 @@ void* network_host_client_sending_thread(
       network_host_client->command_sending
     ) {
       case network_command_disconnecting: {
-        quitting = 1;
+        static struct network_data_packet* network_data_packet_disconnecting;
+
+        network_data_packet_disconnecting = (
+          clic3_memory_allocate_raw(
+            sizeof(
+              struct network_data_packet
+            )
+          )
+        );
+
+        network_data_packet_initialize(
+          network_data_packet_disconnecting,
+          network_command_disconnecting,
+          0
+        );
+
+        long int b = network_data_packet_send(
+          network_data_packet_disconnecting,
+          network_host_client->socket
+        );
+
+        clic3_memory_free_raw(
+          network_data_packet_disconnecting
+        );
         
         break;
       }
@@ -874,6 +898,10 @@ void network_host_destroy(
       network_host->clients[
         index_client
       ]
+    );
+
+    pthread_mutex_lock(
+      &network_host_client->mutex
     );
 
     pthread_mutex_lock(
