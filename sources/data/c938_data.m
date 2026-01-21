@@ -21,16 +21,16 @@ void c938_data_destroy(
   struct metil* metil,
   struct c938_data* c938_data
 ) {
-  c938_logging_destroy(
-    metil,
-    &c938_data->logging
-  );
-
   network_client_destroy(
     &c938_data->network_client
   );
 
   network_host_destroy(
     &c938_data->network_host
+  );
+
+  c938_logging_destroy(
+    metil,
+    &c938_data->logging
   );
 }
