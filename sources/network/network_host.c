@@ -107,6 +107,11 @@ unsigned char network_host_listen_with_notification(
   network_host->connections_accept = 0;
   network_host->online = 1;
 
+  pthread_mutex_init(
+    &network_host->mutex_thread,
+    0
+  );
+
   network_host->length_threads = (
     1
   );
