@@ -1843,11 +1843,6 @@ void network_client_notification(
     data
   );
 
-  c938_logging_log(
-    metil,
-    notification
-  );
-
   enum network_client_notification_type network_client_notification_type =  (
     id_notification
   );
@@ -1883,6 +1878,9 @@ void network_client_notification(
 
       break;
     }
+    case network_client_notification_type_poll: {
+      return;
+    }
     case network_client_notification_type_default:
     default: {
       colour = clic3_colours_bold_blue;
@@ -1890,6 +1888,11 @@ void network_client_notification(
       break;
     }
   }
+
+  c938_logging_log(
+    metil,
+    notification
+  );
 
   network_notification_log_to_stream(
     stream_output,

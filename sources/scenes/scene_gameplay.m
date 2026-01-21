@@ -2,6 +2,7 @@
 
 #include <c938_pipeline_index.h>
 #include <data/c938_data.h>
+#include <data/data_length.h>
 #include <data/enemy_data.h>
 #include <data/parameters_gameplay.h>
 #include <data/player_data.h>
@@ -20,6 +21,7 @@
 #include <player.h>
 #include <textures/textures_buildings.h>
 
+#include <clic3_bytes.h>
 #include <clic3_memory.h>
 
 #include <metil.h>
@@ -970,6 +972,12 @@ void scene_gameplay_poll(
     ].renderable
   );
 
+  struct metil_group* metil_group_players = (
+    metil_scene_gameplay->renderables[
+      scene_gameplay_renderables_index_group_players
+    ].renderable
+  );
+
   struct metil_group* metil_group_projectiles = (
     metil_scene_gameplay->renderables[
       scene_gameplay_renderables_index_projectiles
@@ -1032,6 +1040,138 @@ void scene_gameplay_poll(
       default: {
         break;
       }
+    }
+
+    if (
+      scene_gameplay_data->parameters->networked ==
+      parameters_gameplay_networked_client
+    ) {
+      pthread_mutex_lock(
+        &network_client->mutex_poll
+      );
+
+      if (
+        network_client->network_data_packet_poll != 0
+      ) {
+        unsigned int index_client;
+        unsigned int length_players;
+
+        network_data_packet_read(
+          network_client->network_data_packet_poll,
+          &index_client,
+          data_length_unsigned_int
+        );
+
+        network_data_packet_read(
+          network_client->network_data_packet_poll,
+          &length_players,
+          data_length_unsigned_int
+        );
+
+        if (
+          metil_group_players->length < length_players
+        ) {
+          unsigned int players_original = (
+            metil_group_players->length
+          );
+
+          unsigned int players_new = (
+            length_players -
+            players_original
+          );
+
+          metil_group_add_length_initialize(
+            metil_group_players,
+            players_new,
+            metil_renderable_type_object
+          );
+
+          for (
+            unsigned int index_player_new = players_original;
+            index_player_new < metil_group_players->length;
+            ++index_player_new
+          ) {
+            struct metil_object* metil_object_player = (
+              metil_group_players->renderables[
+                index_player_new
+              ]->renderable
+            );
+            
+            metil_object_player->index_pipeline_render = (
+              c938_pipeline_index_player
+            );
+
+            mesh_player_initialize(
+              &metil_object_player->mesh,
+              &metil->player_defaults
+            );
+
+            metil_object_buffers_initialize(
+              metil_object_player,
+              metil->renderer_interface.metal_device
+            );
+
+            metil_object_texture_add(
+              metil_object_player,
+              metil_scene_gameplay->textures[
+                scene_gameplay_textures_index_player
+              ]
+            );
+          }
+        }
+        
+        while (
+          metil_group_players->length > length_players
+        ) {
+          metil_group_destroy_renderable_at_index(
+            metil,
+            metil_group_players,
+            (
+              metil_group_players->length -
+              1
+            )
+          );
+        }
+
+        unsigned char offset_player = 0;
+
+        for (
+          unsigned int index_player = 0;
+          index_player < length_players;
+          ++index_player
+        ) {
+          if (
+            index_client == index_player
+          ) {
+            offset_player = 1;
+
+            network_client->network_data_packet_poll->offset = (
+              network_client->network_data_packet_poll->offset +
+              data_length_math_c_vector3_float
+            );
+
+            continue;
+          }
+
+          struct metil_object* metil_object_player = (
+            metil_group_players->renderables[
+              index_player +
+              1 -
+              offset_player
+            ]->renderable
+          );
+
+          network_data_packet_read(
+            network_client->network_data_packet_poll,
+            &metil_object_player->position,
+            data_length_math_c_vector3_float
+          );
+        }
+      }
+
+      pthread_mutex_unlock(
+        &network_client->mutex_poll
+      );
     }
 
     scene_gameplay_data->action_data_map = (
@@ -1234,12 +1374,6 @@ void scene_gameplay_poll(
     metil_scene_gameplay
   );
 
-  struct metil_group* metil_group_players = (
-    metil_scene_gameplay->renderables[
-      scene_gameplay_renderables_index_group_players
-    ].renderable
-  );
-
   struct metil_object* metil_object_player = (
     metil_group_players->renderables[
       0
@@ -1260,6 +1394,82 @@ void scene_gameplay_poll(
   metil_object_player->position.z = (
     metil_scene_gameplay->player.position.z
   );
+
+  if (
+    scene_gameplay_data->parameters->networked !=
+    parameters_gameplay_networked_none
+  ) {
+    struct c938_data* c938_data = (
+      metil->data
+    );
+
+    if (
+      scene_gameplay_data->parameters->networked ==
+      parameters_gameplay_networked_client
+    ) {
+      struct network_client* network_client = &(
+        c938_data->network_client
+      );
+
+      static struct network_data_packet* network_data_packet;
+      
+      network_data_packet =(
+        clic3_memory_allocate_raw(
+          sizeof(
+            struct network_data_packet
+          )
+        )
+      );
+
+      network_data_packet_initialize(
+        network_data_packet,
+        network_command_poll,
+        sizeof(
+          struct math_c_vector3_float
+        )
+      );
+
+      network_data_packet_bytes_add(
+        network_data_packet,
+        &metil_scene_gameplay->player.position,
+        sizeof(
+          struct math_c_vector3_float
+        )
+      );
+
+      network_client_send(
+        &c938_data->network_client,
+        network_data_packet
+      );
+    } else if (
+      scene_gameplay_data->parameters->networked ==
+      parameters_gameplay_networked_host
+    ) {
+      struct network_host* network_host = &(
+        c938_data->network_host
+      );
+
+      pthread_mutex_lock(
+        &network_host->mutex_position
+      );
+
+      clic3_bytes_copy(
+        &network_host->position,
+        &metil_scene_gameplay->player.position,
+        sizeof(
+          struct math_c_vector3_float
+        )
+      );
+
+      pthread_mutex_unlock(
+        &network_host->mutex_position
+      );
+
+      network_host_send_poll(
+        &c938_data->network_host
+      );
+    }
+  }
 
   struct metil_object* metil_object_hud_boosted = (
     metil_scene_gameplay->renderables[
@@ -1569,7 +1779,7 @@ OSStatus scene_gameplay_io_proc(
 
     unsigned long int size_buffer_out = (
       audio_buffer_current.mDataByteSize /
-      sizeof(float)
+      data_length_float
     );
 
     unsigned long int count_channel_out = (

@@ -1,5 +1,6 @@
 #include <network/network_host.h>
 
+#include <data/data_length.h>
 #include <network/data/network_data_packet.h>
 #include <network/network.h>
 #include <network/network_client_status.h>
@@ -112,6 +113,11 @@ unsigned char network_host_listen_with_notification(
     0
   );
 
+  pthread_mutex_init(
+    &network_host->mutex_position,
+    0
+  );
+
   network_host->length_threads = (
     1
   );
@@ -150,7 +156,7 @@ unsigned char network_host_listen_with_notification(
   }
 
   network_host->initialized = 1;
-  network_host->connected_players = 1;
+  network_host->connected_players = 0;
 
   notification_manager_send(
     &network_host->notification_manager,
@@ -441,6 +447,15 @@ void* network_host_routing_thread(
       network_host,
       network_host_client_sending_thread_data->index_client
     );
+
+    network_host_client->status = (
+      network_client_status_connected
+    );
+
+    network_host->connected_players = (
+      network_host->connected_players +
+      1
+    );
   }
 
   return 0;
@@ -614,6 +629,25 @@ void* network_host_client_receiving_thread(
 
         break;
       }
+      case network_command_poll: {
+        pthread_mutex_lock(
+          &network_host->mutex_position
+        );
+
+        network_data_packet_read(
+          &network_data_packet,
+          &network_host_client->position,
+          sizeof(
+            struct math_c_vector3_float
+          )
+        );
+
+        pthread_mutex_unlock(
+          &network_host->mutex_position
+        );
+
+        break;
+      }
       case network_command_no_operation:
       default: {
         break;
@@ -631,6 +665,11 @@ void* network_host_client_receiving_thread(
 
   network_host_client->status = (
     network_client_status_disconnected
+  );
+
+  network_host->connected_players = (
+    network_host->connected_players -
+    1
   );
 
   char* notification_prefix = (
@@ -840,6 +879,128 @@ void network_host_data_map_send(
   );
 }
 
+void network_host_send_poll(
+  struct network_host* network_host
+) {
+  pthread_mutex_lock(
+    &network_host->mutex_thread
+  );
+
+  pthread_mutex_lock(
+    &network_host->mutex_position
+  );
+
+  struct network_data_packet network_data_packet;
+
+  network_data_packet_initialize(
+    &network_data_packet,
+    network_command_poll,
+    (
+      sizeof(
+        unsigned int
+      ) *
+      2 +
+      sizeof(
+        struct math_c_vector3_float 
+      ) *
+      (
+        network_host->connected_players +
+        1
+      )
+    )
+  );
+
+  unsigned int index = (
+    network_host->connected_players +
+    1
+  );
+
+  network_data_packet_bytes_add(
+    &network_data_packet,
+    &index,
+    data_length_unsigned_int
+  );
+
+  network_data_packet_bytes_add(
+    &network_data_packet,
+    &index,
+    data_length_unsigned_int
+  );
+
+  for (
+    unsigned int index_client = 0;
+    index_client < network_host->length_clients;
+    ++index_client
+  ) {
+    struct network_host_client* network_host_client = (
+      network_host->clients[
+        index_client
+      ]
+    );
+
+    if (
+      network_host_client->status &
+      network_client_status_connected
+    ) {
+      network_data_packet_bytes_add(
+        &network_data_packet,
+        &network_host_client->position,
+        data_length_math_c_vector3_float
+      );
+    }
+  }
+
+  network_data_packet_bytes_add(
+    &network_data_packet,
+    &network_host->position,
+    data_length_math_c_vector3_float
+  );
+
+  pthread_mutex_unlock(
+    &network_host->mutex_position
+  );
+
+  for (
+    unsigned int index_client = 0;
+    index_client < network_host->length_clients;
+    ++index_client
+  ) {
+    
+    struct network_host_client* network_host_client = (
+      network_host->clients[
+        index_client
+      ]
+    );
+
+    if (
+      network_host_client->status &
+      network_client_status_connected
+    ) {
+      clic3_bytes_copy(
+        (
+          network_data_packet.bytes +
+          1
+        ),
+        &index_client,
+        data_length_unsigned_int
+      );
+
+      network_data_packet_send(
+        &network_data_packet,
+        network_host_client->socket
+      );
+    }
+  }
+
+  network_data_packet_destroy(
+    &network_data_packet
+  );
+
+  pthread_mutex_unlock(
+    &network_host->mutex_thread
+  );
+}
+
 void network_host_connections_accept(
   struct network_host* network_host
 ) {
@@ -957,6 +1118,10 @@ void network_host_destroy(
 
   pthread_mutex_destroy(
     &network_host->mutex_thread
+  );
+
+  pthread_mutex_destroy(
+    &network_host->mutex_position
   );
 
   network_data_map_destroy(
