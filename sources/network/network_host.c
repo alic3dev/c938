@@ -150,6 +150,7 @@ unsigned char network_host_listen_with_notification(
   }
 
   network_host->initialized = 1;
+  network_host->connected_players = 1;
 
   notification_manager_send(
     &network_host->notification_manager,

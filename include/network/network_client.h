@@ -46,6 +46,8 @@ struct network_client {
 
   struct network_data_packet** network_data_packets_outgoing;
   unsigned int length_network_data_packets_outgoing;
+
+  unsigned int connected_players;
 };
 
 struct network_client_thread_data {

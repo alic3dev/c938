@@ -194,6 +194,8 @@ unsigned char network_client_connect_with_notification(
     0
   );
 
+  network_client->connected_players = 0;
+
   notification_manager_initialize(
     &network_client->notification_manager
   );

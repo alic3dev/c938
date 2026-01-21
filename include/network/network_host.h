@@ -38,6 +38,8 @@ struct network_host {
   fd_set file_descriptor_socket_set;
 
   struct network_data_map data_map;
+
+  unsigned int connected_players;
 };
 
 struct network_host_client_thread_data {

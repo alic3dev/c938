@@ -17,7 +17,7 @@
 
 enum scene_gameplay_renderables_index {
   scene_gameplay_renderables_index_buildings = 0,
-  scene_gameplay_renderables_index_player = 1,
+  scene_gameplay_renderables_index_group_players = 1,
   scene_gameplay_renderables_index_projectiles = 2,
   scene_gameplay_renderables_index_enemies = 3,
   scene_gameplay_renderables_index_hud_boosted = 4,
