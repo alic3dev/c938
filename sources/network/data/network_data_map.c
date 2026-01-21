@@ -55,6 +55,14 @@ void network_data_map_packet_set(
 void network_data_map_destroy(
   struct network_data_map* network_data_map
 ) {
+  pthread_mutex_lock(
+    &network_data_map->mutex
+  );
+
+  pthread_mutex_destroy(
+    &network_data_map->mutex
+  );
+
   network_data_packet_destroy(
     network_data_map->packet
   );

@@ -107,6 +107,11 @@ unsigned char network_host_listen_with_notification(
   network_host->connections_accept = 0;
   network_host->online = 1;
 
+  pthread_mutex_init(
+    &network_host->mutex_thread,
+    0
+  );
+
   network_host->length_threads = (
     1
   );
@@ -478,6 +483,7 @@ void* network_host_client_receiving_thread(
     );
 
     if (
+      length_data_received_client > c938_network_data_transfer_limit ||
       length_data_received_client <= 0
     ) {
       network_host_client->status = (
@@ -498,6 +504,45 @@ void* network_host_client_receiving_thread(
     switch (
       network_data_packet.command
     ) {
+      case network_command_disconnecting: {
+        network_host_client->status_game = (
+          network_client_status_game_disconnected
+        );
+
+        network_host_client->status = (
+          network_client_status_disconnecting
+        );
+
+        char* notification_prefix = (
+          clic3_char_arrays_concatenate(
+            "network_host_client::disconnecting->{",
+            network_host_client->char_array_index
+          )
+        );
+
+        char* notification = (
+          clic3_char_arrays_concatenate(
+            notification_prefix,
+            "};"
+          )
+        );
+
+        notification_manager_send(
+          &network_host->notification_manager,
+          notification,
+          network_host_notification_type_default
+        );
+
+        clic3_memory_free_raw(
+          notification_prefix
+        );
+
+        clic3_memory_free_raw(
+          notification
+        );
+
+        break;
+      }
       case network_command_data_map_loaded: {
         network_host_client->status_game = (
           network_client_status_game_loaded
@@ -579,6 +624,42 @@ void* network_host_client_receiving_thread(
     );
   }
 
+  network_host_client->status_game = (
+    network_client_status_game_disconnected
+  );
+
+  network_host_client->status = (
+    network_client_status_disconnected
+  );
+
+  char* notification_prefix = (
+    clic3_char_arrays_concatenate(
+      "network_host_client::disconnected->{",
+      network_host_client->char_array_index
+    )
+  );
+
+  char* notification = (
+    clic3_char_arrays_concatenate(
+      notification_prefix,
+      "};"
+    )
+  );
+
+  notification_manager_send(
+    &network_host->notification_manager,
+    notification,
+    network_host_notification_type_default
+  );
+
+  clic3_memory_free_raw(
+    notification_prefix
+  );
+
+  clic3_memory_free_raw(
+    notification
+  );
+
   clic3_memory_free_raw(
     network_host_client_thread_data
   );
@@ -601,8 +682,6 @@ void* network_host_client_sending_thread(
     network_host_client_thread_data->network_host_client
   );
 
-  unsigned char quitting = 0;
-
   while (
     network_host->online == 1 &&
     (
@@ -617,7 +696,10 @@ void* network_host_client_sending_thread(
     );
 
     if (
-      network_host->online == 0 ||
+      (
+        network_host->online == 0 && 
+        network_host_client->command_sending != network_command_disconnecting
+      ) ||
       (
         network_host_client->status & (
           network_client_status_disconnected |
@@ -636,7 +718,30 @@ void* network_host_client_sending_thread(
       network_host_client->command_sending
     ) {
       case network_command_disconnecting: {
-        quitting = 1;
+        network_host_client->status = (
+          network_client_status_disconnecting
+        );
+
+        struct network_data_packet network_data_packet_disconnecting;
+
+        network_data_packet_initialize(
+          &network_data_packet_disconnecting,
+          network_command_disconnecting,
+          0
+        );
+
+        network_data_packet_send(
+          &network_data_packet_disconnecting,
+          network_host_client->socket
+        );
+
+        network_data_packet_destroy(
+          &network_data_packet_disconnecting
+        );
+
+        close(
+          network_host_client->socket
+        );
         
         break;
       }
@@ -758,8 +863,10 @@ void network_host_destroy(
   network_host->connections_accept = 0;
   network_host->online = 0;
 
-  close(
-    network_host->socket
+  notification_manager_send(
+    &network_host->notification_manager,
+    "network_host::going_offline",
+    network_host_notification_type_default
   );
 
   for (
@@ -777,16 +884,38 @@ void network_host_destroy(
       network_command_disconnecting
     );
 
+    pthread_mutex_lock(
+      &network_host_client->mutex
+    );
+
     pthread_mutex_unlock(
       &network_host_client->mutex_sending
     );
+  }
 
-    // the socket will likely close before quit command is sent,
-    // will think about this at a later point in time
+  for (
+    unsigned int index_client = 0;
+    index_client < network_host->length_clients;
+    ++index_client
+  ) {
+    struct network_host_client* network_host_client = (
+      network_host->clients[
+        index_client
+      ]
+    );
+
+    pthread_mutex_lock(
+      &network_host_client->mutex
+    );
+
     close(
       network_host_client->socket
     );
   }
+
+  close(
+    network_host->socket
+  );
 
   for (
     unsigned char index_thread = 0;
