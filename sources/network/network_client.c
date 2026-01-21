@@ -239,8 +239,10 @@ void* network_client_receiving_thread(
 
   while (
     (
-      network_client->status &
-      network_client_status_disconnecting
+      network_client->status & (
+        network_client_status_disconnecting |
+        network_client_status_disconnected
+      )
     ) == 0
   ) {
     pthread_mutex_lock(
@@ -286,6 +288,23 @@ void* network_client_receiving_thread(
     switch (
       network_data_packet->command
     ) {
+      case network_command_disconnecting: {
+        notification_manager_send(
+          &network_client->notification_manager,
+          "network_client::host::going_offline",
+          network_client_notification_type_error
+        );
+
+        network_client->status = (
+          network_client_status_disconnecting
+        );
+
+        network_client->status_game = (
+          network_client_status_game_disconnected
+        );
+
+        break;
+      }
       case network_command_data_map: {
         network_data_map_packet_set(
           &network_client->data_map,
@@ -336,8 +355,10 @@ void* network_client_sending_thread(
 
   while (
     (
-      network_client->status &
-      network_client_status_disconnecting
+      network_client->status & (
+        network_client_status_disconnecting |
+        network_client_status_disconnected
+      )
     ) == 0
   ) {
     pthread_mutex_lock(
@@ -380,7 +401,6 @@ void* network_client_sending_thread(
         }
         case network_command_disconnecting: {
           network_client->status = (
-            network_client->status |
             network_client_status_disconnecting
           );
 
@@ -395,7 +415,7 @@ void* network_client_sending_thread(
       if (
         (
           network_client->status &
-          network_client_status_disconnecting
+          network_client_status_disconnected
         ) == 0
       ) {
         network_data_packet_send(
@@ -436,6 +456,24 @@ void* network_client_sending_thread(
       &network_client->mutex_network_data_packets_outgoing
     );
   }
+
+  notification_manager_send(
+    &network_client->notification_manager,
+    "network_client::disconnected",
+    network_client_notification_type_error
+  );
+
+  network_client->status = (
+    network_client_status_disconnected
+  );
+
+  network_client->status_game = (
+    network_client_status_game_disconnected
+  );
+
+  pthread_mutex_unlock(
+    &network_client->mutex_thread_sending
+  );
   
   clic3_memory_free(
     network_client_thread_data
@@ -494,12 +532,36 @@ void network_client_destroy(
   }
 
   network_client->status = (
-    network_client->status |
     network_client_status_disconnecting
   );
 
-  pthread_mutex_unlock(
-    &network_client->mutex_sending
+  network_client->status_game = (
+    network_client_status_game_disconnected
+  );
+
+  static struct network_data_packet* network_data_packet_outgoing;
+
+  network_data_packet_outgoing = (
+    clic3_memory_allocate_raw(
+      sizeof(
+        struct network_data_packet
+      )
+    )
+  );
+
+  network_data_packet_initialize(
+    network_data_packet_outgoing,
+    network_command_disconnecting,
+    0
+  );
+
+  network_client_send(
+    network_client,
+    network_data_packet_outgoing
+  );
+
+  pthread_mutex_lock(
+    &network_client->mutex_thread_sending
   );
 
   pthread_mutex_unlock(
