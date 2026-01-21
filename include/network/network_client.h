@@ -41,6 +41,7 @@ struct network_client {
 
   pthread_mutex_t mutex;
   pthread_mutex_t mutex_sending;
+  pthread_mutex_t mutex_thread_sending;
   pthread_mutex_t mutex_network_data_packets_outgoing;
 
   struct network_data_packet** network_data_packets_outgoing;

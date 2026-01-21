@@ -172,8 +172,17 @@ unsigned char network_client_connect_with_notification(
     0
   );
 
+  pthread_mutex_init(
+    &network_client->mutex_thread_sending,
+    0
+  );
+
   pthread_mutex_lock(
     &network_client->mutex_sending
+  );
+
+  pthread_mutex_lock(
+    &network_client->mutex_thread_sending
   );
 
   network_client->network_data_packets_outgoing = (
@@ -517,6 +526,10 @@ void network_client_destroy(
 
   pthread_mutex_destroy(
     &network_client->mutex_sending
+  );
+
+  pthread_mutex_destroy(
+    &network_client->mutex_thread_sending
   );
 
   pthread_mutex_destroy(
