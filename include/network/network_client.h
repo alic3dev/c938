@@ -17,7 +17,8 @@
 enum network_client_notification_type {
   network_client_notification_type_default = 0,
   network_client_notification_type_error = 1,
-  network_client_notification_type_data_map_sent = 2
+  network_client_notification_type_data_map_sent = 2,
+  network_client_notification_type_poll = 3
 };
 
 struct network_client {
@@ -43,9 +44,14 @@ struct network_client {
   pthread_mutex_t mutex_sending;
   pthread_mutex_t mutex_thread_sending;
   pthread_mutex_t mutex_network_data_packets_outgoing;
+  pthread_mutex_t mutex_poll;
 
   struct network_data_packet** network_data_packets_outgoing;
   unsigned int length_network_data_packets_outgoing;
+
+  unsigned int connected_players;
+
+  struct network_data_packet* network_data_packet_poll;
 };
 
 struct network_client_thread_data {

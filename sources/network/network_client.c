@@ -124,6 +124,8 @@ unsigned char network_client_connect_with_notification(
     &network_client->data_map
   );
 
+  network_client->network_data_packet_poll = 0;
+
   network_client->status = (
     network_client_status_initialized |
     network_client_status_connected
@@ -176,6 +178,11 @@ unsigned char network_client_connect_with_notification(
     0
   );
 
+  pthread_mutex_init(
+    &network_client->mutex_poll,
+    0
+  );
+
   pthread_mutex_lock(
     &network_client->mutex_sending
   );
@@ -193,6 +200,8 @@ unsigned char network_client_connect_with_notification(
   network_client->length_network_data_packets_outgoing = (
     0
   );
+
+  network_client->connected_players = 0;
 
   notification_manager_initialize(
     &network_client->notification_manager
@@ -302,6 +311,14 @@ void* network_client_receiving_thread(
           network_client_status_game_disconnected
         );
 
+        network_data_packet_destroy(
+          network_data_packet
+        );
+
+        clic3_memory_free_raw(
+          network_data_packet
+        );
+
         break;
       }
       case network_command_data_map: {
@@ -318,9 +335,44 @@ void* network_client_receiving_thread(
 
         break;
       }
+      case network_command_poll:
+        pthread_mutex_lock(
+          &network_client->mutex_poll
+        );
+
+        if (
+          network_client->network_data_packet_poll != 0
+        ) {
+          network_data_packet_destroy(
+            network_client->network_data_packet_poll
+          );
+
+          clic3_memory_free_raw(
+            network_client->network_data_packet_poll
+          );
+        }
+
+        network_client->network_data_packet_poll = (
+          network_data_packet
+        );
+
+        pthread_mutex_unlock(
+          &network_client->mutex_poll
+        );
+
+        notification_manager_send(
+          &network_client->notification_manager,
+          "network_client::poll",
+          network_client_notification_type_poll
+        );
+        break;
       case network_command_initialize:
       case network_command_no_operation:
       default: {
+        network_data_packet_destroy(
+          network_data_packet
+        );
+
         clic3_memory_free_raw(
           network_data_packet
         );
@@ -595,6 +647,10 @@ void network_client_destroy(
 
   pthread_mutex_destroy(
     &network_client->mutex_network_data_packets_outgoing
+  );
+
+  pthread_mutex_destroy(
+    &network_client->mutex_poll
   );
 
   network_data_map_destroy(

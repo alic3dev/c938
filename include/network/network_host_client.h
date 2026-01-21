@@ -5,6 +5,8 @@
 #include <network/network_client_status_game.h>
 #include <network/network_command.h>
 
+#include <math_c_vector.h>
+
 #include <pthread.h>
 
 struct network_host_client {
@@ -20,6 +22,8 @@ struct network_host_client {
   enum network_client_status_game status_game;
 
   enum network_command command_sending;
+
+  struct math_c_vector3_float position;
 };
 
 void network_host_client_initialize(

@@ -32,12 +32,16 @@ struct network_host {
   pthread_t* threads;
 
   pthread_mutex_t mutex_thread;
+  pthread_mutex_t mutex_position;
 
   struct notification_manager notification_manager;
 
   fd_set file_descriptor_socket_set;
 
   struct network_data_map data_map;
+
+  struct math_c_vector3_float position;
+  unsigned int connected_players;
 };
 
 struct network_host_client_thread_data {
@@ -74,6 +78,10 @@ void network_host_data_map_client_index_send(
 );
 
 void network_host_data_map_send(
+  struct network_host*
+);
+
+void network_host_send_poll(
   struct network_host*
 );
 
