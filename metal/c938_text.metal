@@ -1,18 +1,15 @@
+#include <c938_metal/c938_text.h>
+
+#include <c938_metal/c938_data_vertex_textured_coloured.h>
+
 #include <metil_rendering/metil_renderer_data_frame.h>
 #include <metil_rendering/metil_renderer_data_object.h>
 #include <metil_rendering/metil_renderer_vertex_index_parameter.h>
 
-#include <metal_stdlib>
+#include <metal_texture>
 
-struct data_vertex {
-  float4 position [[position]];
-  float2 position_texture;
-  float brightness;
-  float4 colour;
-};
-
-[[vertex]] struct data_vertex c938_text_vertex(
-  const device simd_float4* positions [[
+[[vertex]] struct c938_data_vertex_textured_coloured c938_text_vertex(
+  const device metal::float4* positions [[
     buffer(
       metil_renderer_vertex_index_parameter_vertices
     )
@@ -29,50 +26,50 @@ struct data_vertex {
   ]],
   unsigned int id_vertex [[vertex_id]]
 ) {
-  struct data_vertex data_vertex;
+  struct c938_data_vertex_textured_coloured c938_data_vertex_textured_coloured;
 
-  data_vertex.position = (
+  c938_data_vertex_textured_coloured.position = (
     data_object->view_model_matrix_projection *
     positions[id_vertex]
   );
 
-  data_vertex.brightness = (
+  c938_data_vertex_textured_coloured.brightness = (
     data_frame->brightness_text
   );
 
-  data_vertex.colour.r = (
+  c938_data_vertex_textured_coloured.colour.r = (
     data_object->colour.x
   );
 
-  data_vertex.colour.g = (
+  c938_data_vertex_textured_coloured.colour.g = (
     data_object->colour.y
   );
 
-  data_vertex.colour.b = (
+  c938_data_vertex_textured_coloured.colour.b = (
     data_object->colour.z
   );
 
-  data_vertex.colour.a = (
+  c938_data_vertex_textured_coloured.colour.a = (
     data_object->colour.w
   );
 
-  data_vertex.position_texture.x = (
+  c938_data_vertex_textured_coloured.position_texture.x = (
     id_vertex == 0 || id_vertex == 3
     ? 0
     : 1
   );
 
-  data_vertex.position_texture.y = (
+  c938_data_vertex_textured_coloured.position_texture.y = (
     id_vertex == 0 || id_vertex == 1
     ? 1
     : 0
   );
 
-  return data_vertex;
+  return c938_data_vertex_textured_coloured;
 }
 
-[[fragment]] float4 c938_text_fragment(
-  data_vertex data_vertex [[stage_in]],
+[[fragment]] metal::float4 c938_text_fragment(
+  c938_data_vertex_textured_coloured c938_data_vertex_textured_coloured [[stage_in]],
   metal::texture2d<half> texture [[texture(0)]]
 ) {
   constexpr metal::sampler sampler_texture(
@@ -80,32 +77,32 @@ struct data_vertex {
     metal::mip_filter::linear
   );
 
-  float4 colour_texture = float4(
+  metal::float4 colour_texture = metal::float4(
     texture.sample(
       sampler_texture,
-      data_vertex.position_texture
+      c938_data_vertex_textured_coloured.position_texture
     )
   );
 
-  return float4(
+  return metal::float4(
     (
       colour_texture[0] *
-      data_vertex.colour.r *
-      data_vertex.brightness
+      c938_data_vertex_textured_coloured.colour.r *
+      c938_data_vertex_textured_coloured.brightness
     ),
     (
       colour_texture[1] *
-      data_vertex.colour.g *
-      data_vertex.brightness
+      c938_data_vertex_textured_coloured.colour.g *
+      c938_data_vertex_textured_coloured.brightness
     ),
     (
       colour_texture[2] *
-      data_vertex.colour.b *
-      data_vertex.brightness
+      c938_data_vertex_textured_coloured.colour.b *
+      c938_data_vertex_textured_coloured.brightness
     ),
     (
       colour_texture[3] *
-      data_vertex.colour.a
+      c938_data_vertex_textured_coloured.colour.a
     )
   );
 }

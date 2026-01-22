@@ -1,19 +1,15 @@
+#include <c938_metal/c938_building.h>
+
+#include <c938_metal/c938_data_vertex_textured_coloured.h>
+
 #include <metil_rendering/metil_renderer_data_frame.h>
 #include <metil_rendering/metil_renderer_data_object.h>
 #include <metil_rendering/metil_renderer_vertex_index_parameter.h>
 
-#include <metal_stdlib>
+#include <metal_texture>
 
-struct data_vertex {
-  float4 position [[position]];
-  float2 position_texture;
-  float brightness;
-  float4 colour;
-  float distance;
-};
-
-[[vertex]] struct data_vertex c938_building_vertex(
-  const device simd_float4* positions [[
+[[vertex]] struct c938_data_vertex_textured_coloured c938_building_vertex(
+  const device metal::float4* positions [[
     buffer(
       metil_renderer_vertex_index_parameter_vertices
     )
@@ -30,33 +26,34 @@ struct data_vertex {
   ]],
   unsigned int id_vertex [[vertex_id]]
 ) {
-  struct data_vertex data_vertex;
+  struct c938_data_vertex_textured_coloured c938_data_vertex_textured_coloured;
 
-  data_vertex.position = (
+  c938_data_vertex_textured_coloured.position = (
     data_object->view_model_matrix_projection *
-    positions[id_vertex]
+    positions[
+      id_vertex
+    ]
   );
 
-  data_vertex.position_texture.x = positions[id_vertex].x + positions[id_vertex].z;
-  data_vertex.position_texture.y = positions[id_vertex].y + positions[id_vertex].x;
-
-  data_vertex.brightness = (positions[id_vertex].y > 0.0f ? (
-    data_frame->brightness *
-    positions[id_vertex].z > 0.0f
-    ? positions[id_vertex].x > 0.0f
-    ? 0.5f
-    : 0.6f
-    : 1.0f
-  ) : 0.013f);
-
-  data_vertex.colour = float4(
-    data_object->colour.x,
-    data_object->colour.y,
-    data_object->colour.z,
-    data_object->colour.w
+  c938_data_vertex_textured_coloured.position_texture.x = (
+    positions[
+      id_vertex
+    ].x +
+    positions[
+      id_vertex
+    ].z
   );
 
-  data_vertex.distance = metal::distance(
+  c938_data_vertex_textured_coloured.position_texture.y = (
+    positions[
+      id_vertex
+    ].y +
+    positions[
+      id_vertex
+    ].x
+  );
+
+  float distance = metal::distance(
     metal::float4(
       metal::float4(
         data_object->position.x,
@@ -64,7 +61,9 @@ struct data_vertex {
         data_object->position.z,
         1.0f
       ) +
-      positions[id_vertex]
+      positions[
+        id_vertex
+      ]
     ),
     metal::float4(
       data_frame->position_player.x,
@@ -74,31 +73,63 @@ struct data_vertex {
     )
   );
 
-  return data_vertex;
-}
-
-[[fragment]] float4 c938_building_fragment(
-  data_vertex data_vertex [[stage_in]],
-  metal::texture2d<half> texture [[texture(0)]]
-) {
-  float brightness = (
-    data_vertex.brightness * 
+  c938_data_vertex_textured_coloured.brightness = (
+    (
+      positions[
+        id_vertex
+      ].y > 0.0f
+      ? (
+        data_frame->brightness *
+        positions[
+          id_vertex
+        ].z > 0.0f
+        ? (
+          positions[
+            id_vertex
+          ].x > 0.0f
+          ? 0.5f
+          : 0.6f
+        )
+        : 1.0f
+      )
+      : 0.013f
+    ) *
     metal::fmin(
       metal::fmax(
-        1.0f - (data_vertex.distance / 10000.0f),
+        (
+          1.0f -
+          (
+            distance /
+            10000.0f
+          )
+        ),
         0.5f
       ),
       1.0f
     )
   );
 
-  brightness = (
-    brightness *
-    brightness *
-    brightness *
-    brightness *
-    brightness *
-    brightness
+  c938_data_vertex_textured_coloured.colour = metal::float4(
+    data_object->colour.x,
+    data_object->colour.y,
+    data_object->colour.z,
+    data_object->colour.w
+  );
+
+  return c938_data_vertex_textured_coloured;
+}
+
+[[fragment]] metal::float4 c938_building_fragment(
+  c938_data_vertex_textured_coloured c938_data_vertex_textured_coloured [[stage_in]],
+  metal::texture2d<half> texture [[texture(0)]]
+) {
+  float brightness = (
+    c938_data_vertex_textured_coloured.brightness *
+    c938_data_vertex_textured_coloured.brightness *
+    c938_data_vertex_textured_coloured.brightness *
+    c938_data_vertex_textured_coloured.brightness *
+    c938_data_vertex_textured_coloured.brightness *
+    c938_data_vertex_textured_coloured.brightness
   );
 
   constexpr metal::sampler sampler_texture(
@@ -107,17 +138,35 @@ struct data_vertex {
     metal::s_address::repeat
   );
 
-  float4 colour_texture = float4(
+  metal::float4 colour_texture = metal::float4(
     texture.sample(
       sampler_texture,
-      data_vertex.position_texture / 100.0f
+      (
+        c938_data_vertex_textured_coloured.position_texture /
+        100.0f
+      )
     )
   );
 
-  return float4(
-    colour_texture[0] * data_vertex.colour.r * brightness,
-    colour_texture[1] * data_vertex.colour.g * brightness,
-    colour_texture[2] * data_vertex.colour.b * brightness,
-    data_vertex.colour.a
+  return metal::float4(
+    (
+      colour_texture.r *
+      c938_data_vertex_textured_coloured.colour.r *
+      brightness
+    ),
+    (
+      colour_texture.g *
+      c938_data_vertex_textured_coloured.colour.g *
+      brightness
+    ),
+    (
+      colour_texture.b *
+      c938_data_vertex_textured_coloured.colour.b *
+      brightness
+    ),
+    (
+      colour_texture.a *
+      c938_data_vertex_textured_coloured.colour.a
+    )
   );
 }
