@@ -30,6 +30,11 @@ void network_host_client_initialize(
   );
 
   pthread_mutex_init(
+    &network_host_client->mutex_position,
+    0
+  );
+
+  pthread_mutex_init(
     &network_host_client->mutex_sending,
     0
   );
@@ -56,6 +61,10 @@ void network_host_client_destroy(
 
   pthread_mutex_destroy(
     &network_host_client->mutex
+  );
+
+  pthread_mutex_destroy(
+    &network_host_client->mutex_position
   );
 
   pthread_mutex_destroy(

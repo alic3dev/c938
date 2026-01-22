@@ -631,7 +631,7 @@ void* network_host_client_receiving_thread(
       }
       case network_command_poll: {
         pthread_mutex_lock(
-          &network_host->mutex_position
+          &network_host_client->mutex_position
         );
 
         network_data_packet_read(
@@ -643,7 +643,7 @@ void* network_host_client_receiving_thread(
         );
 
         pthread_mutex_unlock(
-          &network_host->mutex_position
+          &network_host_client->mutex_position
         );
 
         break;
@@ -942,10 +942,18 @@ void network_host_send_poll(
       network_host_client->status &
       network_client_status_connected
     ) {
+      pthread_mutex_lock(
+        &network_host_client->mutex_position
+      );
+
       network_data_packet_bytes_add(
         &network_data_packet,
         &network_host_client->position,
         data_length_math_c_vector3_float
+      );
+
+      pthread_mutex_unlock(
+        &network_host_client->mutex_position
       );
     }
   }

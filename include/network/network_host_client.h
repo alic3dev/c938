@@ -16,6 +16,7 @@ struct network_host_client {
   char* char_array_index;
 
   pthread_mutex_t mutex;
+  pthread_mutex_t mutex_position;
   pthread_mutex_t mutex_sending;
 
   enum network_client_status status;
