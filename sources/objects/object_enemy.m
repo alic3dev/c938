@@ -1,7 +1,7 @@
 #include <objects/object_enemy.h>
 
 #include <mesh/mesh_enemy.h>
-#include <c938_pipeline_index.h>
+#include <rendering/c938_pipeline_index.h>
 #include <data/enemy_data.h>
 #include <data/player_data.h>
 

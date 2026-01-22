@@ -1,5 +1,5 @@
-#ifndef __scenes_scene_menu_main_h
-#define __scenes_scene_menu_main_h
+#ifndef __c938_scenes_scene_menu_main_h
+#define __c938_scenes_scene_menu_main_h
 
 #include <data/parameters_gameplay.h>
 #include <menus/menu_main.h>

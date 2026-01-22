@@ -1,6 +1,6 @@
-#include <scenes/scene_gameplay.h>
+#include <scenes/scene_gameplay/scene_gameplay.h>
 
-#include <c938_pipeline_index.h>
+#include <rendering/c938_pipeline_index.h>
 #include <data/c938_data.h>
 #include <data/data_length.h>
 #include <data/enemy_data.h>
@@ -18,7 +18,9 @@
 #include <network/network_host.h>
 #include <objects/object_crosshair.h>
 #include <objects/object_enemy.h>
-#include <player.h>
+#include <objects/object_player.h>
+#include <player/player.h>
+#include <scenes/scene_gameplay/scene_gameplay_group_players.h>
 #include <textures/textures_buildings.h>
 
 #include <clic3_bytes.h>
@@ -55,7 +57,7 @@
 
 void scene_gameplay_initialize(
   struct metil* metil,
-  struct metil_scene* scene
+  struct metil_scene* metil_scene_gameplay
 ) {
   struct c938_data* c938_data = (
     metil->data
@@ -74,11 +76,11 @@ void scene_gameplay_initialize(
 
   metil_scene_initialize_with_renderables(
     metil,
-    scene,
+    metil_scene_gameplay,
     scene_gameplay_length_renderables
   );
 
-  scene->data = (
+  metil_scene_gameplay->data = (
     clic3_memory_allocate_raw(
       sizeof(
         struct scene_gameplay_data
@@ -87,7 +89,7 @@ void scene_gameplay_initialize(
   );
 
   struct scene_gameplay_data* scene_gameplay_data = (
-    scene->data
+    metil_scene_gameplay->data
   );
 
   scene_gameplay_data->parameters = (
@@ -112,9 +114,9 @@ void scene_gameplay_initialize(
     );
   }
 
-  scene->player.poll = player_poll;
-  scene->player.poll_input = player_poll_input;
-  scene->player.destroy = player_destroy;
+  metil_scene_gameplay->player.poll = player_poll;
+  metil_scene_gameplay->player.poll_input = player_poll_input;
+  metil_scene_gameplay->player.destroy = player_destroy;
 
   static struct player_data* player_data;
 
@@ -126,14 +128,14 @@ void scene_gameplay_initialize(
     )
   );
 
-  scene->player.data = player_data;
+  metil_scene_gameplay->player.data = player_data;
 
-  scene->poll = scene_gameplay_poll;
-  scene->destroy = scene_gameplay_destroy;
+  metil_scene_gameplay->poll = scene_gameplay_poll;
+  metil_scene_gameplay->destroy = scene_gameplay_destroy;
 
   for (
     unsigned char index_renderable = 0;
-    index_renderable < scene->length_renderables;
+    index_renderable < metil_scene_gameplay->length_renderables;
     ++index_renderable
   ) {
     switch (
@@ -144,20 +146,20 @@ void scene_gameplay_initialize(
       case scene_gameplay_renderables_index_projectiles:
       case scene_gameplay_renderables_index_enemies:
         metil_renderable_initialize_at_index(
-          scene->renderables,
+          metil_scene_gameplay->renderables,
           index_renderable,
           metil_renderable_type_group
         );
 
         break;
       case scene_gameplay_renderables_index_group_logging:
-        scene->renderables[
+        metil_scene_gameplay->renderables[
           index_renderable
         ].type = (
           metil_renderable_type_group
         );
 
-        scene->renderables[
+        metil_scene_gameplay->renderables[
           index_renderable
         ].renderable = (
           &c938_data->logging.group
@@ -166,7 +168,7 @@ void scene_gameplay_initialize(
         break;
       default:
         metil_renderable_initialize_at_index(
-          scene->renderables,
+          metil_scene_gameplay->renderables,
           index_renderable,
           metil_renderable_type_object
         );
@@ -181,7 +183,7 @@ void scene_gameplay_initialize(
     ++index_renderable
   ) {
     struct metil_object* metil_object_hud = (
-      scene->renderables[
+      metil_scene_gameplay->renderables[
         index_renderable
       ].renderable
     );
@@ -253,14 +255,14 @@ void scene_gameplay_initialize(
     }
   }
 
-  scene->length_textures = 1;
+  metil_scene_gameplay->length_textures = 1;
   clic3_memory_reallocate_raw(
-    &scene->textures,
+    &metil_scene_gameplay->textures,
     (
       sizeof(
         id<MTLTexture>
       ) *
-      scene->length_textures
+      metil_scene_gameplay->length_textures
     )
   );
 
@@ -272,13 +274,13 @@ void scene_gameplay_initialize(
   textures_buildings_load(
     metil,
     texture_loader,
-    scene->textures
+    metil_scene_gameplay->textures
   );
 
   [texture_loader release];
 
   struct metil_group* metil_group_players = (
-    scene->renderables[
+    metil_scene_gameplay->renderables[
       scene_gameplay_renderables_index_group_players
     ].renderable
   );
@@ -295,33 +297,17 @@ void scene_gameplay_initialize(
     ]->renderable
   );
 
-  metil_object_player->index_pipeline_render = (
-    c938_pipeline_index_player
-  );
-
-  mesh_player_initialize(
-    &metil_object_player->mesh,
-    &metil->player_defaults
-  );
-
-  metil_object_player->positioning = (
-    metil_positioning_player
-  );
-
-  metil_object_buffers_initialize(
+  object_player_initialize(
+    metil,
     metil_object_player,
-    metil->renderer_interface.metal_device
-  );
-
-  metil_object_texture_add(
-    metil_object_player,
-    scene->textures[
+    metil_scene_gameplay->textures[
       scene_gameplay_textures_index_player
-    ]
+    ],
+    1
   );
 
   struct metil_object* metil_object_crosshair = (
-    scene->renderables[
+    metil_scene_gameplay->renderables[
       scene_gameplay_renderables_index_crosshair
     ].renderable
   );
@@ -333,7 +319,7 @@ void scene_gameplay_initialize(
 
   scene_gameplay_populate(
     metil,
-    scene,
+    metil_scene_gameplay,
     1
   );
 
@@ -476,7 +462,7 @@ void scene_gameplay_network_host_notification_on(
 
 void scene_gameplay_populate(
   struct metil* metil,
-  struct metil_scene* scene,
+  struct metil_scene* metil_scene_gameplay,
   unsigned char reset
 ) {
   struct c938_data* c938_data = (
@@ -488,27 +474,27 @@ void scene_gameplay_populate(
   );
 
   struct scene_gameplay_data* scene_gameplay_data = (
-    scene->data
+    metil_scene_gameplay->data
   );
 
   struct player_data* player_data = (
-    scene->player.data
+    metil_scene_gameplay->player.data
   );
 
   struct metil_group* metil_group_buildings = (
-    scene->renderables[
+    metil_scene_gameplay->renderables[
       scene_gameplay_renderables_index_buildings
     ].renderable
   );
 
   struct metil_group* metil_group_enemies = (
-    scene->renderables[
+    metil_scene_gameplay->renderables[
       scene_gameplay_renderables_index_enemies
     ].renderable
   );
 
   struct metil_group* metil_group_projectiles = (
-    scene->renderables[
+    metil_scene_gameplay->renderables[
       scene_gameplay_renderables_index_projectiles
     ].renderable
   );
@@ -522,13 +508,13 @@ void scene_gameplay_populate(
     metil_group_projectiles
   );
 
-  scene->player.rotation.x = 0.0f;
-  scene->player.rotation.y = 0.0f;
-  scene->player.rotation.z = 0.0f;
+  metil_scene_gameplay->player.rotation.x = 0.0f;
+  metil_scene_gameplay->player.rotation.y = 0.0f;
+  metil_scene_gameplay->player.rotation.z = 0.0f;
 
-  scene->player.velocity.x = 0.0f;
-  scene->player.velocity.y = 0.0f;
-  scene->player.velocity.z = 0.0f;
+  metil_scene_gameplay->player.velocity.x = 0.0f;
+  metil_scene_gameplay->player.velocity.y = 0.0f;
+  metil_scene_gameplay->player.velocity.z = 0.0f;
 
   player_data_initialize(
     player_data,
@@ -536,7 +522,7 @@ void scene_gameplay_populate(
   );
 
   player_data->time = &(
-    scene->time
+    metil_scene_gameplay->time
   );
 
   scene_gameplay_data->length_projectiles = 0;
@@ -570,7 +556,7 @@ void scene_gameplay_populate(
   );
 
   struct metil_group* metil_group_players = (
-    scene->renderables[
+    metil_scene_gameplay->renderables[
       scene_gameplay_renderables_index_group_players
     ].renderable
   );
@@ -606,9 +592,9 @@ void scene_gameplay_populate(
       scene_gameplay_data->parameters,
       metil_group_buildings,
       metil_group_enemies,
-      &scene->player.position,
+      &metil_scene_gameplay->player.position,
       &player_data->index_target_building,
-      scene->textures[
+      metil_scene_gameplay->textures[
         scene_gameplay_textures_index_buildings
       ]
     );
@@ -621,7 +607,7 @@ void scene_gameplay_populate(
       scene_gameplay_data->parameters->speed_movement
     );
 
-    scene->player.speed_movement = (
+    metil_scene_gameplay->player.speed_movement = (
       scene_gameplay_data->speed_movement
     );
 
@@ -634,7 +620,7 @@ void scene_gameplay_populate(
     );
 
     metil_object_player->position.y = (
-      scene->player.position.y
+      metil_scene_gameplay->player.position.y
     );
 
     static struct network_data_packet* network_data_packet;
@@ -687,7 +673,7 @@ void scene_gameplay_populate(
       scene_gameplay_data->parameters->speed_movement
     );
 
-    scene->player.speed_movement = (
+    metil_scene_gameplay->player.speed_movement = (
       scene_gameplay_data->speed_movement
     );
 
@@ -699,7 +685,7 @@ void scene_gameplay_populate(
       scene_gameplay_data->parameters->length_enemies
     );
   } else {
-    scene->player.speed_movement = (
+    metil_scene_gameplay->player.speed_movement = (
       scene_gameplay_data->speed_movement *
       scene_gameplay_data->parameters->multiplier_speed_movement
     );
@@ -777,7 +763,7 @@ void scene_gameplay_populate(
     metil_group_buildings,
     scene_gameplay_data->length_buildings,
     player_data->index_target_building,
-    scene->textures[
+    metil_scene_gameplay->textures[
       scene_gameplay_textures_index_buildings
     ]
   );
@@ -788,19 +774,19 @@ void scene_gameplay_populate(
     ]->renderable
   );
 
-  scene->player.position.x = object->position.x;
+  metil_scene_gameplay->player.position.x = object->position.x;
   
-  scene->player.position.y = (
+  metil_scene_gameplay->player.position.y = (
     object->position.y +
     object->mesh.size.y
   );
 
-  scene->player.position.z = (
+  metil_scene_gameplay->player.position.z = (
     object->position.z
   );
 
   metil_object_player->position.y = (
-    scene->player.position.y
+    metil_scene_gameplay->player.position.y
   );
 
   metil_group_destroy(
@@ -944,7 +930,7 @@ void scene_gameplay_populate(
       scene_gameplay_data->parameters,
       metil_group_buildings,
       metil_group_enemies,
-      &scene->player.position,
+      &metil_scene_gameplay->player.position,
       player_data->index_target_building
     );
 
@@ -1068,70 +1054,14 @@ void scene_gameplay_poll(
           data_length_unsigned_int
         );
 
-        if (
-          metil_group_players->length < length_players
-        ) {
-          unsigned int players_original = (
-            metil_group_players->length
-          );
-
-          unsigned int players_new = (
-            length_players -
-            players_original
-          );
-
-          metil_group_add_length_initialize(
-            metil_group_players,
-            players_new,
-            metil_renderable_type_object
-          );
-
-          for (
-            unsigned int index_player_new = players_original;
-            index_player_new < metil_group_players->length;
-            ++index_player_new
-          ) {
-            struct metil_object* metil_object_player = (
-              metil_group_players->renderables[
-                index_player_new
-              ]->renderable
-            );
-            
-            metil_object_player->index_pipeline_render = (
-              c938_pipeline_index_player
-            );
-
-            mesh_player_initialize(
-              &metil_object_player->mesh,
-              &metil->player_defaults
-            );
-
-            metil_object_buffers_initialize(
-              metil_object_player,
-              metil->renderer_interface.metal_device
-            );
-
-            metil_object_texture_add(
-              metil_object_player,
-              metil_scene_gameplay->textures[
-                scene_gameplay_textures_index_player
-              ]
-            );
-          }
-        }
-        
-        while (
-          metil_group_players->length > length_players
-        ) {
-          metil_group_destroy_renderable_at_index(
-            metil,
-            metil_group_players,
-            (
-              metil_group_players->length -
-              1
-            )
-          );
-        }
+        scene_gameplay_group_players_resize(
+          metil,
+          metil_group_players,
+          length_players,
+          metil_scene_gameplay->textures[
+            scene_gameplay_textures_index_player
+          ]
+        );
 
         unsigned char offset_player = 0;
 

@@ -1,5 +1,5 @@
-#ifndef __enemy_data_h
-#define __enemy_data_h
+#ifndef __c938_data_enemy_data_h
+#define __c938_data_enemy_data_h
 
 #include <math_c_vector.h>
 

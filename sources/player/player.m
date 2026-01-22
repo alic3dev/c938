@@ -1,4 +1,4 @@
-#include <player.h>
+#include <player/player.h>
 
 #include <objects/object_projectile.h>
 #include <data/player_data.h>

@@ -1,5 +1,5 @@
-#ifndef __projectile_data_h
-#define __projectile_data_h
+#ifndef __c938_data_projectile_data_h
+#define __c938_data_projectile_data_h
 
 #include <math_c_vector.h>
 

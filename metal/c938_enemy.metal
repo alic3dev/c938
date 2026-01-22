@@ -1,18 +1,14 @@
+#include <c938_metal/c938_enemy.h>
+
+#include <c938_metal/c938_data_vertex_coloured.h>
+
 #include <data/enemy_data.h>
 
 #include <metil_rendering/metil_renderer_data_frame.h>
 #include <metil_rendering/metil_renderer_vertex_index_parameter.h>
 
-#include <metal_stdlib>
-
-struct data_vertex {
-  float4 position [[position]];
-  float brightness;
-  float4 colour;
-};
-
-[[vertex]] struct data_vertex c938_enemy_vertex(
-  const device simd_float4* positions [[
+[[vertex]] struct c938_data_vertex_coloured c938_enemy_vertex(
+  const device metal::float4* positions [[
     buffer(
       metil_renderer_vertex_index_parameter_vertices
     )
@@ -29,14 +25,16 @@ struct data_vertex {
   ]],
   unsigned int id_vertex [[vertex_id]]
 ) {
-  struct data_vertex data_vertex;
+  struct c938_data_vertex_coloured c938_data_vertex_coloured;
 
-  data_vertex.position = (
+  c938_data_vertex_coloured.position = (
     enemy_data->view_model_matrix_projection *
-    positions[id_vertex]
+    positions[
+      id_vertex
+    ]
   );
 
-  data_vertex.brightness = (
+  c938_data_vertex_coloured.brightness = (
     data_frame->brightness
   );
 
@@ -45,24 +43,51 @@ struct data_vertex {
     (float) enemy_data->life_maximum
   );
 
-  data_vertex.colour = float4(
-    enemy_data->colour.x * metal::fmin(percentage_life * 2.0f, 1.0f),
-    enemy_data->colour.y * percentage_life,
-    enemy_data->colour.z * percentage_life,
-    1.0f
+  c938_data_vertex_coloured.colour = (
+    metal::float4(
+      (
+        enemy_data->colour.x *
+        metal::fmin(
+          (
+            percentage_life *
+            2.0f
+          ),
+          1.0f
+        )
+      ),
+      (
+        enemy_data->colour.y *
+        percentage_life
+      ),
+      (
+        enemy_data->colour.z *
+        percentage_life
+      ),
+      1.0f
+    )
   );
 
-  return data_vertex;
+  return (
+    c938_data_vertex_coloured
+  );
 }
 
-[[fragment]] float4 c938_enemy_fragment(
-  data_vertex data_vertex [[stage_in]],
-  metal::texture2d<half> texture [[texture(0)]]
+[[fragment]] metal::float4 c938_enemy_fragment(
+  c938_data_vertex_coloured c938_data_vertex_coloured [[stage_in]]
 ) {
-  return float4(
-    data_vertex.colour.r * data_vertex.brightness,
-    data_vertex.colour.g * data_vertex.brightness,
-    data_vertex.colour.b * data_vertex.brightness,
-    data_vertex.colour.a
+  return metal::float4(
+    (
+      c938_data_vertex_coloured.colour.r *
+      c938_data_vertex_coloured.brightness
+    ),
+    (
+      c938_data_vertex_coloured.colour.g *
+      c938_data_vertex_coloured.brightness
+    ),
+    (
+      c938_data_vertex_coloured.colour.b *
+      c938_data_vertex_coloured.brightness
+    ),
+    c938_data_vertex_coloured.colour.a
   );
 }

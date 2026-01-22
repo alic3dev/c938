@@ -1,5 +1,5 @@
-#ifndef __player_data_h
-#define __player_data_h
+#ifndef __c938_data_player_data_h
+#define __c938_data_player_data_h
 
 #include <metil_rendering/metil_renderable.h>
 

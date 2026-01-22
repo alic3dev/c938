@@ -1,5 +1,5 @@
-#ifndef __network_data_network_data_packet_h
-#define __network_data_network_data_packet_h
+#ifndef __c938_network_data_network_data_packet_h
+#define __c938_network_data_network_data_packet_h
 
 #include <network/network_command.h>
 

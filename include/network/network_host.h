@@ -1,5 +1,5 @@
-#ifndef __network_host_h
-#define __network_host_h
+#ifndef __c938_network_network_host_h
+#define __c938_network_network_host_h
 
 #include <network/data/network_data_map.h>
 #include <network/network_host_client.h>

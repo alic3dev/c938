@@ -1,5 +1,5 @@
-#ifndef __menus_menu_main_network_h
-#define __menus_menu_main_network_h
+#ifndef __c938_menus_menu_main_network_h
+#define __c938_menus_menu_main_network_h
 
 #include <metil_menus/metil_menu.h>
 
