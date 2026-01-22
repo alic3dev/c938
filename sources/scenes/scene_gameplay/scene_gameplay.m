@@ -1133,10 +1133,6 @@ void scene_gameplay_poll(
           ]->renderable
         );
 
-        pthread_mutex_lock(
-          &network_host->mutex_thread
-        );
-
         for (
           unsigned int index_client = offset_network_host_client;
           index_client < network_host->length_clients;
@@ -1168,22 +1164,61 @@ void scene_gameplay_poll(
               network_host_client->position.z
             );
 
+            pthread_mutex_unlock(
+              &network_host_client->mutex_position
+            );
+
             offset_network_host_client = (
               index_client +
               1
             );
 
-            pthread_mutex_unlock(
-              &network_host_client->mutex_position
+            struct metil_object* metil_object_building = (
+              metil_group_buildings->renderables[
+                player_data->index_target_building
+              ]->renderable
             );
+
+            if (
+              metil_object_player->position.y == (
+                metil_object_building->position.y +
+                metil_object_building->mesh.size.y
+              )
+            ) {
+              struct math_c_vector2_float size_half_object = {
+                .x = metil_object_building->mesh.size.x / 2.0f,
+                .y = metil_object_building->mesh.size.z / 2.0f
+              };
+
+              struct math_c_vector2_float position_minimum_object = {
+                .x = metil_object_building->position.x - size_half_object.x,
+                .y = metil_object_building->position.z - size_half_object.y
+              };
+
+              struct math_c_vector2_float position_maximum_object = {
+                .x = metil_object_building->position.x + size_half_object.x,
+                .y = metil_object_building->position.z + size_half_object.y
+              };
+
+              if (
+                metil_object_player->position.x >= position_minimum_object.x - metil_object_player->mesh.size.x &&
+                metil_object_player->position.x <= position_maximum_object.x + metil_object_player->mesh.size.x &&
+                metil_object_player->position.z >= position_minimum_object.y - metil_object_player->mesh.size.z &&
+                metil_object_player->position.z <= position_maximum_object.y + metil_object_player->mesh.size.z
+              ) {
+                scene_gameplay_populate(
+                  metil,
+                  metil_scene_gameplay,
+                  0
+                );
+
+                return;
+              }
+            }
 
             break;
           }
         }
-
-        pthread_mutex_unlock(
-          &network_host->mutex_thread
-        );
       }
     }
 
@@ -1193,6 +1228,8 @@ void scene_gameplay_poll(
   }
   
   if (
+    scene_gameplay_data->parameters->networked !=
+    parameters_gameplay_networked_client &&
     player_data->on_ground == (
       player_data->index_target_building +
       1
