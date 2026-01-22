@@ -1,5 +1,5 @@
-#ifndef __scenes_scene_gameplay_h
-#define __scenes_scene_gameplay_h
+#ifndef __scenes_scene_gameplay_scene_gameplay_h
+#define __scenes_scene_gameplay_scene_gameplay_h
 
 #include <data/parameters_gameplay.h>
 #include <data/scene_gameplay_data.h>

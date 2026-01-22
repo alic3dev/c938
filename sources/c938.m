@@ -7,7 +7,7 @@
 #include <player.h>
 #include <scenes/scene_id.h>
 #include <scenes/scene_menu_main/scene_menu_main.h>
-#include <scenes/scene_gameplay.h>
+#include <scenes/scene_gameplay/scene_gameplay.h>
 
 #include <clic3_memory.h>
 

@@ -1,4 +1,4 @@
-#include <scenes/scene_gameplay.h>
+#include <scenes/scene_gameplay/scene_gameplay.h>
 
 #include <c938_pipeline_index.h>
 #include <data/c938_data.h>
@@ -20,6 +20,7 @@
 #include <objects/object_enemy.h>
 #include <objects/object_player.h>
 #include <player.h>
+#include <scenes/scene_gameplay/scene_gameplay_group_players.h>
 #include <textures/textures_buildings.h>
 
 #include <clic3_bytes.h>
@@ -1053,58 +1054,14 @@ void scene_gameplay_poll(
           data_length_unsigned_int
         );
 
-        if (
-          metil_group_players->length < length_players
-        ) {
-          unsigned int players_original = (
-            metil_group_players->length
-          );
-
-          unsigned int players_new = (
-            length_players -
-            players_original
-          );
-
-          metil_group_add_length_initialize(
-            metil_group_players,
-            players_new,
-            metil_renderable_type_object
-          );
-
-          for (
-            unsigned int index_player_new = players_original;
-            index_player_new < metil_group_players->length;
-            ++index_player_new
-          ) {
-            struct metil_object* metil_object_player = (
-              metil_group_players->renderables[
-                index_player_new
-              ]->renderable
-            );
-            
-            object_player_initialize(
-              metil,
-              metil_object_player,
-              metil_scene_gameplay->textures[
-                scene_gameplay_textures_index_player
-              ],
-              0
-            );
-          }
-        }
-        
-        while (
-          metil_group_players->length > length_players
-        ) {
-          metil_group_destroy_renderable_at_index(
-            metil,
-            metil_group_players,
-            (
-              metil_group_players->length -
-              1
-            )
-          );
-        }
+        scene_gameplay_group_players_resize(
+          metil,
+          metil_group_players,
+          length_players,
+          metil_scene_gameplay->textures[
+            scene_gameplay_textures_index_player
+          ]
+        );
 
         unsigned char offset_player = 0;
 
