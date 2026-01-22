@@ -482,7 +482,7 @@ void player_poll_input(
     .y = player->size.z / 2.0f
   };
 
-  struct metil_object* object = (void*)0;
+  struct metil_object* object = 0;
 
   for (
     unsigned int index_renderable = 0;
