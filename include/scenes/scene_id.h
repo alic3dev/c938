@@ -2,9 +2,9 @@
 #define __scenes_scene_h
 
 enum scene_id {
-  scene_id_unknown,
-  scene_id_menu_main,
-  scene_id_gameplay
+  scene_id_unknown   = 0x00,
+  scene_id_menu_main = 0x01,
+  scene_id_gameplay  = 0x02
 };
 
 #endif
