@@ -4,7 +4,7 @@
 #include <data/c938_data.h>
 #include <data/parameters_gameplay.h>
 #include <data/scene_menu_main_data.h>
-#include <player.h>
+#include <player/player.h>
 #include <scenes/scene_id.h>
 #include <scenes/scene_menu_main/scene_menu_main.h>
 #include <scenes/scene_gameplay/scene_gameplay.h>

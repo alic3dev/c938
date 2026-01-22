@@ -19,7 +19,7 @@
 #include <objects/object_crosshair.h>
 #include <objects/object_enemy.h>
 #include <objects/object_player.h>
-#include <player.h>
+#include <player/player.h>
 #include <scenes/scene_gameplay/scene_gameplay_group_players.h>
 #include <textures/textures_buildings.h>
 
