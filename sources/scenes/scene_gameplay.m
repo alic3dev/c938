@@ -18,6 +18,7 @@
 #include <network/network_host.h>
 #include <objects/object_crosshair.h>
 #include <objects/object_enemy.h>
+#include <objects/object_player.h>
 #include <player.h>
 #include <textures/textures_buildings.h>
 
@@ -295,29 +296,13 @@ void scene_gameplay_initialize(
     ]->renderable
   );
 
-  metil_object_player->index_pipeline_render = (
-    c938_pipeline_index_player
-  );
-
-  mesh_player_initialize(
-    &metil_object_player->mesh,
-    &metil->player_defaults
-  );
-
-  metil_object_player->positioning = (
-    metil_positioning_player
-  );
-
-  metil_object_buffers_initialize(
+  object_player_initialize(
+    metil,
     metil_object_player,
-    metil->renderer_interface.metal_device
-  );
-
-  metil_object_texture_add(
-    metil_object_player,
-    scene->textures[
+    metil_scene_gameplay->textures[
       scene_gameplay_textures_index_player
-    ]
+    ],
+    1
   );
 
   struct metil_object* metil_object_crosshair = (
@@ -1097,25 +1082,13 @@ void scene_gameplay_poll(
               ]->renderable
             );
             
-            metil_object_player->index_pipeline_render = (
-              c938_pipeline_index_player
-            );
-
-            mesh_player_initialize(
-              &metil_object_player->mesh,
-              &metil->player_defaults
-            );
-
-            metil_object_buffers_initialize(
-              metil_object_player,
-              metil->renderer_interface.metal_device
-            );
-
-            metil_object_texture_add(
+            object_player_initialize(
+              metil,
               metil_object_player,
               metil_scene_gameplay->textures[
                 scene_gameplay_textures_index_player
-              ]
+              ],
+              0
             );
           }
         }
