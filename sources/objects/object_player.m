@@ -1,6 +1,6 @@
 #include <objects/object_player.h>
 
-#include <c938_pipeline_index.h>
+#include <rendering/c938_pipeline_index.h>
 #include <mesh/mesh_player.h>
 
 #include <metil.h>

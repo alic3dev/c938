@@ -1,6 +1,6 @@
 #include <scenes/scene_menu_main/scene_menu_main.h>
 
-#include <c938_pipeline_index.h>
+#include <rendering/c938_pipeline_index.h>
 #include <data/c938_data.h>
 #include <data/parameters_gameplay.h>
 #include <data/scene_menu_main_data.h>

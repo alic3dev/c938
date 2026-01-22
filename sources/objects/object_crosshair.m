@@ -1,7 +1,7 @@
 #include <objects/object_crosshair.h>
 
 #include <mesh/mesh_crosshair.h>
-#include <c938_pipeline_index.h>
+#include <rendering/c938_pipeline_index.h>
 
 #include <metil_object.h>
 #include <metil_positioning.h>
