@@ -1,6 +1,6 @@
 #include <data/c938_data.h>
 
-#include <c938_logging.h>
+#include <logging/c938_logging.h>
 #include <network/network_client.h>
 #include <network/network_host.h>
 
