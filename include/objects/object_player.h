@@ -1,5 +1,5 @@
-#ifndef __objects_object_player_h
-#define __objects_object_player_h
+#ifndef __c938_objects_object_player_h
+#define __c938_objects_object_player_h
 
 #include <metil.h>
 #include <metil_object/metil_object.h>

@@ -1,5 +1,5 @@
-#ifndef __scenes_scene_h
-#define __scenes_scene_h
+#ifndef __c938_scenes_scene_id_h
+#define __c938_scenes_scene_id_h
 
 enum scene_id {
   scene_id_unknown   = 0x00,

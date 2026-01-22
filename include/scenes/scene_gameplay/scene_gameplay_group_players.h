@@ -1,5 +1,5 @@
-#ifndef __scenes_scene_gameplay_scene_gameplay_group_players_h
-#define __scenes_scene_gameplay_scene_gameplay_group_players_h
+#ifndef __c938_scenes_scene_gameplay_scene_gameplay_group_players_h
+#define __c938_scenes_scene_gameplay_scene_gameplay_group_players_h
 
 #include <metil.h>
 #include <metil_group.h>

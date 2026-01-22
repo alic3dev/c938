@@ -1,5 +1,5 @@
-#ifndef __c938_parameters_gameplay_h
-#define __c938_parameters_gameplay_h
+#ifndef __c938_data_parameters_gameplay_h
+#define __c938_data_parameters_gameplay_h
 
 #define parameters_gameplay_length_buildings_default 200
 #define parameters_gameplay_length_enemies_default 255

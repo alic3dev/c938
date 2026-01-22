@@ -1,5 +1,5 @@
-#ifndef __network_network_client_status_h
-#define __network_network_client_status_h
+#ifndef __c938_network_network_client_status_h
+#define __c938_network_network_client_status_h
 
 enum network_client_status {
   network_client_status_none          = 0b00000000,

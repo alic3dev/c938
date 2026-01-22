@@ -1,5 +1,5 @@
-#ifndef __network_network_host_client_h
-#define __network_network_host_client_h
+#ifndef __c938_network_network_host_client_h
+#define __c938_network_network_host_client_h
 
 #include <network/network_client_status.h>
 #include <network/network_client_status_game.h>

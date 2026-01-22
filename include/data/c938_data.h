@@ -1,5 +1,5 @@
-#ifndef __c938_data_h
-#define __c938_data_h
+#ifndef __c938_data_c938_data_h
+#define __c938_data_c938_data_h
 
 #include <logging/c938_logging.h>
 

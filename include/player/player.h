@@ -1,5 +1,5 @@
-#ifndef __player_h
-#define __player_h
+#ifndef __c938_player_player_h
+#define __c938_player_player_h
 
 #include <metil_player/metil_player.h>
 

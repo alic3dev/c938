@@ -1,5 +1,5 @@
-#ifndef __menus_menu_main_custom_h
-#define __menus_menu_main_custom_h
+#ifndef __c938_menus_menu_main_custom_h
+#define __c938_menus_menu_main_custom_h
 
 #include <data/parameters_gameplay.h>
 #include <metil_menus/metil_menu.h>

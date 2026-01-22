@@ -1,5 +1,5 @@
-#ifndef __network_network_command_h
-#define __network_network_command_h
+#ifndef __c938_network_network_command_h
+#define __c938_network_network_command_h
 
 enum network_command {
   network_command_no_operation = 0x00,
