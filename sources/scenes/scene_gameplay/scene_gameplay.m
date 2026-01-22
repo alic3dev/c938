@@ -1102,6 +1102,89 @@ void scene_gameplay_poll(
       pthread_mutex_unlock(
         &network_client->mutex_poll
       );
+    } else if (
+      scene_gameplay_data->parameters->networked ==
+      parameters_gameplay_networked_host
+    ) {
+      unsigned int length_players = (
+        network_host->connected_players +
+        1
+      );
+
+      scene_gameplay_group_players_resize(
+        metil,
+        metil_group_players,
+        length_players,
+        metil_scene_gameplay->textures[
+          scene_gameplay_textures_index_player
+        ]
+      );
+
+      unsigned int offset_network_host_client = 0;
+
+      for (
+        unsigned int index_player = 1;
+        index_player < metil_group_players->length;
+        ++index_player
+      ) {
+        struct metil_object* metil_object_player = (
+          metil_group_players->renderables[
+            index_player
+          ]->renderable
+        );
+
+        pthread_mutex_lock(
+          &network_host->mutex_thread
+        );
+
+        for (
+          unsigned int index_client = offset_network_host_client;
+          index_client < network_host->length_clients;
+          ++index_client
+        ) {
+          struct network_host_client* network_host_client = (
+            network_host->clients[
+              index_client
+            ]
+          );
+
+          if (
+            network_host_client->status &
+            network_client_status_connected
+          ) {
+            pthread_mutex_lock(
+              &network_host_client->mutex_position
+            );
+
+            metil_object_player->position.x = (
+              network_host_client->position.x
+            );
+
+            metil_object_player->position.y = (
+              network_host_client->position.y
+            );
+
+            metil_object_player->position.z = (
+              network_host_client->position.z
+            );
+
+            offset_network_host_client = (
+              index_client +
+              1
+            );
+
+            pthread_mutex_unlock(
+              &network_host_client->mutex_position
+            );
+
+            break;
+          }
+        }
+
+        pthread_mutex_unlock(
+          &network_host->mutex_thread
+        );
+      }
     }
 
     scene_gameplay_data->action_data_map = (
