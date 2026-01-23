@@ -634,13 +634,93 @@ void* network_host_client_receiving_thread(
           &network_host_client->mutex_position
         );
 
-        network_data_packet_read(
-          &network_data_packet,
-          &network_host_client->position,
-          sizeof(
-            struct math_c_vector3_float
-          )
+        unsigned long int length_data_received_client_expected = (
+          data_length_math_c_vector3_float +
+          data_length_unsigned_int
         );
+
+        if (
+          length_data_received_client >=
+          length_data_received_client_expected
+        ) {
+          network_data_packet_read(
+            &network_data_packet,
+            &network_host_client->position,
+            data_length_math_c_vector3_float
+          );
+
+          unsigned int length_shots_fired = 0;
+
+          network_data_packet_read(
+            &network_data_packet,
+            &length_shots_fired,
+            data_length_unsigned_int
+          );
+
+          length_data_received_client_expected = (
+            length_data_received_client_expected +
+            length_shots_fired * (
+              data_length_math_c_vector3_float +
+              data_length_math_c_vector2_float +
+              data_length_unsigned_long_int
+            )
+          );
+
+          if (
+            length_data_received_client ==
+            length_data_received_client_expected
+          ) {
+            pthread_mutex_lock(
+              &network_host_client->mutex_shots_fired
+            );
+
+            unsigned int index_shot_fired = (
+              network_host_client->length_shots_fired
+            );
+
+            network_host_client_shots_fired_add(
+              network_host_client,
+              length_shots_fired
+            );
+
+            for (
+              ;
+              index_shot_fired < (
+                index_shot_fired +
+                length_shots_fired
+              );
+              ++index_shot_fired
+            ) {
+              struct network_host_client_shot_fired* network_host_client_shot_fired = &(
+                network_host_client->shots_fired[
+                  index_shot_fired
+                ]
+              );
+
+              network_data_packet_read(
+                &network_data_packet,
+                &network_host_client_shot_fired->position,
+                data_length_math_c_vector3_float
+              );
+
+              network_data_packet_read(
+                &network_data_packet,
+                &network_host_client_shot_fired->angle,
+                data_length_math_c_vector2_float
+              );
+
+              network_data_packet_read(
+                &network_data_packet,
+                &network_host_client_shot_fired->time,
+                data_length_unsigned_long_int
+              );
+            }
+
+            pthread_mutex_unlock(
+              &network_host_client->mutex_shots_fired
+            );
+          }
+        }
 
         pthread_mutex_unlock(
           &network_host_client->mutex_position
