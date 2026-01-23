@@ -24,6 +24,13 @@ void network_host_client_initialize(
     )
   );
 
+  network_host_client->length_shots_fired = 0;
+  network_host_client->shots_fired = (
+    clic3_memory_allocate_raw(
+      0
+    )
+  );
+
   pthread_mutex_init(
     &network_host_client->mutex,
     0
@@ -39,6 +46,11 @@ void network_host_client_initialize(
     0
   );
 
+  pthread_mutex_init(
+    &network_host_client->mutex_shots_fired,
+    0
+  );
+
   pthread_mutex_lock(
     &network_host_client->mutex_sending
   );
@@ -49,6 +61,53 @@ void network_host_client_initialize(
 
   network_host_client->status = (
     network_client_status_initializing
+  );
+}
+
+void network_host_client_shots_fired_clear(
+  struct network_host_client* network_host_client
+) {
+  pthread_mutex_lock(
+    &network_host_client->mutex_shots_fired
+  );
+
+  network_host_client->length_shots_fired = 0;
+  
+  clic3_memory_reallocate_raw(
+    &network_host_client->shots_fired,
+    0
+  );
+
+  pthread_mutex_unlock(
+    &network_host_client->mutex_shots_fired
+  );
+}
+
+void network_host_client_shots_fired_add(
+  struct network_host_client* network_host_client,
+  unsigned int length_shots_fired
+) {
+  pthread_mutex_lock(
+    &network_host_client->mutex_shots_fired
+  );
+
+  network_host_client->length_shots_fired = (
+    network_host_client->length_shots_fired +
+    length_shots_fired
+  );
+
+  clic3_memory_reallocate_raw(
+    &network_host_client->shots_fired,
+    (
+      sizeof(
+        struct network_host_client_shot_fired
+      ) *
+      network_host_client->length_shots_fired
+    )
+  );
+
+  pthread_mutex_unlock(
+    &network_host_client->mutex_shots_fired
   );
 }
 
@@ -71,7 +130,15 @@ void network_host_client_destroy(
     &network_host_client->mutex_sending
   );
 
+  pthread_mutex_destroy(
+    &network_host_client->mutex_shots_fired
+  );
+
   clic3_memory_free_raw(
     network_host_client->char_array_index
+  );
+
+  clic3_memory_free_raw(
+    network_host_client->shots_fired
   );
 }
