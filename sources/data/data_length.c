@@ -10,6 +10,12 @@ const unsigned long int data_length_float = (
   )
 );
 
+const unsigned long int data_length_math_c_vector2_float = (
+  sizeof(
+    struct math_c_vector2_float
+  )
+);
+
 const unsigned long int data_length_math_c_vector3_float = (
   sizeof(
     struct math_c_vector3_float
@@ -27,5 +33,11 @@ const unsigned long int data_length_parameters_gameplay = (
 const unsigned long int data_length_unsigned_int = (
   sizeof(
     unsigned int
+  )
+);
+
+const unsigned long int data_length_unsigned_long_int = (
+  sizeof(
+    unsigned long int
   )
 );
