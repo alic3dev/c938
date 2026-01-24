@@ -1,8 +1,9 @@
 #include <player/player.h>
 
-#include <objects/object_projectile.h>
+#include <data/c938_data.h>
 #include <data/player_data.h>
 #include <data/scene_gameplay_data.h>
+#include <objects/object_projectile.h>
 
 #include <metil_group.h>
 #include <metil_input/metil_keycodes.h>
@@ -692,6 +693,56 @@ void player_poll(
     player_data->time_shot = (
       *player_data->time
     );
+
+    if (
+      scene_gameplay_data->parameters->networked ==
+      parameters_gameplay_networked_client
+    ) {
+      struct c938_data* c938_data = (
+        metil->data
+      );
+
+      struct network_client* network_client = &(
+        c938_data->network_client
+      );
+
+      pthread_mutex_lock(
+        &network_client->mutex_shots_fired
+      );
+
+      network_client->length_shots_fired = (
+        network_client->length_shots_fired +
+        1
+      );
+
+      pthread_mutex_unlock(
+        &network_client->mutex_shots_fired
+      );
+    } else if (
+      scene_gameplay_data->parameters->networked ==
+      parameters_gameplay_networked_host
+    ) {
+      struct c938_data* c938_data = (
+        metil->data
+      );
+
+      struct network_host* network_host = &(
+        c938_data->network_host
+      );
+
+      pthread_mutex_lock(
+        &network_host->mutex_shots_fired
+      );
+
+      network_host->length_shots_fired = (
+        network_host->length_shots_fired +
+        1
+      );
+
+      pthread_mutex_unlock(
+        &network_host->mutex_shots_fired
+      );
+    }
 
     object_projectile_initialize(
       metil_object_projectile,

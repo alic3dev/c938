@@ -1,6 +1,7 @@
 #ifndef __c938_network_network_host_client_h
 #define __c938_network_network_host_client_h
 
+#include <network/data/network_data_shot_fired.h>
 #include <network/network_client_status.h>
 #include <network/network_client_status_game.h>
 #include <network/network_command.h>
@@ -9,7 +10,7 @@
 
 #include <pthread.h>
 
-struct network_host_client_shot_fired;
+struct network_data_shot_fired;
 
 struct network_host_client {
   int socket;
@@ -29,14 +30,8 @@ struct network_host_client {
 
   struct math_c_vector3_float position;
 
-  struct network_host_client_shot_fired* shots_fired;
+  struct network_data_shot_fired* shots_fired;
   unsigned int length_shots_fired;
-};
-
-struct network_host_client_shot_fired {
-  struct math_c_vector3_float position;
-  struct math_c_vector2_float angle;
-  unsigned long int time;
 };
 
 void network_host_client_initialize(

@@ -7,5 +7,6 @@ extern const unsigned long int data_length_math_c_vector3_float;
 extern const unsigned long int data_length_parameters_gameplay;
 extern const unsigned long int data_length_unsigned_int;
 extern const unsigned long int data_length_unsigned_long_int;
+extern const unsigned long int data_length_network_data_shot_fired;
 
 #endif

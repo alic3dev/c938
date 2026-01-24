@@ -33,6 +33,10 @@ struct network_host {
 
   pthread_mutex_t mutex_thread;
   pthread_mutex_t mutex_position;
+  pthread_mutex_t mutex_shots_fired;
+
+  unsigned int length_shots_fired;
+  struct network_data_shot_fired* shots_fired;
 
   struct notification_manager notification_manager;
 

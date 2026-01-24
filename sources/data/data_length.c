@@ -1,6 +1,7 @@
 #include <data/data_length.h>
 
 #include <data/parameters_gameplay.h>
+#include <network/data/network_data_shot_fired.h>
 
 #include <math_c_vector.h>
 
@@ -39,5 +40,11 @@ const unsigned long int data_length_unsigned_int = (
 const unsigned long int data_length_unsigned_long_int = (
   sizeof(
     unsigned long int
+  )
+);
+
+const unsigned long int data_length_network_data_shot_fired = (
+  sizeof(
+    struct network_data_shot_fired
   )
 );
