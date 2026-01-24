@@ -118,6 +118,11 @@ unsigned char network_host_listen_with_notification(
     0
   );
 
+  pthread_mutex_init(
+    &network_host->mutex_shots_fired,
+    0
+  );
+
   network_host->length_threads = (
     1
   );
@@ -128,6 +133,13 @@ unsigned char network_host_listen_with_notification(
         pthread_t
       ) *
       network_host->length_threads
+    )
+  );
+
+  network_host->length_shots_fired = 0;
+  network_host->shots_fired = (
+    clic3_memory_allocate_raw(
+      0
     )
   );
 
@@ -660,9 +672,7 @@ void* network_host_client_receiving_thread(
           length_data_received_client_expected = (
             length_data_received_client_expected +
             length_shots_fired * (
-              data_length_math_c_vector3_float +
-              data_length_math_c_vector2_float +
-              data_length_unsigned_long_int
+              data_length_network_data_shot_fired
             )
           );
 
@@ -691,7 +701,7 @@ void* network_host_client_receiving_thread(
               );
               ++index_shot_fired
             ) {
-              struct network_host_client_shot_fired* network_host_client_shot_fired = &(
+              struct network_data_shot_fired* network_data_shot_fired = &(
                 network_host_client->shots_fired[
                   index_shot_fired
                 ]
@@ -699,20 +709,8 @@ void* network_host_client_receiving_thread(
 
               network_data_packet_read(
                 &network_data_packet,
-                &network_host_client_shot_fired->position,
-                data_length_math_c_vector3_float
-              );
-
-              network_data_packet_read(
-                &network_data_packet,
-                &network_host_client_shot_fired->angle,
-                data_length_math_c_vector2_float
-              );
-
-              network_data_packet_read(
-                &network_data_packet,
-                &network_host_client_shot_fired->time,
-                data_length_unsigned_long_int
+                network_data_shot_fired,
+                data_length_network_data_shot_fired
               );
             }
 
@@ -1212,6 +1210,10 @@ void network_host_destroy(
     &network_host->mutex_position
   );
 
+  pthread_mutex_destroy(
+    &network_host->mutex_shots_fired
+  );
+
   network_data_map_destroy(
     &network_host->data_map
   );
@@ -1222,5 +1224,9 @@ void network_host_destroy(
 
   clic3_memory_free_raw(
     network_host->threads
+  );
+
+  clic3_memory_free_raw(
+    network_host->shots_fired
   );
 }

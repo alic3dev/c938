@@ -1,5 +1,7 @@
 #include <network/network_host_client.h>
 
+#include <network/data/network_data_shot_fired.h>
+
 #include <clic3_char_arrays.h>
 #include <clic3_memory.h>
 
@@ -100,7 +102,7 @@ void network_host_client_shots_fired_add(
     &network_host_client->shots_fired,
     (
       sizeof(
-        struct network_host_client_shot_fired
+        struct network_data_shot_fired
       ) *
       network_host_client->length_shots_fired
     )

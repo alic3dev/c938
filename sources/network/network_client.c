@@ -183,6 +183,11 @@ unsigned char network_client_connect_with_notification(
     0
   );
 
+  pthread_mutex_init(
+    &network_client->mutex_shots_fired,
+    0
+  );
+
   pthread_mutex_lock(
     &network_client->mutex_sending
   );
@@ -200,6 +205,14 @@ unsigned char network_client_connect_with_notification(
   network_client->length_network_data_packets_outgoing = (
     0
   );
+
+  network_client->shots_fired = (
+    clic3_memory_allocate_raw(
+      0
+    )
+  );
+
+  network_client->length_shots_fired = 0;
 
   network_client->connected_players = 0;
 
@@ -657,6 +670,10 @@ void network_client_destroy(
     &network_client->data_map
   );
 
+  pthread_mutex_destroy(
+    &network_client->mutex_shots_fired
+  );
+
   for (
     unsigned int index_network_data_packet_outgoing = 0;
     index_network_data_packet_outgoing < network_client->length_network_data_packets_outgoing;
@@ -679,5 +696,9 @@ void network_client_destroy(
 
   clic3_memory_free_raw(
     network_client->network_data_packets_outgoing
+  );
+  
+  clic3_memory_free_raw(
+    network_client->shots_fired
   );
 }
