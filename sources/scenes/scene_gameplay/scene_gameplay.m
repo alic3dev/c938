@@ -19,6 +19,7 @@
 #include <objects/object_crosshair.h>
 #include <objects/object_enemy.h>
 #include <objects/object_player.h>
+#include <objects/object_projectile.h>
 #include <player/player.h>
 #include <scenes/scene_gameplay/scene_gameplay_group_players.h>
 #include <textures/textures_buildings.h>
@@ -1471,24 +1472,62 @@ void scene_gameplay_poll(
         )
       );
 
+      pthread_mutex_lock(
+        &network_client->mutex_shots_fired
+      );
+
       network_data_packet_initialize(
         network_data_packet,
         network_command_poll,
-        sizeof(
-          struct math_c_vector3_float
+        (
+          data_length_math_c_vector3_float +
+          data_length_unsigned_int +
+          (
+            data_length_network_data_shot_fired *
+            network_client->length_shots_fired
+          )
         )
       );
 
       network_data_packet_bytes_add(
         network_data_packet,
         &metil_scene_gameplay->player.position,
-        sizeof(
-          struct math_c_vector3_float
-        )
+        data_length_math_c_vector3_float
       );
 
-      network_client_send(
-        &c938_data->network_client,
+      network_data_packet_bytes_add(
+        network_data_packet,
+        &network_client->length_shots_fired,
+        data_length_unsigned_int
+      );
+
+      for (
+        unsigned int index_shot_fired = 0;
+        index_shot_fired < network_client->length_shots_fired;
+        ++index_shot_fired
+      ) {
+        network_data_packet_bytes_add(
+          network_data_packet,
+          &network_client->shots_fired[
+            index_shot_fired
+          ],
+          data_length_network_data_shot_fired
+        );
+      }
+
+      network_client->length_shots_fired = 0;
+
+      clic3_memory_reallocate_raw(
+        &network_client->shots_fired,
+        0
+      );
+
+      pthread_mutex_unlock(
+        &network_client->mutex_shots_fired
+      );
+
+      network_client_send( 
+        network_client,
         network_data_packet
       );
     } else if (
@@ -1515,8 +1554,90 @@ void scene_gameplay_poll(
         &network_host->mutex_position
       );
 
+      for (
+        unsigned int index_network_host_client = 0;
+        index_network_host_client < network_host->length_clients;
+        ++index_network_host_client
+      ) {
+        struct network_host_client* network_host_client = (
+          network_host->clients[
+            index_network_host_client
+          ]
+        );
+
+        if (
+          (
+            network_host_client->status &
+            network_client_status_connected
+          ) == 0
+        ) {
+          continue;
+        }
+
+        pthread_mutex_lock(
+          &network_host_client->mutex_shots_fired
+        );
+
+        unsigned int index_projectile = (
+          metil_group_projectiles->length
+        );
+
+        metil_group_add_length_initialize(
+          metil_group_projectiles,
+          network_host_client->length_shots_fired,
+          metil_renderable_type_object
+        );
+        
+        for (
+          unsigned int index_shot_fired = 0;
+          index_shot_fired < network_host_client->length_shots_fired;
+          ++index_shot_fired
+        ) {
+          struct network_data_shot_fired* network_data_shot_fired = &(
+            network_host_client->shots_fired[
+              index_shot_fired
+            ]
+          );
+
+          struct metil_object* metil_object_projectile = (
+            metil_group_projectiles->renderables[
+              index_projectile
+            ]->renderable
+          );
+
+          index_projectile = (
+            index_projectile +
+            1
+          );
+
+          object_projectile_initialize(
+            metil_object_projectile,
+            metil->renderer_interface.metal_device,
+            network_data_shot_fired->position,
+            (struct math_c_vector3_float) {
+              .x = network_data_shot_fired->angle.x,
+              .y = network_data_shot_fired->angle.y,
+              .z = 0.0f
+            },
+            network_data_shot_fired->time,
+            200.0f
+          );
+        }
+
+        network_host_client->length_shots_fired = 0;
+
+        clic3_memory_reallocate_raw(
+          &network_host_client->shots_fired,
+          0
+        );
+
+        pthread_mutex_unlock(
+          &network_host_client->mutex_shots_fired
+        );
+      }
+
       network_host_send_poll(
-        &c938_data->network_host
+        network_host
       );
     }
   }

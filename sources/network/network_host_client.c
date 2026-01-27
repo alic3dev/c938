@@ -89,10 +89,6 @@ void network_host_client_shots_fired_add(
   struct network_host_client* network_host_client,
   unsigned int length_shots_fired
 ) {
-  pthread_mutex_lock(
-    &network_host_client->mutex_shots_fired
-  );
-
   network_host_client->length_shots_fired = (
     network_host_client->length_shots_fired +
     length_shots_fired
@@ -106,10 +102,6 @@ void network_host_client_shots_fired_add(
       ) *
       network_host_client->length_shots_fired
     )
-  );
-
-  pthread_mutex_unlock(
-    &network_host_client->mutex_shots_fired
   );
 }
 

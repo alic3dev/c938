@@ -647,6 +647,7 @@ void* network_host_client_receiving_thread(
         );
 
         unsigned long int length_data_received_client_expected = (
+          1 + // network command byte
           data_length_math_c_vector3_float +
           data_length_unsigned_int
         );
@@ -695,10 +696,7 @@ void* network_host_client_receiving_thread(
 
             for (
               ;
-              index_shot_fired < (
-                index_shot_fired +
-                length_shots_fired
-              );
+              index_shot_fired < network_host_client->length_shots_fired;
               ++index_shot_fired
             ) {
               struct network_data_shot_fired* network_data_shot_fired = &(
