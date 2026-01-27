@@ -1,17 +1,15 @@
+#include <c938_metal/c938_player.h>
+
+#include <c938_metal/c938_data_vertex_textured_coloured.h>
+
 #include <metil_rendering/metil_renderer_data_frame.h>
 #include <metil_rendering/metil_renderer_data_object.h>
 #include <metil_rendering/metil_renderer_vertex_index_parameter.h>
 
-#include <metal_stdlib>
+#include <metal_texture>
 
-struct data_vertex {
-  float4 position [[position]];
-  float2 position_texture;
-  float brightness;
-};
-
-[[vertex]] struct data_vertex c938_player_vertex(
-  const device simd_float4* positions [[
+[[vertex]] struct c938_data_vertex_textured_coloured c938_player_vertex(
+  const device metal::float4* positions [[
     buffer(
       metil_renderer_vertex_index_parameter_vertices
     )
@@ -28,55 +26,126 @@ struct data_vertex {
   ]],
   unsigned int id_vertex [[vertex_id]]
 ) {
-  struct data_vertex data_vertex;
+  struct c938_data_vertex_textured_coloured c938_data_vertex_textured_coloured;
 
-  data_vertex.position = (
+  c938_data_vertex_textured_coloured.position = (
     data_object->view_model_matrix_projection *
-    positions[id_vertex]
+    positions[
+      id_vertex
+    ]
   );
 
-  data_vertex.brightness = data_frame->brightness;
+  c938_data_vertex_textured_coloured.brightness = (
+    data_frame->brightness
+  );
 
   if (
     id_vertex == 0
   ) {
-    data_vertex.position_texture.x = 0.5f;
-    data_vertex.position_texture.y = metal::fabs(1.0f - (float)(data_frame->frame % 221) / 110.0f);
+    c938_data_vertex_textured_coloured.position_texture.x = (
+      0.5f
+    );
+
+    c938_data_vertex_textured_coloured.position_texture.y = (
+      metal::fabs(
+        1.0f -
+        (
+          (
+            (float)
+            (
+              data_frame->frame %
+              221
+            )
+          ) /
+          110.0f
+        )
+      )
+    );
   } else {
-    data_vertex.position_texture.x = (float) ((id_vertex - 1)) / 6.0f;
+    c938_data_vertex_textured_coloured.position_texture.x = (
+      (
+        (float)
+        (
+          id_vertex -
+          1
+        )
+      ) /
+      6.0f
+    );
     
     if (
-      data_vertex.position_texture.x > 1.0f
+      c938_data_vertex_textured_coloured.position_texture.x > 1.0f
     ) {
-      data_vertex.position_texture.x = 1.0f - (data_vertex.position_texture.x - 1.0f);
+      c938_data_vertex_textured_coloured.position_texture.x = (
+        1.0f -
+        (
+          c938_data_vertex_textured_coloured.position_texture.x -
+          1.0f
+        )
+      );
     }
 
-    data_vertex.position_texture.y = metal::fabs(((float)(data_frame->frame % 667) / 333.0f) - 1.0f);
+    c938_data_vertex_textured_coloured.position_texture.y = (
+      metal::fabs(
+        (
+          (
+            (float)
+            (
+              data_frame->frame %
+              667
+            )
+          ) /
+          333.0f
+        ) -
+        1.0f
+      )
+    );
   }
 
-  return data_vertex;
+  return (
+    c938_data_vertex_textured_coloured
+  );
 }
 
-[[fragment]] float4 c938_player_fragment(
-  data_vertex data_vertex [[stage_in]],
-  metal::texture2d<half> texture [[texture(0)]]
+[[fragment]] metal::float4 c938_player_fragment(
+  struct c938_data_vertex_textured_coloured c938_data_vertex_textured_coloured [[stage_in]],
+  metal::texture2d<half> metal_texture_player [[texture(0)]]
 ) {
   constexpr metal::sampler sampler_texture(
     metal::filter::linear,
     metal::mip_filter::linear
   );
 
-  float4 colour_texture = float4(
-    texture.sample(
+  metal::float4 colour_texture_player = metal::float4(
+    metal_texture_player.sample(
       sampler_texture,
-      data_vertex.position_texture
+      c938_data_vertex_textured_coloured.position_texture
     )
   );
 
-  return float4(
-    colour_texture[0] * data_vertex.brightness * 0.7f + 0.15f,
-    colour_texture[1] * data_vertex.brightness * 0.5f,
-    colour_texture[2] * data_vertex.brightness * 0.7f + 0.3f,
-    colour_texture[3]
+  return metal::float4(
+    (
+      colour_texture_player[0] *
+      c938_data_vertex_textured_coloured.colour.r *
+      c938_data_vertex_textured_coloured.brightness *
+      0.7f +
+      0.15f
+    ),
+    (
+      colour_texture_player[1] *
+      c938_data_vertex_textured_coloured.colour.g *
+      c938_data_vertex_textured_coloured.brightness *
+      0.5f
+    ),
+    (
+      colour_texture_player[2] *
+      c938_data_vertex_textured_coloured.colour.b *
+      c938_data_vertex_textured_coloured.brightness *
+      0.7f +
+      0.3f
+    ),
+    (
+      c938_data_vertex_textured_coloured.colour.a
+    )
   );
 }

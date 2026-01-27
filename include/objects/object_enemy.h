@@ -1,5 +1,5 @@
-#ifndef __object_enemy_h
-#define __object_enemy_h
+#ifndef __c938_objects_object_enemy_h
+#define __c938_objects_object_enemy_h
 
 #include <data/enemy_data.h>
 

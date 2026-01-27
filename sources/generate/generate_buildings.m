@@ -1,7 +1,7 @@
 #include <generate/generate_buildings.h>
 
 #include <mesh/mesh_building.h>
-#include <c938_pipeline_index.h>
+#include <rendering/c938_pipeline_index.h>
 
 #include <metil_object.h>
 #include <metil_rendering/metil_renderable.h>
@@ -25,8 +25,8 @@ void generate_buildings(
   struct metil* metil,
   id<MTLDevice> metal_device,
   struct metil_group* metil_group_buildings,
-  unsigned short int length_buildings,
-  unsigned short int index_target_building,
+  unsigned int length_buildings,
+  unsigned int index_target_building,
   id<MTLTexture> texture
 ) {
   struct metil_object* object = (void*) 0;
@@ -41,24 +41,11 @@ void generate_buildings(
     metil_group_buildings
   );
 
-  for (
-    unsigned short int index_building = metil_group_buildings->length;
-    index_building < length_buildings;
-    ++index_building
-  ) {
-    metil_group_add_initialize(
-      metil_group_buildings,
-      metil_renderable_type_object
-    );
-
-    object = metil_group_buildings->renderables[
-      index_building
-    ]->renderable;
-
-    object->index_pipeline_render = (
-      c938_pipeline_index_building
-    );
-  }
+  metil_group_add_length_initialize(
+    metil_group_buildings,
+    length_buildings,
+    metil_renderable_type_object
+  );
 
   struct math_c_vector2_float size_maximum = {
     .x = 0.0f,
@@ -81,7 +68,7 @@ void generate_buildings(
   );
 
   for (
-    unsigned char index_building = 1;
+    unsigned int index_building = 1;
     index_building < length_buildings;
     ++index_building
   ) {
@@ -95,6 +82,10 @@ void generate_buildings(
       metil_group_buildings->renderables[
         index_building
       ]->renderable
+    );
+
+    object->index_pipeline_render = (
+      c938_pipeline_index_building
     );
 
     mesh_building_initialize(

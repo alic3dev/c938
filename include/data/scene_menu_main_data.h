@@ -4,6 +4,7 @@
 #include <data/parameters_gameplay.h>
 
 #include <metil_menus/metil_menu.h>
+#include <network/network_host.h>
 
 #include <stdio.h>
 
@@ -11,6 +12,7 @@ struct scene_menu_main_data {
   struct metil_menu* _Nonnull menu_current;
   struct metil_menu menu_main;
   struct metil_menu menu_main_custom;
+  struct metil_menu menu_main_network;
 
   unsigned long int time_started;
 

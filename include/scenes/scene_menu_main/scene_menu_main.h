@@ -1,9 +1,11 @@
-#ifndef __scenes_scene_menu_main_h
-#define __scenes_scene_menu_main_h
+#ifndef __c938_scenes_scene_menu_main_h
+#define __c938_scenes_scene_menu_main_h
 
 #include <data/parameters_gameplay.h>
 #include <menus/menu_main.h>
 #include <menus/menu_main_custom.h>
+#include <menus/menu_main_network.h>
+#include <network/network_host.h>
 
 #include <metil.h>
 #include <metil_object.h>
@@ -19,13 +21,19 @@
 #define scene_menu_main_length_buildings_default 200
 #define scene_menu_main_time_scene_transition 333
 
-#define scene_menu_main_length_renderables 6
+#define scene_menu_main_length_renderables 9
 
 #define scene_menu_main_length_group_renderables_text_main menus_menu_main_length
 #define scene_menu_main_length_group_renderables_text_main_backing scene_menu_main_length_group_renderables_text_main
 
-#define scene_menu_main_length_group_renderables_text_menu_custom 10
+#define scene_menu_main_length_group_renderables_text_menu_custom (\
+  menus_menu_main_custom_length +\
+  1\
+)
 #define scene_menu_main_length_group_renderables_text_menu_custom_backing scene_menu_main_length_group_renderables_text_menu_custom
+
+#define scene_menu_main_length_group_renderables_text_menu_network menus_menu_main_network_length
+#define scene_menu_main_length_group_renderables_text_menu_network_backing scene_menu_main_length_group_renderables_text_menu_network
 
 enum scene_menu_main_renderables_index {
   scene_menu_main_renderables_index_group_buildings = 0,
@@ -34,6 +42,9 @@ enum scene_menu_main_renderables_index {
   scene_menu_main_renderables_index_group_text_menu_main = 3,
   scene_menu_main_renderables_index_group_text_menu_custom_backing = 4,
   scene_menu_main_renderables_index_group_text_menu_custom = 5,
+  scene_menu_main_renderables_index_group_text_menu_network_backing = 6,
+  scene_menu_main_renderables_index_group_text_menu_network = 7,
+  scene_menu_main_renderables_index_group_logging = 8
 };
 
 enum scene_menu_main_renderables_group_text_main_index {
@@ -42,6 +53,9 @@ enum scene_menu_main_renderables_group_text_main_index {
   ),
   scene_menu_main_renderables_group_text_main_index_menu_custom = (
     menus_menu_main_index_custom
+  ),
+  scene_menu_main_renderables_group_text_main_index_menu_network = (
+    menus_menu_main_index_network
   ),
   scene_menu_main_renderables_group_text_main_index_menu_exit = (
     menus_menu_main_index_exit
@@ -61,6 +75,18 @@ enum scene_menu_main_renderables_group_text_menu_custom_index {
   scene_menu_main_renderables_group_text_menu_custom_index_menu_back = 9
 };
 
+enum scene_menu_main_renderables_group_text_main_network_index {
+  scene_menu_main_renderables_group_text_main_index_menu_network_host = (
+    menus_menu_main_network_index_host
+  ),
+  scene_menu_main_renderables_group_text_main_index_menu_network_join = (
+    menus_menu_main_network_index_join
+  ),
+  scene_menu_main_renderables_group_text_main_index_menu_network_back = (
+    menus_menu_main_network_index_back
+  )
+};
+
 #define scene_menu_main_length_textures 2
 
 enum scene_menu_main_textures_index {
@@ -71,8 +97,7 @@ enum scene_menu_main_textures_index {
 
 void scene_menu_main_initialize(
   struct metil* _Nonnull,
-  struct metil_scene* _Nonnull,
-  struct parameters_gameplay* _Nonnull
+  struct metil_scene* _Nonnull
 );
 
 void scene_menu_main_poll(
@@ -98,6 +123,24 @@ void scene_menu_main_poll_input(
 void scene_menu_main_destroy(
   struct metil* _Nonnull,
   struct metil_scene* _Nonnull
+);
+
+void network_client_notification(
+  char* _Nonnull,
+  unsigned char,
+  void* _Nonnull
+);
+
+void network_host_notification(
+  char* _Nonnull,
+  unsigned char,
+  void* _Nonnull
+);
+
+void network_notification_log_to_stream(
+  FILE* _Nonnull,
+  const char* _Nonnull,
+  char* _Nonnull
 );
 
 #if target_os_ios

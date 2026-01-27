@@ -1,15 +1,18 @@
 #include <scenes/scene_menu_main/scene_menu_main.h>
 
+#include <rendering/c938_pipeline_index.h>
+#include <data/c938_data.h>
 #include <data/parameters_gameplay.h>
 #include <data/scene_menu_main_data.h>
 #include <generate/generate_buildings.h>
 #include <menus/menu_main.h>
 #include <menus/menu_main_custom.h>
-#include <c938_pipeline_index.h>
+#include <network/network_host.h>
 #include <scenes/scene_id.h>
 #include <textures/textures_buildings.h>
 
 #include <clic3_char_arrays.h>
+#include <clic3_colours.h>
 #include <clic3_memory.h>
 
 #include <metil_audio/metil_audio_io_proc.h>
@@ -45,9 +48,16 @@
 
 void scene_menu_main_initialize(
   struct metil* metil,
-  struct metil_scene* scene,
-  struct parameters_gameplay* parameters_gameplay
+  struct metil_scene* scene
 ) {
+  struct c938_data* c938_data = (
+    metil->data
+  );
+
+  struct parameters_gameplay* parameters_gameplay = (
+    &c938_data->parameters_gameplay
+  );
+  
   metil_scene_initialize_with_renderables(
     metil,
     scene,
@@ -67,11 +77,28 @@ void scene_menu_main_initialize(
       case scene_menu_main_renderables_index_group_text_menu_main:
       case scene_menu_main_renderables_index_group_text_menu_custom_backing:
       case scene_menu_main_renderables_index_group_text_menu_custom:
+      case scene_menu_main_renderables_index_group_text_menu_network_backing:
+      case scene_menu_main_renderables_index_group_text_menu_network:
         metil_renderable_initialize_at_index(
           scene->renderables,
           index_renderable,
           metil_renderable_type_group
         );
+
+        break;
+      case scene_menu_main_renderables_index_group_logging:
+        scene->renderables[
+          index_renderable
+        ].type = (
+          metil_renderable_type_group
+        );
+
+        scene->renderables[
+          index_renderable
+        ].renderable = (
+          &c938_data->logging.group
+        );
+
         break;
       default:
         metil_renderable_initialize_at_index(
@@ -79,6 +106,7 @@ void scene_menu_main_initialize(
           index_renderable,
           metil_renderable_type_object
         );
+
         break;
     }
   }
@@ -95,9 +123,11 @@ void scene_menu_main_initialize(
     scene_menu_main_destroy
   );
 
-  scene->data = malloc(
-    sizeof(
-      struct scene_menu_main_data
+  scene->data = (
+    clic3_memory_allocate_raw(
+      sizeof(
+        struct scene_menu_main_data
+      )
     )
   );
 
@@ -124,6 +154,10 @@ void scene_menu_main_initialize(
   menu_main_custom_initialize(
     &data->menu_main_custom,
     parameters_gameplay
+  );
+
+  menu_main_network_initialize(
+    &data->menu_main_network
   );
 
   data->menu_current = &(
@@ -237,6 +271,14 @@ void scene_menu_main_initialize(
         );
 
         break;
+      case scene_menu_main_renderables_group_text_main_index_menu_network:
+        metil_object_text_initialize(
+          metil,
+          metil_object_text,
+          "network"
+        );
+
+        break;
       case scene_menu_main_renderables_group_text_main_index_menu_exit:
         metil_object_text_initialize(
           metil,
@@ -303,7 +345,8 @@ void scene_menu_main_initialize(
           index_metil_group_text_main_renderable *
           4.0f
         )
-      )
+      ) +
+      0.15f
     );
 
     metil_object_text_backing->position.y = (
@@ -354,7 +397,6 @@ void scene_menu_main_initialize(
         index_metil_group_text_main_renderable
       ]->renderable
     );
-
 
     switch (
       index_metil_group_text_main_renderable
@@ -496,6 +538,151 @@ void scene_menu_main_initialize(
     );
   }
 
+  struct metil_group* metil_group_text_network_backing = (
+    scene->renderables[
+      scene_menu_main_renderables_index_group_text_menu_network_backing
+    ].renderable
+  );
+
+  struct metil_group* metil_group_text_network = (
+    scene->renderables[
+      scene_menu_main_renderables_index_group_text_menu_network
+    ].renderable
+  );
+
+  metil_group_add_length_initialize(
+    metil_group_text_network_backing,
+    scene_menu_main_length_group_renderables_text_menu_network_backing,
+    metil_renderable_type_object
+  );
+
+  metil_group_add_length_initialize(
+    metil_group_text_network,
+    scene_menu_main_length_group_renderables_text_menu_network,
+    metil_renderable_type_object
+  );
+
+  metil_group_text_network_backing->visible = 0;
+  metil_group_text_network->visible = 0;
+
+  for (
+    unsigned char index_metil_group_text_network_renderable = 0;
+    index_metil_group_text_network_renderable < scene_menu_main_length_group_renderables_text_menu_network;
+    ++index_metil_group_text_network_renderable
+  ) {
+    struct metil_object* metil_object_text_backing = (
+      metil_group_text_network_backing->renderables[
+        index_metil_group_text_network_renderable
+      ]->renderable
+    );
+
+    struct metil_object* metil_object_text = (
+      metil_group_text_network->renderables[
+        index_metil_group_text_network_renderable
+      ]->renderable
+    );
+
+    switch (
+      index_metil_group_text_network_renderable
+    ) {
+      case scene_menu_main_renderables_group_text_main_index_menu_network_host: {
+        metil_object_text_initialize(
+          metil,
+          metil_object_text,
+          "host"
+        );
+
+        break;
+      }
+      case scene_menu_main_renderables_group_text_main_index_menu_network_join: {
+        metil_object_text_initialize(
+          metil,
+          metil_object_text,
+          "join"
+        );
+
+        break;
+      }
+      case scene_menu_main_renderables_group_text_main_index_menu_network_back: {
+        metil_object_text_initialize(
+          metil,
+          metil_object_text,
+          "back"
+        );
+
+        break;
+      }
+    }
+
+    metil_mesh_box_initialize(
+      &metil_object_text_backing->mesh,
+      (struct math_c_vector3_float) {
+        .x = 0.5f,
+        .y = (
+          metil_object_text->mesh.size.y * 1.5f
+        ),
+        .z = (
+          0.5f
+        )
+      }
+    );
+
+    metil_object_text_backing->position.z = 0.5f;
+
+    metil_object_text_backing->rotation.x = -0.025f;
+    metil_object_text_backing->rotation.y = -0.025f;
+
+    metil_object_text_backing->visible = (
+      metil_object_text->visible
+    );
+
+    metil_object_texture_add(
+      metil_object_text_backing,
+      scene->textures[
+        scene_menu_main_textures_index_text_backing
+      ]
+    );
+
+    metil_object_buffers_initialize(
+      metil_object_text_backing,
+      metil->renderer_interface.metal_device
+    );
+
+    struct metil_renderer_data_object* metil_renderer_data_object = (
+      metil_object_text_backing->buffers_vertex[
+        metil_object_buffer_default_index_data
+      ].buffer.contents
+    );
+
+    metil_renderer_data_object_initialize(
+      metil_renderer_data_object
+    );
+
+    metil_object_text_backing->index_pipeline_render = (
+      c938_pipeline_index_text_backing_menu
+    );
+
+    metil_object_text_backing->positioning = (
+      metil_positioning_static
+    );
+
+    metil_object_text->position.y = (
+      0.05f *
+      (
+        -6.0f -
+        (
+          index_metil_group_text_network_renderable *
+          4.0f
+        )
+      ) +
+      0.15f
+    );
+
+    metil_object_text_backing->position.y = (
+      metil_object_text->position.y
+    );
+  }
+
   struct metil_group* metil_group_buildings = (
     scene->renderables[
       scene_menu_main_renderables_index_group_buildings
@@ -534,8 +721,16 @@ void scene_menu_main_poll(
   struct metil* metil,
   struct metil_scene* scene
 ) {
+  struct c938_data* c938_data = (
+    metil->data
+  );
+
   struct scene_menu_main_data* data = (
     scene->data
+  );
+
+  c938_logging_poll(
+    metil
   );
 
   data->angle = fmod((
@@ -599,13 +794,27 @@ void scene_menu_main_poll(
       scene_menu_main_renderables_index_group_text_menu_custom
     ].renderable
   );
+
+  struct metil_group* metil_group_text_menu_network_backing = (
+    scene->renderables[
+      scene_menu_main_renderables_index_group_text_menu_network_backing
+    ].renderable
+  );
+
+  struct metil_group* metil_group_text_menu_network = (
+    scene->renderables[
+      scene_menu_main_renderables_index_group_text_menu_network
+    ].renderable
+  );
   
   for (
     unsigned char index_metil_group_text_main_renderable = 0;
     index_metil_group_text_main_renderable < (
       menu == &data->menu_main
       ? scene_menu_main_length_group_renderables_text_main
-      : scene_menu_main_length_group_renderables_text_menu_custom
+      : menu == &data->menu_main_custom
+      ? scene_menu_main_length_group_renderables_text_menu_custom
+      : scene_menu_main_length_group_renderables_text_menu_network
     );
     ++index_metil_group_text_main_renderable
   ) {
@@ -638,7 +847,13 @@ void scene_menu_main_poll(
           index_metil_group_text_main_renderable
         ]->renderable
       );
-    } else {
+
+      offset_position_y = (
+        0.15f
+      );
+    } else if (
+      menu == &data->menu_main_custom
+    ) {
       metil_object_text_backing = (
         metil_group_text_menu_custom_backing->renderables[
           index_metil_group_text_main_renderable
@@ -674,6 +889,24 @@ void scene_menu_main_poll(
         menu,
         index_menu,
         1
+      );
+    } else if (
+      menu == &data->menu_main_network
+    ) {
+      metil_object_text_backing = (
+        metil_group_text_menu_network_backing->renderables[
+          index_metil_group_text_main_renderable
+        ]->renderable
+      );
+
+      metil_object_text = (
+        metil_group_text_menu_network->renderables[
+          index_metil_group_text_main_renderable
+        ]->renderable
+      );
+
+      offset_position_y = (
+        0.15f
       );
     }
 
@@ -741,7 +974,11 @@ void scene_menu_main_poll(
 
       if (
         menu == &data->menu_main &&
-        index_menu == menus_menu_main_index_exit
+        index_menu == menus_menu_main_index_exit ||
+        menu == &data->menu_main_custom &&
+        index_menu == menus_menu_main_custom_index_back ||
+        menu == &data->menu_main_network &&
+        index_menu == menus_menu_main_network_index_back
       ) {
         metil_renderer_data_text_backing->colour.y = (
           0.4f
@@ -795,7 +1032,11 @@ void scene_menu_main_poll(
 
       if (
         menu == &data->menu_main &&
-        index_menu == menus_menu_main_index_exit
+        index_menu == menus_menu_main_index_exit ||
+        menu == &data->menu_main_custom &&
+        index_menu == menus_menu_main_custom_index_back ||
+        menu == &data->menu_main_network &&
+        index_menu == menus_menu_main_network_index_back
       ) {
         metil_renderer_data_text_backing->colour.y = (
           0.5f
@@ -895,7 +1136,6 @@ void scene_menu_main_poll(
 
           break;
         }
-        default:
         case menus_menu_main_index_custom: {
           menu->index_selected = -1;
           menu->handled = 0;
@@ -908,6 +1148,30 @@ void scene_menu_main_poll(
 
           data->menu_current = &(
             data->menu_main_custom
+          );
+
+          data->menu_current->index_current = (
+            0
+          );
+
+          metil_stopwatch_start(
+            &data->menu_current->stopwatch_input
+          );
+
+          break;
+        }
+        case menus_menu_main_index_network: {
+          menu->index_selected = -1;
+          menu->handled = 0;
+
+          metil_group_text_main_backing->visible = 0;
+          metil_group_text_main->visible = 0;
+
+          metil_group_text_menu_network_backing->visible = 1;
+          metil_group_text_menu_network->visible = 1;
+
+          data->menu_current = &(
+            data->menu_main_network
           );
 
           data->menu_current->index_current = (
@@ -937,14 +1201,163 @@ void scene_menu_main_poll(
           break;
         }
       }
-    } else {
+    } else if (
+       data->menu_current == &data->menu_main_custom
+    ) {
       switch (
         menu->index_selected
       ) {
         case menus_menu_main_custom_index_start: {
+          if (
+            data->parameters_gameplay->networked ==
+            parameters_gameplay_networked_none
+          ) {
+            metil_debug_log(
+              metil->configuration.debug_log_level,
+              "scene_menu_main:starting_custom\n"
+            );
+
+            data->time_started = (
+              scene->time
+            );
+          } else {
+            metil_debug_log(
+              metil->configuration.debug_log_level,
+              "scene_menu_main:starting_network_host\n"
+            );
+
+            unsigned char status_network_host_listen = (
+              network_host_listen_with_notification(
+                &c938_data->network_host,
+                network_host_notification,
+                metil
+              )
+            );
+
+            if (
+              status_network_host_listen != 0
+            ) {
+              metil_debug_log(
+                metil->configuration.debug_log_level,
+                "scene_menu_main:network_host:failure_to_start\n"
+              );
+
+              network_host_notification(
+                "network_host::creation_failed",
+                network_host_notification_type_error,
+                metil
+              );
+
+              menu->index_selected = -1;
+              menu->handled = 0;
+            } else {
+              network_host_connections_accept(
+                &c938_data->network_host
+              );
+
+              metil_scene_controller_scene_change(
+                metil,
+                metil->scene_controller,
+                scene_id_gameplay
+              );
+
+              return;
+            }
+          }
+
+          break;
+        }
+        default:
+        case menus_menu_main_custom_index_back: {
+          menu->index_selected = -1;
+          menu->handled = 0;
+
+          metil_group_text_menu_custom_backing->visible = 0;
+          metil_group_text_menu_custom->visible = 0;
+
+          if (
+            data->parameters_gameplay->networked ==
+            parameters_gameplay_networked_none
+          ) {
+            data->menu_current = &(
+              data->menu_main
+            );
+
+            metil_group_text_main_backing->visible = 1;
+            metil_group_text_main->visible = 1;
+          } else {
+            data->menu_current = &(
+              data->menu_main_network
+            );
+
+            metil_group_text_menu_network_backing->visible = 1;
+            metil_group_text_menu_network->visible = 1;
+          }
+
+          data->menu_current->index_current = (
+            0
+          );
+
+          metil_stopwatch_start(
+            &data->menu_current->stopwatch_input
+          );
+
+          break;
+        }
+      }
+    } else if (
+      data->menu_current == &data->menu_main_network
+    ) {
+      switch (
+        menu->index_selected
+      ) {
+        case menus_menu_main_network_index_host: {
+          data->parameters_gameplay->networked = (
+            parameters_gameplay_networked_host
+          );
+
           metil_debug_log(
             metil->configuration.debug_log_level,
-            "scene_menu_main:starting\n"
+            "setting::parameters_gameplay::networked->{host};\n"
+          );
+
+          menu->index_selected = -1;
+          menu->handled = 0;
+
+          metil_group_text_menu_custom_backing->visible = 1;
+          metil_group_text_menu_custom->visible = 1;
+
+          metil_group_text_menu_network_backing->visible = 0;
+          metil_group_text_menu_network->visible = 0;
+
+          data->menu_current = &(
+            data->menu_main_custom
+          );
+
+          data->menu_current->index_current = (
+            0
+          );
+
+          metil_stopwatch_start(
+            &data->menu_current->stopwatch_input
+          );
+
+          break;
+        }
+        case menus_menu_main_network_index_join: {
+          data->parameters_gameplay->networked = (
+            parameters_gameplay_networked_client
+          );
+          
+          metil_debug_log(
+            metil->configuration.debug_log_level,
+            "setting::parameters_gameplay::networked->{client};\n"
+          );
+
+          network_client_connect_with_notification(
+            &c938_data->network_client,
+            network_client_notification,
+            metil
           );
 
           data->time_started = (
@@ -954,15 +1367,24 @@ void scene_menu_main_poll(
           break;
         }
         default:
-        case menus_menu_main_custom_index_back: {
+        case menus_menu_main_network_index_back: {
+          data->parameters_gameplay->networked = (
+            parameters_gameplay_networked_none
+          );
+
+          metil_debug_log(
+            metil->configuration.debug_log_level,
+            "setting::parameters_gameplay::networked->{none};\n"
+          );
+
           menu->index_selected = -1;
           menu->handled = 0;
 
           metil_group_text_main_backing->visible = 1;
           metil_group_text_main->visible = 1;
 
-          metil_group_text_menu_custom_backing->visible = 0;
-          metil_group_text_menu_custom->visible = 0;
+          metil_group_text_menu_network_backing->visible = 0;
+          metil_group_text_menu_network->visible = 0;
 
           data->menu_current = &(
             data->menu_main
@@ -1392,7 +1814,7 @@ void scene_menu_main_destroy(
   struct scene_menu_main_data* scene_menu_main_data = (
     scene->data
   );
-
+  
   metil_menu_destroy(
     &scene_menu_main_data->menu_main
   );
@@ -1401,9 +1823,196 @@ void scene_menu_main_destroy(
     &scene_menu_main_data->menu_main_custom
   );
 
+  scene->length_renderables = (
+    scene->length_renderables -
+    1
+  );
+
   metil_scene_destroy_default(
     metil,
     scene
+  );
+}
+
+void network_client_notification(
+  char* notification,
+  unsigned char id_notification,
+  void* data
+) {
+  struct metil* metil = (
+    data
+  );
+
+  enum network_client_notification_type network_client_notification_type =  (
+    id_notification
+  );
+
+  struct c938_data* c938_data = (
+    metil->data
+  );
+
+  struct c938_logging* c938_logging = (
+    &c938_data->logging
+  );
+
+  FILE* stream_output = (
+    stdout
+  );
+
+  const char* colour;
+
+  switch (
+    network_client_notification_type
+  ) {
+    case network_client_notification_type_error: {
+      stream_output = (
+        stderr
+      );
+
+      colour = clic3_colours_bold_red;
+
+      break;
+    }
+    case network_client_notification_type_data_map_sent: {
+      colour = clic3_colours_bold_green;
+
+      break;
+    }
+    case network_client_notification_type_enemies:
+    case network_client_notification_type_poll: {
+      return;
+    }
+    case network_client_notification_type_default:
+    default: {
+      colour = clic3_colours_bold_blue;
+
+      break;
+    }
+  }
+
+  c938_logging_log(
+    metil,
+    notification
+  );
+
+  network_notification_log_to_stream(
+    stream_output,
+    colour,
+    notification
+  );
+}
+
+void network_host_notification(
+  char* notification,
+  unsigned char id_notification,
+  void* data
+) {
+  struct metil* metil = (
+    data
+  );
+
+  c938_logging_log(
+    metil,
+    notification
+  );
+
+  enum network_host_notification_type network_host_notification_type =  (
+    id_notification
+  );
+
+  FILE* stream_output;
+  const char* colour;
+
+  switch (
+    network_host_notification_type
+  ) {
+    case network_host_notification_type_error: {
+      stream_output = (
+        stderr
+      );
+
+      colour = clic3_colours_bold_red;
+
+      break;
+    }
+    case network_host_notification_type_default:
+    default: {
+      stream_output = (
+        stdout
+      );
+
+      colour = clic3_colours_bold_blue;
+
+      break;
+    }
+  }
+
+  struct c938_data* c938_data = (
+    metil->data
+  );
+
+  struct c938_logging* c938_logging = (
+    &c938_data->logging
+  );
+
+  network_notification_log_to_stream(
+    stream_output,
+    colour,
+    notification
+  );
+}
+
+void network_notification_log_to_stream(
+  FILE* stream_output,
+  const char* colour,
+  char* notification
+) {
+  char** notification_parts = (
+    clic3_char_array_split_on_char(
+      notification,
+      ':'
+    )
+  );
+
+  unsigned char index_notification_part = 0;
+
+  while (
+    index_notification_part++ <
+    (unsigned long int)
+    notification_parts[
+      0
+    ]
+  ) {
+    fprintf(
+      stream_output,
+      "%s%s%s",
+      index_notification_part == 1
+      ? colour
+      : index_notification_part % 2 == 0
+      ? clic3_colours_bold_foreground
+      : clic3_colours_reset,
+      index_notification_part % 2 == 0
+      ? "::"
+      : "",
+      notification_parts[
+        index_notification_part
+      ]
+    );
+
+    clic3_memory_free_raw(
+      notification_parts[
+        index_notification_part
+      ]
+    );
+  }
+
+  fprintf(
+    stream_output,
+    "\n"
+  );
+
+  clic3_memory_free_raw(
+    notification_parts
   );
 }
 

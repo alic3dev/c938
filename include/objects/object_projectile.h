@@ -1,5 +1,5 @@
-#ifndef __object_projectile_h
-#define __object_projectile_h
+#ifndef __c938_objects_object_projectile_h
+#define __c938_objects_object_projectile_h
 
 #include <data/projectile_data.h>
 

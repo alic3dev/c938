@@ -1,5 +1,5 @@
-#ifndef __scenes_scene_gameplay_h
-#define __scenes_scene_gameplay_h
+#ifndef __c938_scenes_scene_gameplay_scene_gameplay_h
+#define __c938_scenes_scene_gameplay_scene_gameplay_h
 
 #include <data/parameters_gameplay.h>
 #include <data/scene_gameplay_data.h>
@@ -13,17 +13,18 @@
 #include <CoreAudio/CoreAudio.h>
 #endif
 
-#define scene_gameplay_length_renderables 8
+#define scene_gameplay_length_renderables 9
 
 enum scene_gameplay_renderables_index {
   scene_gameplay_renderables_index_buildings = 0,
-  scene_gameplay_renderables_index_player = 1,
+  scene_gameplay_renderables_index_group_players = 1,
   scene_gameplay_renderables_index_projectiles = 2,
   scene_gameplay_renderables_index_enemies = 3,
   scene_gameplay_renderables_index_hud_boosted = 4,
   scene_gameplay_renderables_index_hud_jumping = 5,
   scene_gameplay_renderables_index_hud_jumping_secondary = 6,
-  scene_gameplay_renderables_index_crosshair = 7
+  scene_gameplay_renderables_index_crosshair = 7,
+  scene_gameplay_renderables_index_group_logging = 8
 };
 
 enum scene_gameplay_renderables_index_range {
@@ -43,8 +44,19 @@ enum scene_gameplay_textures {
 
 void scene_gameplay_initialize(
   struct metil* _Nonnull,
-  struct metil_scene* _Nonnull,
-  struct parameters_gameplay* _Nonnull
+  struct metil_scene* _Nonnull
+);
+
+void scene_gameplay_network_client_notification_on(
+  char* _Nonnull,
+  unsigned char,
+  void* _Nonnull
+);
+
+void scene_gameplay_network_host_notification_on(
+  char* _Nonnull,
+  unsigned char,
+  void* _Nonnull
 );
 
 void scene_gameplay_populate(

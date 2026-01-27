@@ -1,5 +1,5 @@
-#ifndef __mesh_player_h
-#define __mesh_player_h
+#ifndef __c938_mesh_mesh_player_h
+#define __c938_mesh_mesh_player_h
 
 #include <metil_mesh/metil_mesh.h>
 #include <metil_player/metil_player_defaults.h>

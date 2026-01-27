@@ -1,16 +1,15 @@
+#include <c938_metal/c938_crosshair.h>
+
+#include <c938_metal/c938_data_vertex_coloured.h>
+
 #include <metil_rendering/metil_renderer_data_frame.h>
 #include <metil_rendering/metil_renderer_data_object.h>
 #include <metil_rendering/metil_renderer_vertex_index_parameter.h>
 
-#include <metal_stdlib>
+#include <metal_texture>
 
-struct data_vertex {
-  float4 position [[position]];
-  float4 colour;
-};
-
-[[vertex]] struct data_vertex c938_crosshair_vertex(
-  const device simd_float4* positions [[
+[[vertex]] struct c938_data_vertex_coloured c938_crosshair_vertex(
+  const device metal::float4* positions [[
     buffer(
       metil_renderer_vertex_index_parameter_vertices
     )
@@ -27,28 +26,28 @@ struct data_vertex {
   ]],
   unsigned int id_vertex [[vertex_id]]
 ) {
-  struct data_vertex data_vertex;
+  struct c938_data_vertex_coloured c938_data_vertex_coloured;
 
-  data_vertex.position = (
+  c938_data_vertex_coloured.position = (
     data_object->view_model_matrix_projection *
     positions[id_vertex]
   );
 
-  data_vertex.colour.r = data_object->colour.x;
-  data_vertex.colour.g = data_object->colour.y;
-  data_vertex.colour.b = data_object->colour.z;
-  data_vertex.colour.a = data_object->colour.w;
+  c938_data_vertex_coloured.colour.r = data_object->colour.x;
+  c938_data_vertex_coloured.colour.g = data_object->colour.y;
+  c938_data_vertex_coloured.colour.b = data_object->colour.z;
+  c938_data_vertex_coloured.colour.a = data_object->colour.w;
 
-  return data_vertex;
+  return c938_data_vertex_coloured;
 }
 
-[[fragment]] float4 c938_crosshair_fragment(
-  data_vertex data_vertex [[stage_in]]
+[[fragment]] metal::float4 c938_crosshair_fragment(
+  c938_data_vertex_coloured c938_data_vertex_coloured [[stage_in]]
 ) {
-  return float4(
-    data_vertex.colour.r,
-    data_vertex.colour.g,
-    data_vertex.colour.b,
-    data_vertex.colour.a
+  return metal::float4(
+    c938_data_vertex_coloured.colour.r,
+    c938_data_vertex_coloured.colour.g,
+    c938_data_vertex_coloured.colour.b,
+    c938_data_vertex_coloured.colour.a
   );
 }

@@ -1,5 +1,5 @@
-#ifndef __c938_pipeline_index
-#define __c938_pipeline_index
+#ifndef __c938_rendering_c938_pipeline_index
+#define __c938_rendering_c938_pipeline_index
 
 extern unsigned short int c938_pipeline_index_building;
 extern unsigned short int c938_pipeline_index_ground;
