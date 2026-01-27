@@ -1121,6 +1121,8 @@ void network_host_send_poll(
     &network_host->mutex_position
   );
 
+  index = 0;
+
   for (
     unsigned int index_client = 0;
     index_client < network_host->length_clients;
@@ -1178,7 +1180,7 @@ void network_host_send_poll(
         network_data_packet_client_poll.bytes +
         1
       ),
-      &index_client,
+      &index,
       data_length_unsigned_int
     );
 
@@ -1212,6 +1214,11 @@ void network_host_send_poll(
 
     network_data_packet_destroy(
       &network_data_packet_client_poll
+    );
+
+    index = (
+      index +
+      1
     );
   }
 
