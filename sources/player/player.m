@@ -1,9 +1,13 @@
 #include <player/player.h>
 
 #include <data/c938_data.h>
+#include <data/data_length.h>
 #include <data/player_data.h>
 #include <data/scene_gameplay_data.h>
 #include <objects/object_projectile.h>
+
+#include <clic3_bytes.h>
+#include <clic3_memory.h>
 
 #include <metil_group.h>
 #include <metil_input/metil_keycodes.h>
@@ -12,8 +16,6 @@
 #include <metil_player/metil_player.h>
 #include <metil_scenes/metil_scene.h>
 #include <metil_scenes/metil_scene_controller.h>
-
-#include <stdlib.h>
 
 const float player_speed_movement_default = 100.0f;
 
@@ -694,6 +696,21 @@ void player_poll(
       *player_data->time
     );
 
+    struct math_c_vector3_float position_projectile = {
+      .x = player->position.x,
+      .y = (
+        player->position.y +
+        player_data->height
+      ),
+      .z = player->position.z
+    };
+
+    struct math_c_vector3_float angle_projectile = {
+      .x = player->rotation.x,
+      .y = -player->rotation.y,
+      .z = player->rotation.z
+    };
+
     if (
       scene_gameplay_data->parameters->networked ==
       parameters_gameplay_networked_client
@@ -713,6 +730,39 @@ void player_poll(
       network_client->length_shots_fired = (
         network_client->length_shots_fired +
         1
+      );
+
+      clic3_memory_reallocate_raw(
+        &network_client->shots_fired,
+        (
+          data_length_network_data_shot_fired *
+          network_client->length_shots_fired
+        )
+      );
+
+      struct network_data_shot_fired* network_data_shot_fired = &(
+        network_client->shots_fired[
+          network_client->length_shots_fired -
+          1
+        ]
+      );
+
+      clic3_bytes_copy(
+        &network_data_shot_fired->position,
+        &position_projectile,
+        data_length_math_c_vector3_float
+      );
+
+      clic3_bytes_copy(
+        &network_data_shot_fired->angle,
+        &angle_projectile,
+        data_length_math_c_vector2_float
+      );
+
+      clic3_bytes_copy(
+        &network_data_shot_fired->time,
+        &player_data->time_shot,
+        data_length_unsigned_long_int
       );
 
       pthread_mutex_unlock(
@@ -739,6 +789,39 @@ void player_poll(
         1
       );
 
+      clic3_memory_reallocate_raw(
+        &network_host->shots_fired,
+        (
+          data_length_network_data_shot_fired *
+          network_host->length_shots_fired
+        )
+      );
+
+      struct network_data_shot_fired* network_data_shot_fired = &(
+        network_host->shots_fired[
+          network_host->length_shots_fired -
+          1
+        ]
+      );
+
+      clic3_bytes_copy(
+        &network_data_shot_fired->position,
+        &position_projectile,
+        data_length_math_c_vector3_float
+      );
+
+      clic3_bytes_copy(
+        &network_data_shot_fired->angle,
+        &angle_projectile,
+        data_length_math_c_vector2_float
+      );
+
+      clic3_bytes_copy(
+        &network_data_shot_fired->time,
+        &player_data->time_shot,
+        data_length_unsigned_long_int
+      );
+
       pthread_mutex_unlock(
         &network_host->mutex_shots_fired
       );
@@ -747,19 +830,8 @@ void player_poll(
     object_projectile_initialize(
       metil_object_projectile,
       player_data->metal_device,
-      (struct math_c_vector3_float) {
-        .x = player->position.x,
-        .y = (
-          player->position.y +
-          player_data->height
-        ),
-        .z = player->position.z
-      },
-      (struct math_c_vector3_float) {
-        .x = player->rotation.x,
-        .y = -player->rotation.y,
-        .z = player->rotation.z
-      },
+      position_projectile,
+      angle_projectile,
       *player_data->time,
       player_data->is_boosted == 0
       ? 200.0f :
