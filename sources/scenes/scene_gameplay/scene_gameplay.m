@@ -1156,75 +1156,79 @@ void scene_gameplay_poll(
           );
 
           if (
-            network_host_client->status &
-            network_client_status_connected
+            (
+              network_host_client->status &
+              network_client_status_connected
+            ) == 0
           ) {
-            pthread_mutex_lock(
-              &network_host_client->mutex_position
-            );
+            continue;
+          }
 
-            metil_object_player->position.x = (
-              network_host_client->position.x
-            );
+          pthread_mutex_lock(
+            &network_host_client->mutex_position
+          );
 
-            metil_object_player->position.y = (
-              network_host_client->position.y
-            );
+          metil_object_player->position.x = (
+            network_host_client->position.x
+          );
 
-            metil_object_player->position.z = (
-              network_host_client->position.z
-            );
+          metil_object_player->position.y = (
+            network_host_client->position.y
+          );
 
-            pthread_mutex_unlock(
-              &network_host_client->mutex_position
-            );
+          metil_object_player->position.z = (
+            network_host_client->position.z
+          );
 
-            offset_network_host_client = (
-              index_client +
-              1
-            );
+          pthread_mutex_unlock(
+            &network_host_client->mutex_position
+          );
 
-            struct metil_object* metil_object_building = (
-              metil_group_buildings->renderables[
-                player_data->index_target_building
-              ]->renderable
-            );
+          offset_network_host_client = (
+            index_client +
+            1
+          );
+
+          struct metil_object* metil_object_building = (
+            metil_group_buildings->renderables[
+              player_data->index_target_building
+            ]->renderable
+          );
+
+          if (
+            metil_object_player->position.y == (
+              metil_object_building->position.y +
+              metil_object_building->mesh.size.y
+            )
+          ) {
+            struct math_c_vector2_float size_half_object = {
+              .x = metil_object_building->mesh.size.x / 2.0f,
+              .y = metil_object_building->mesh.size.z / 2.0f
+            };
+
+            struct math_c_vector2_float position_minimum_object = {
+              .x = metil_object_building->position.x - size_half_object.x,
+              .y = metil_object_building->position.z - size_half_object.y
+            };
+
+            struct math_c_vector2_float position_maximum_object = {
+              .x = metil_object_building->position.x + size_half_object.x,
+              .y = metil_object_building->position.z + size_half_object.y
+            };
 
             if (
-              metil_object_player->position.y == (
-                metil_object_building->position.y +
-                metil_object_building->mesh.size.y
-              )
+              metil_object_player->position.x >= position_minimum_object.x - metil_object_player->mesh.size.x &&
+              metil_object_player->position.x <= position_maximum_object.x + metil_object_player->mesh.size.x &&
+              metil_object_player->position.z >= position_minimum_object.y - metil_object_player->mesh.size.z &&
+              metil_object_player->position.z <= position_maximum_object.y + metil_object_player->mesh.size.z
             ) {
-              struct math_c_vector2_float size_half_object = {
-                .x = metil_object_building->mesh.size.x / 2.0f,
-                .y = metil_object_building->mesh.size.z / 2.0f
-              };
+              scene_gameplay_populate(
+                metil,
+                metil_scene_gameplay,
+                0
+              );
 
-              struct math_c_vector2_float position_minimum_object = {
-                .x = metil_object_building->position.x - size_half_object.x,
-                .y = metil_object_building->position.z - size_half_object.y
-              };
-
-              struct math_c_vector2_float position_maximum_object = {
-                .x = metil_object_building->position.x + size_half_object.x,
-                .y = metil_object_building->position.z + size_half_object.y
-              };
-
-              if (
-                metil_object_player->position.x >= position_minimum_object.x - metil_object_player->mesh.size.x &&
-                metil_object_player->position.x <= position_maximum_object.x + metil_object_player->mesh.size.x &&
-                metil_object_player->position.z >= position_minimum_object.y - metil_object_player->mesh.size.z &&
-                metil_object_player->position.z <= position_maximum_object.y + metil_object_player->mesh.size.z
-              ) {
-                scene_gameplay_populate(
-                  metil,
-                  metil_scene_gameplay,
-                  0
-                );
-
-                return;
-              }
+              return;
             }
 
             break;
