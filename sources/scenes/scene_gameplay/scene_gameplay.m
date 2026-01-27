@@ -1098,6 +1098,16 @@ void scene_gameplay_poll(
             data_length_math_c_vector3_float
           );
         }
+
+        network_data_packet_destroy(
+          network_client->network_data_packet_poll
+        );
+
+        clic3_memory_free_raw(
+          network_client->network_data_packet_poll
+        );
+
+        network_client->network_data_packet_poll = 0;
       }
 
       pthread_mutex_unlock(
