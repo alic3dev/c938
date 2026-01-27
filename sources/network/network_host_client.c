@@ -120,19 +120,11 @@ void network_host_client_shots_fired_add(
 void network_host_client_shots_fired_outgoing_clear(
   struct network_host_client* network_host_client
 ) {
-  pthread_mutex_lock(
-    &network_host_client->mutex_shots_fired_outgoing
-  );
-
   network_host_client->length_shots_fired_outgoing = 0;
   
   clic3_memory_reallocate_raw(
     &network_host_client->shots_fired_outgoing,
     0
-  );
-
-  pthread_mutex_unlock(
-    &network_host_client->mutex_shots_fired_outgoing
   );
 }
 
