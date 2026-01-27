@@ -22,6 +22,7 @@ struct network_host_client {
   pthread_mutex_t mutex_position;
   pthread_mutex_t mutex_sending;
   pthread_mutex_t mutex_shots_fired;
+  pthread_mutex_t mutex_shots_fired_outgoing;
 
   enum network_client_status status;
   enum network_client_status_game status_game;
@@ -32,6 +33,9 @@ struct network_host_client {
 
   struct network_data_shot_fired* shots_fired;
   unsigned int length_shots_fired;
+
+  struct network_data_shot_fired* shots_fired_outgoing;
+  unsigned int length_shots_fired_outgoing;
 };
 
 void network_host_client_initialize(
@@ -45,6 +49,15 @@ void network_host_client_shots_fired_clear(
 );
 
 void network_host_client_shots_fired_add(
+  struct network_host_client*,
+  unsigned int
+);
+
+void network_host_client_shots_fired_outgoing_clear(
+  struct network_host_client*
+);
+
+void network_host_client_shots_fired_outgoing_add(
   struct network_host_client*,
   unsigned int
 );

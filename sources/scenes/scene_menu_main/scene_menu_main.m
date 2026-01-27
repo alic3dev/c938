@@ -1249,7 +1249,7 @@ void scene_menu_main_poll(
               );
 
               menu->index_selected = -1;
-              menu->handled = 1;
+              menu->handled = 0;
             } else {
               network_host_connections_accept(
                 &c938_data->network_host
