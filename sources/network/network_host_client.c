@@ -33,6 +33,13 @@ void network_host_client_initialize(
     )
   );
 
+  network_host_client->length_shots_fired_outgoing = 0;
+  network_host_client->shots_fired_outgoing = (
+    clic3_memory_allocate_raw(
+      0
+    )
+  );
+
   pthread_mutex_init(
     &network_host_client->mutex,
     0
@@ -50,6 +57,11 @@ void network_host_client_initialize(
 
   pthread_mutex_init(
     &network_host_client->mutex_shots_fired,
+    0
+  );
+
+  pthread_mutex_init(
+    &network_host_client->mutex_shots_fired_outgoing,
     0
   );
 
@@ -105,6 +117,45 @@ void network_host_client_shots_fired_add(
   );
 }
 
+void network_host_client_shots_fired_outgoing_clear(
+  struct network_host_client* network_host_client
+) {
+  pthread_mutex_lock(
+    &network_host_client->mutex_shots_fired_outgoing
+  );
+
+  network_host_client->length_shots_fired_outgoing = 0;
+  
+  clic3_memory_reallocate_raw(
+    &network_host_client->shots_fired_outgoing,
+    0
+  );
+
+  pthread_mutex_unlock(
+    &network_host_client->mutex_shots_fired_outgoing
+  );
+}
+
+void network_host_client_shots_fired_outgoing_add(
+  struct network_host_client* network_host_client,
+  unsigned int length_shots_fired_outgoing
+) {
+  network_host_client->length_shots_fired_outgoing = (
+    network_host_client->length_shots_fired_outgoing +
+    length_shots_fired_outgoing
+  );
+
+  clic3_memory_reallocate_raw(
+    &network_host_client->shots_fired_outgoing,
+    (
+      sizeof(
+        struct network_data_shot_fired
+      ) *
+      network_host_client->length_shots_fired_outgoing
+    )
+  );
+}
+
 void network_host_client_destroy(
   struct network_host_client* network_host_client
 ) {
@@ -128,11 +179,19 @@ void network_host_client_destroy(
     &network_host_client->mutex_shots_fired
   );
 
+  pthread_mutex_destroy(
+    &network_host_client->mutex_shots_fired_outgoing
+  );
+
   clic3_memory_free_raw(
     network_host_client->char_array_index
   );
 
   clic3_memory_free_raw(
     network_host_client->shots_fired
+  );
+
+  clic3_memory_free_raw(
+    network_host_client->shots_fired_outgoing
   );
 }
