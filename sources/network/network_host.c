@@ -1138,21 +1138,25 @@ void network_host_destroy(
       ]
     );
 
+    pthread_mutex_unlock(
+      &network_host_client->mutex
+    );
+
     if (
       (
         network_host_client->status &
         network_client_status_connected
       ) == 0
     ) {
+      pthread_mutex_unlock(
+        &network_host_client->mutex_sending
+      );
+      
       continue;
     }
 
     network_host_client->command_sending = (
       network_command_disconnecting
-    );
-
-    pthread_mutex_unlock(
-      &network_host_client->mutex
     );
 
     pthread_mutex_lock(
