@@ -1584,8 +1584,8 @@ void scene_gameplay_poll(
 
         metil_group_add_length_initialize(
           metil_group_projectiles,
-          metil_renderable_type_object,
-          network_host_client->length_shots_fired
+          network_host_client->length_shots_fired,
+          metil_renderable_type_object
         );
         
         for (
