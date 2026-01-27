@@ -4,6 +4,7 @@
 #include <rendering/c938_pipeline_index.h>
 #include <data/enemy_data.h>
 #include <data/player_data.h>
+#include <data/scene_gameplay_data.h>
 
 #include <math_c_vector.h>
 
@@ -208,13 +209,22 @@ void object_enemy_poll(
     )->scene
   );
 
-  object_enemy_travel(
-    metil_object,
-    &metil_scene->player.position,
-    enemy_data,
-    &metil_scene->time_delta,
-    ((struct player_data*) metil_scene->player.data)->height
+  struct scene_gameplay_data* scene_gameplay_data = (
+    metil_scene->data
   );
+
+  if (
+    scene_gameplay_data->parameters->networked !=
+    parameters_gameplay_networked_client
+  ) {
+    object_enemy_travel(
+      metil_object,
+      &metil_scene->player.position,
+      enemy_data,
+      &metil_scene->time_delta,
+      ((struct player_data*) metil_scene->player.data)->height
+    );
+  }
 
   metil_positioning_view_model_matrix_projection_set(
     metil_object->positioning,

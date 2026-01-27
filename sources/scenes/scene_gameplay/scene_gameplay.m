@@ -21,6 +21,7 @@
 #include <objects/object_player.h>
 #include <objects/object_projectile.h>
 #include <player/player.h>
+#include <scenes/scene_gameplay/scene_gameplay_group_enemies.h>
 #include <scenes/scene_gameplay/scene_gameplay_group_players.h>
 #include <textures/textures_buildings.h>
 
@@ -1169,6 +1170,78 @@ void scene_gameplay_poll(
       pthread_mutex_unlock(
         &network_client->mutex_poll
       );
+
+      pthread_mutex_lock(
+        &network_client->mutex_enemies
+      );
+
+      if (
+        network_client->network_data_packet_enemies != 0
+      ) {
+        unsigned int length_enemies;
+
+        network_data_packet_read(
+          network_client->network_data_packet_enemies,
+          &length_enemies,
+          data_length_unsigned_int
+        );
+
+        scene_gameplay_group_enemies_resize(
+          metil,
+          metil_group_enemies,
+          length_enemies
+        );
+
+        for (
+          unsigned int index_enemy = 0;
+          index_enemy < length_enemies;
+          ++index_enemy
+        ) {
+          struct metil_object* metil_object_enemy = (
+            metil_group_enemies->renderables[
+              index_enemy
+            ]->renderable
+          );
+
+          struct enemy_data* enemy_data = (
+            metil_object_enemy->buffers_vertex[
+              metil_object_buffer_default_index_data
+            ].buffer.contents
+          );
+
+          network_data_packet_read(
+            network_client->network_data_packet_enemies,
+            &enemy_data->life,
+            1
+          );
+
+          network_data_packet_read(
+            network_client->network_data_packet_enemies,
+            &metil_object_enemy->position,
+            data_length_math_c_vector3_float
+          );
+
+          network_data_packet_read(
+            network_client->network_data_packet_enemies,
+            &enemy_data->speed,
+            data_length_float
+          );
+        }
+
+        network_data_packet_destroy(
+          network_client->network_data_packet_enemies
+        );
+
+        clic3_memory_free_raw(
+          network_client->network_data_packet_enemies
+        );
+
+        network_client->network_data_packet_enemies = 0;
+      }
+
+      pthread_mutex_unlock(
+        &network_client->mutex_enemies
+      );
     } else if (
       scene_gameplay_data->parameters->networked ==
       parameters_gameplay_networked_host
@@ -1344,51 +1417,56 @@ void scene_gameplay_poll(
       0
     );
 
-    for (
-      unsigned int index_enemy = 0;
-      index_enemy < metil_group_enemies->length;
-      ++index_enemy
+    if (
+      scene_gameplay_data->parameters->networked !=
+      parameters_gameplay_networked_client
     ) {
-      struct metil_object* metil_object_enemy = (
-        metil_group_enemies->renderables[
-          index_enemy
-        ]->renderable
-      );
-
-      if (
-        metil_object_projectile->position.x >= metil_object_enemy->position.x - (metil_object_enemy->mesh.size.x / 2.0f) &&
-        metil_object_projectile->position.x <= metil_object_enemy->position.x + (metil_object_enemy->mesh.size.x / 2.0f) &&
-
-        metil_object_projectile->position.y >= metil_object_enemy->position.y - (metil_object_enemy->mesh.size.y / 2.0f) &&
-        metil_object_projectile->position.y <= metil_object_enemy->position.y + (metil_object_enemy->mesh.size.y / 2.0f) &&
-
-        metil_object_projectile->position.z >= metil_object_enemy->position.z - (metil_object_enemy->mesh.size.z / 2.0f) &&
-        metil_object_projectile->position.z <= metil_object_enemy->position.z + (metil_object_enemy->mesh.size.z / 2.0f)
+      for (
+        unsigned int index_enemy = 0;
+        index_enemy < metil_group_enemies->length;
+        ++index_enemy
       ) {
-        collision = 1;
-
-        struct enemy_data* enemy_data = (
-          metil_object_enemy->buffers_vertex[
-            metil_object_buffer_default_index_data
-          ].buffer.contents
-        );
-
-        enemy_data->life = (
-          enemy_data->life -
-          1
+        struct metil_object* metil_object_enemy = (
+          metil_group_enemies->renderables[
+            index_enemy
+          ]->renderable
         );
 
         if (
-          enemy_data->life <= 0
-        ) {
-          metil_group_destroy_renderable_at_index(
-            metil,
-            metil_group_enemies,
-            index_enemy
-          );
-        }
+          metil_object_projectile->position.x >= metil_object_enemy->position.x - (metil_object_enemy->mesh.size.x / 2.0f) &&
+          metil_object_projectile->position.x <= metil_object_enemy->position.x + (metil_object_enemy->mesh.size.x / 2.0f) &&
 
-        break;
+          metil_object_projectile->position.y >= metil_object_enemy->position.y - (metil_object_enemy->mesh.size.y / 2.0f) &&
+          metil_object_projectile->position.y <= metil_object_enemy->position.y + (metil_object_enemy->mesh.size.y / 2.0f) &&
+
+          metil_object_projectile->position.z >= metil_object_enemy->position.z - (metil_object_enemy->mesh.size.z / 2.0f) &&
+          metil_object_projectile->position.z <= metil_object_enemy->position.z + (metil_object_enemy->mesh.size.z / 2.0f)
+        ) {
+          collision = 1;
+
+          struct enemy_data* enemy_data = (
+            metil_object_enemy->buffers_vertex[
+              metil_object_buffer_default_index_data
+            ].buffer.contents
+          );
+
+          enemy_data->life = (
+            enemy_data->life -
+            1
+          );
+
+          if (
+            enemy_data->life <= 0
+          ) {
+            metil_group_destroy_renderable_at_index(
+              metil,
+              metil_group_enemies,
+              index_enemy
+            );
+          }
+
+          break;
+        }
       }
     }
 
@@ -1800,7 +1878,8 @@ void scene_gameplay_poll(
         data_length_unsigned_int +
         metil_group_enemies->length * (
           1 +
-          data_length_math_c_vector3_float
+          data_length_math_c_vector3_float +
+          data_length_float
         )
       )
     );
@@ -1838,6 +1917,12 @@ void scene_gameplay_poll(
         &network_data_packet_enemies,
         &metil_object_enemies->position,
         data_length_math_c_vector3_float
+      );
+
+      network_data_packet_bytes_add(
+        &network_data_packet_enemies,
+        &enemy_data->speed,
+        data_length_float
       );
     }
 

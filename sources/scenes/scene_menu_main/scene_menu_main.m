@@ -1878,6 +1878,7 @@ void network_client_notification(
 
       break;
     }
+    case network_client_notification_type_enemies:
     case network_client_notification_type_poll: {
       return;
     }

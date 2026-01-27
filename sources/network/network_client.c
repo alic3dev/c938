@@ -124,6 +124,7 @@ unsigned char network_client_connect_with_notification(
     &network_client->data_map
   );
 
+  network_client->network_data_packet_enemies = 0;
   network_client->network_data_packet_poll = 0;
 
   network_client->status = (
@@ -175,6 +176,11 @@ unsigned char network_client_connect_with_notification(
 
   pthread_mutex_init(
     &network_client->mutex_thread_sending,
+    0
+  );
+
+  pthread_mutex_init(
+    &network_client->mutex_enemies,
     0
   );
 
@@ -348,7 +354,39 @@ void* network_client_receiving_thread(
 
         break;
       }
-      case network_command_poll:
+      case network_command_enemies: {
+        pthread_mutex_lock(
+          &network_client->mutex_enemies
+        );
+
+        if (
+          network_client->network_data_packet_enemies != 0
+        ) {
+          network_data_packet_destroy(
+            network_client->network_data_packet_enemies
+          );
+
+          clic3_memory_free_raw(
+            network_client->network_data_packet_enemies
+          );
+        }
+
+        network_client->network_data_packet_enemies = (
+          network_data_packet
+        );
+
+        pthread_mutex_unlock(
+          &network_client->mutex_enemies
+        );
+
+        notification_manager_send(
+          &network_client->notification_manager,
+          "network_client::enemies",
+          network_client_notification_type_enemies
+        );
+        break;
+      }
+      case network_command_poll: {
         pthread_mutex_lock(
           &network_client->mutex_poll
         );
@@ -379,6 +417,7 @@ void* network_client_receiving_thread(
           network_client_notification_type_poll
         );
         break;
+      }
       case network_command_initialize:
       case network_command_no_operation:
       default: {
@@ -663,6 +702,10 @@ void network_client_destroy(
   );
 
   pthread_mutex_destroy(
+    &network_client->mutex_enemies
+  );
+
+  pthread_mutex_destroy(
     &network_client->mutex_poll
   );
 
@@ -673,6 +716,30 @@ void network_client_destroy(
   pthread_mutex_destroy(
     &network_client->mutex_shots_fired
   );
+
+  if (
+    network_client->network_data_packet_poll != 0
+  ) {
+    network_data_packet_destroy(
+      network_client->network_data_packet_poll
+    );
+
+    clic3_memory_free_raw(
+      network_client->network_data_packet_poll
+    );
+  }
+
+  if (
+    network_client->network_data_packet_enemies != 0
+  ) {
+    network_data_packet_destroy(
+      network_client->network_data_packet_enemies
+    );
+
+    clic3_memory_free_raw(
+      network_client->network_data_packet_enemies
+    );
+  }
 
   for (
     unsigned int index_network_data_packet_outgoing = 0;
