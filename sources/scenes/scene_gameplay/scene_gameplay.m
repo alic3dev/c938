@@ -1778,6 +1778,99 @@ void scene_gameplay_poll(
     ? 0
     : 2000
   );
+
+  if (
+    scene_gameplay_data->parameters->networked ==
+    parameters_gameplay_networked_host
+  ) {
+    struct c938_data* c938_data = (
+      metil->data
+    );
+    
+    struct network_host* network_host = &(
+      c938_data->network_host
+    );
+  
+    struct network_data_packet network_data_packet_enemies;
+
+    network_data_packet_initialize(
+      &network_data_packet_enemies,
+      network_command_enemies,
+      (
+        data_length_unsigned_int +
+        metil_group_enemies->length * (
+          1 +
+          data_length_math_c_vector3_float
+        )
+      )
+    );
+
+    network_data_packet_bytes_add(
+      &network_data_packet_enemies,
+      &metil_group_enemies->length,
+      data_length_unsigned_int
+    );
+
+    for (
+      unsigned int index_enemy = 0;
+      index_enemy < metil_group_enemies->length;
+      ++index_enemy
+    ) {
+      struct metil_object* metil_object_enemies = (
+        metil_group_enemies->renderables[
+          index_enemy
+        ]->renderable
+      );
+
+      struct enemy_data* enemy_data = (
+        metil_object_enemies->buffers_vertex[
+          metil_object_buffer_default_index_data
+        ].buffer.contents
+      );
+
+      network_data_packet_bytes_add(
+        &network_data_packet_enemies,
+        &enemy_data->life,
+        1
+      );
+
+      network_data_packet_bytes_add(
+        &network_data_packet_enemies,
+        &metil_object_enemies->position,
+        data_length_math_c_vector3_float
+      );
+    }
+
+    for (
+      unsigned int index_network_host_client = 0;
+      index_network_host_client < network_host->length_clients;
+      ++index_network_host_client
+    ) {
+      struct network_host_client* network_host_client = (
+        network_host->clients[
+          index_network_host_client
+        ]
+      );
+
+      if (
+        (
+          network_host_client->status &
+          network_client_status_connected
+        ) == 0
+      ) {
+        continue;
+      }
+
+      network_data_packet_send(
+        &network_data_packet_enemies,
+        network_host_client->socket
+      );
+    }
+
+    network_data_packet_destroy(
+      &network_data_packet_enemies
+    );
+  }
 }
 
 void scene_gameplay_destroy(
