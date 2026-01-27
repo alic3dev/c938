@@ -907,6 +907,18 @@ void network_host_data_map_client_index_send(
     ]
   );
 
+  if (
+    (
+      network_host_client->status &
+      (
+        network_client_status_disconnecting |
+        network_client_status_disconnected
+      )
+    ) != 0
+  ) {
+    return;
+  }
+
   pthread_mutex_lock(
     &network_host_client->mutex
   );
