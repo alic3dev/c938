@@ -760,11 +760,11 @@ void* network_host_client_receiving_thread(
 
               for (
                 ;
-                index_shot_fired < network_host_client_outgoing->length_shots_fired;
+                index_shot_fired < network_host_client_outgoing->length_shots_fired_outgoing;
                 ++index_shot_fired
               ) {
                 struct network_data_shot_fired* network_data_shot_fired = &(
-                  network_host_client_outgoing->shots_fired[
+                  network_host_client_outgoing->shots_fired_outgoing[
                     index_shot_fired
                   ]
                 );
