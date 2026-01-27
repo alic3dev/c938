@@ -822,6 +822,49 @@ void player_poll(
         data_length_unsigned_long_int
       );
 
+      for (
+        unsigned int index_client = 0;
+        index_client < network_host->length_clients;
+        ++index_client
+      ) {
+        struct network_host_client* network_host_client = (
+          network_host->clients[
+            index_client
+          ]
+        );
+
+        if (
+          (
+            network_host_client->status &
+            network_client_status_connected
+          ) == 0
+        ) {
+          continue;
+        }
+
+        pthread_mutex_lock(
+          &network_host_client->mutex_shots_fired_outgoing
+        );
+
+        network_host_client_shots_fired_outgoing_add(
+          network_host_client,
+          1
+        );
+
+        clic3_bytes_copy(
+          &network_host_client->shots_fired_outgoing[
+            network_host_client->length_shots_fired_outgoing -
+            1
+          ],
+          network_data_shot_fired,
+          data_length_network_data_shot_fired
+        );
+
+        pthread_mutex_unlock(
+          &network_host_client->mutex_shots_fired_outgoing
+        );
+      }
+
       pthread_mutex_unlock(
         &network_host->mutex_shots_fired
       );
