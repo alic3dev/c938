@@ -1126,6 +1126,15 @@ void network_host_destroy(
       ]
     );
 
+    if (
+      (
+        network_host_client->status &
+        network_client_status_connected
+      ) == 0
+    ) {
+      continue;
+    }
+
     network_host_client->command_sending = (
       network_command_disconnecting
     );
