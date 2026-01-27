@@ -1220,6 +1220,11 @@ void scene_gameplay_poll(
             continue;
           }
 
+          offset_network_host_client = (
+            index_client +
+            1
+          );
+
           pthread_mutex_lock(
             &network_host_client->mutex_position
           );
@@ -1238,11 +1243,6 @@ void scene_gameplay_poll(
 
           pthread_mutex_unlock(
             &network_host_client->mutex_position
-          );
-
-          offset_network_host_client = (
-            index_client +
-            1
           );
 
           struct metil_object* metil_object_building = (
@@ -1286,9 +1286,9 @@ void scene_gameplay_poll(
 
               return;
             }
-
-            break;
           }
+
+          break;
         }
       }
     }
