@@ -1,8 +1,13 @@
 #include <player/player.h>
 
-#include <objects/object_projectile.h>
+#include <data/c938_data.h>
+#include <data/data_length.h>
 #include <data/player_data.h>
 #include <data/scene_gameplay_data.h>
+#include <objects/object_projectile.h>
+
+#include <clic3_bytes.h>
+#include <clic3_memory.h>
 
 #include <metil_group.h>
 #include <metil_input/metil_keycodes.h>
@@ -11,8 +16,6 @@
 #include <metil_player/metil_player.h>
 #include <metil_scenes/metil_scene.h>
 #include <metil_scenes/metil_scene_controller.h>
-
-#include <stdlib.h>
 
 const float player_speed_movement_default = 100.0f;
 
@@ -693,22 +696,185 @@ void player_poll(
       *player_data->time
     );
 
+    struct math_c_vector3_float position_projectile = {
+      .x = player->position.x,
+      .y = (
+        player->position.y +
+        player_data->height
+      ),
+      .z = player->position.z
+    };
+
+    struct math_c_vector3_float angle_projectile = {
+      .x = player->rotation.x,
+      .y = -player->rotation.y,
+      .z = player->rotation.z
+    };
+
+    if (
+      scene_gameplay_data->parameters->networked ==
+      parameters_gameplay_networked_client
+    ) {
+      struct c938_data* c938_data = (
+        metil->data
+      );
+
+      struct network_client* network_client = &(
+        c938_data->network_client
+      );
+
+      pthread_mutex_lock(
+        &network_client->mutex_shots_fired
+      );
+
+      network_client->length_shots_fired = (
+        network_client->length_shots_fired +
+        1
+      );
+
+      clic3_memory_reallocate_raw(
+        &network_client->shots_fired,
+        (
+          data_length_network_data_shot_fired *
+          network_client->length_shots_fired
+        )
+      );
+
+      struct network_data_shot_fired* network_data_shot_fired = &(
+        network_client->shots_fired[
+          network_client->length_shots_fired -
+          1
+        ]
+      );
+
+      clic3_bytes_copy(
+        &network_data_shot_fired->position,
+        &position_projectile,
+        data_length_math_c_vector3_float
+      );
+
+      clic3_bytes_copy(
+        &network_data_shot_fired->angle,
+        &angle_projectile,
+        data_length_math_c_vector2_float
+      );
+
+      clic3_bytes_copy(
+        &network_data_shot_fired->time,
+        &player_data->time_shot,
+        data_length_unsigned_long_int
+      );
+
+      pthread_mutex_unlock(
+        &network_client->mutex_shots_fired
+      );
+    } else if (
+      scene_gameplay_data->parameters->networked ==
+      parameters_gameplay_networked_host
+    ) {
+      struct c938_data* c938_data = (
+        metil->data
+      );
+
+      struct network_host* network_host = &(
+        c938_data->network_host
+      );
+
+      pthread_mutex_lock(
+        &network_host->mutex_shots_fired
+      );
+
+      network_host->length_shots_fired = (
+        network_host->length_shots_fired +
+        1
+      );
+
+      clic3_memory_reallocate_raw(
+        &network_host->shots_fired,
+        (
+          data_length_network_data_shot_fired *
+          network_host->length_shots_fired
+        )
+      );
+
+      struct network_data_shot_fired* network_data_shot_fired = &(
+        network_host->shots_fired[
+          network_host->length_shots_fired -
+          1
+        ]
+      );
+
+      clic3_bytes_copy(
+        &network_data_shot_fired->position,
+        &position_projectile,
+        data_length_math_c_vector3_float
+      );
+
+      clic3_bytes_copy(
+        &network_data_shot_fired->angle,
+        &angle_projectile,
+        data_length_math_c_vector2_float
+      );
+
+      clic3_bytes_copy(
+        &network_data_shot_fired->time,
+        &player_data->time_shot,
+        data_length_unsigned_long_int
+      );
+
+      for (
+        unsigned int index_client = 0;
+        index_client < network_host->length_clients;
+        ++index_client
+      ) {
+        struct network_host_client* network_host_client = (
+          network_host->clients[
+            index_client
+          ]
+        );
+
+        if (
+          (
+            network_host_client->status &
+            network_client_status_connected
+          ) == 0
+        ) {
+          continue;
+        }
+
+        pthread_mutex_lock(
+          &network_host_client->mutex_shots_fired_outgoing
+        );
+
+        network_host_client_shots_fired_outgoing_add(
+          network_host_client,
+          1
+        );
+
+        clic3_bytes_copy(
+          &network_host_client->shots_fired_outgoing[
+            network_host_client->length_shots_fired_outgoing -
+            1
+          ],
+          network_data_shot_fired,
+          data_length_network_data_shot_fired
+        );
+
+        pthread_mutex_unlock(
+          &network_host_client->mutex_shots_fired_outgoing
+        );
+      }
+
+      pthread_mutex_unlock(
+        &network_host->mutex_shots_fired
+      );
+    }
+
     object_projectile_initialize(
       metil_object_projectile,
       player_data->metal_device,
-      (struct math_c_vector3_float) {
-        .x = player->position.x,
-        .y = (
-          player->position.y +
-          player_data->height
-        ),
-        .z = player->position.z
-      },
-      (struct math_c_vector3_float) {
-        .x = player->rotation.x,
-        .y = -player->rotation.y,
-        .z = player->rotation.z
-      },
+      position_projectile,
+      angle_projectile,
       *player_data->time,
       player_data->is_boosted == 0
       ? 200.0f :

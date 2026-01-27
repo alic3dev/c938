@@ -118,6 +118,11 @@ unsigned char network_host_listen_with_notification(
     0
   );
 
+  pthread_mutex_init(
+    &network_host->mutex_shots_fired,
+    0
+  );
+
   network_host->length_threads = (
     1
   );
@@ -128,6 +133,13 @@ unsigned char network_host_listen_with_notification(
         pthread_t
       ) *
       network_host->length_threads
+    )
+  );
+
+  network_host->length_shots_fired = 0;
+  network_host->shots_fired = (
+    clic3_memory_allocate_raw(
+      0
     )
   );
 
@@ -634,13 +646,142 @@ void* network_host_client_receiving_thread(
           &network_host_client->mutex_position
         );
 
-        network_data_packet_read(
-          &network_data_packet,
-          &network_host_client->position,
-          sizeof(
-            struct math_c_vector3_float
-          )
+        unsigned long int length_data_received_client_expected = (
+          1 + // network command byte
+          data_length_math_c_vector3_float +
+          data_length_unsigned_int
         );
+
+        if (
+          length_data_received_client >=
+          length_data_received_client_expected
+        ) {
+          network_data_packet_read(
+            &network_data_packet,
+            &network_host_client->position,
+            data_length_math_c_vector3_float
+          );
+
+          unsigned int length_shots_fired = 0;
+
+          network_data_packet_read(
+            &network_data_packet,
+            &length_shots_fired,
+            data_length_unsigned_int
+          );
+
+          length_data_received_client_expected = (
+            length_data_received_client_expected +
+            length_shots_fired * (
+              data_length_network_data_shot_fired
+            )
+          );
+
+          if (
+            length_data_received_client ==
+            length_data_received_client_expected
+          ) {
+            unsigned int offset_shots_fired = (
+              network_data_packet.offset
+            );
+
+            pthread_mutex_lock(
+              &network_host_client->mutex_shots_fired
+            );
+
+            unsigned int index_shot_fired = (
+              network_host_client->length_shots_fired
+            );
+
+            network_host_client_shots_fired_add(
+              network_host_client,
+              length_shots_fired
+            );
+
+            for (
+              ;
+              index_shot_fired < network_host_client->length_shots_fired;
+              ++index_shot_fired
+            ) {
+              struct network_data_shot_fired* network_data_shot_fired = &(
+                network_host_client->shots_fired[
+                  index_shot_fired
+                ]
+              );
+
+              network_data_packet_read(
+                &network_data_packet,
+                network_data_shot_fired,
+                data_length_network_data_shot_fired
+              );
+            }
+
+            pthread_mutex_unlock(
+              &network_host_client->mutex_shots_fired
+            );
+
+            for (
+              unsigned int index_client = 0;
+              index_client < network_host->length_clients;
+              ++index_client
+            ) {
+              struct network_host_client* network_host_client_outgoing = (
+                network_host->clients[
+                  index_client
+                ]
+              );
+
+              if (
+                index_client == network_host_client->index ||
+                (
+                  network_host_client_outgoing->status &
+                  network_client_status_connected
+                ) == 0
+              ) {
+                continue;
+              }
+
+              pthread_mutex_lock(
+                &network_host_client_outgoing->mutex_shots_fired_outgoing
+              );
+
+              index_shot_fired = (
+                network_host_client_outgoing->length_shots_fired
+              );
+
+              network_host_client_shots_fired_outgoing_add(
+                network_host_client_outgoing,
+                length_shots_fired
+              );
+
+              network_data_packet.offset = (
+                offset_shots_fired
+              );
+
+              for (
+                ;
+                index_shot_fired < network_host_client_outgoing->length_shots_fired_outgoing;
+                ++index_shot_fired
+              ) {
+                struct network_data_shot_fired* network_data_shot_fired = &(
+                  network_host_client_outgoing->shots_fired_outgoing[
+                    index_shot_fired
+                  ]
+                );
+
+                network_data_packet_read(
+                  &network_data_packet,
+                  network_data_shot_fired,
+                  data_length_network_data_shot_fired
+                );
+              }
+
+              pthread_mutex_unlock(
+                &network_host_client_outgoing->mutex_shots_fired_outgoing
+              );
+            }
+          }
+        }
 
         pthread_mutex_unlock(
           &network_host_client->mutex_position
@@ -831,6 +972,18 @@ void network_host_data_map_client_index_send(
     ]
   );
 
+  if (
+    (
+      network_host_client->status &
+      (
+        network_client_status_disconnecting |
+        network_client_status_disconnected
+      )
+    ) != 0
+  ) {
+    return;
+  }
+
   pthread_mutex_lock(
     &network_host_client->mutex
   );
@@ -968,12 +1121,13 @@ void network_host_send_poll(
     &network_host->mutex_position
   );
 
+  index = 0;
+
   for (
     unsigned int index_client = 0;
     index_client < network_host->length_clients;
     ++index_client
   ) {
-    
     struct network_host_client* network_host_client = (
       network_host->clients[
         index_client
@@ -981,23 +1135,91 @@ void network_host_send_poll(
     );
 
     if (
-      network_host_client->status &
-      network_client_status_connected
+      (
+        network_host_client->status &
+        network_client_status_connected
+      ) == 0
     ) {
-      clic3_bytes_copy(
-        (
-          network_data_packet.bytes +
-          1
-        ),
-        &index_client,
-        data_length_unsigned_int
-      );
-
-      network_data_packet_send(
-        &network_data_packet,
-        network_host_client->socket
-      );
+      continue;
     }
+
+    struct network_data_packet network_data_packet_client_poll;
+
+    pthread_mutex_lock(
+      &network_host_client->mutex_shots_fired_outgoing
+    );
+
+    network_data_packet_initialize(
+      &network_data_packet_client_poll,
+      network_command_poll,
+      (
+        network_data_packet.length -
+        1 +
+        data_length_unsigned_int +
+        (
+          data_length_network_data_shot_fired *
+          network_host_client->length_shots_fired_outgoing
+        )
+      )
+    );
+
+    network_data_packet_bytes_add(
+      &network_data_packet_client_poll,
+      (
+        network_data_packet.bytes +
+        1
+      ),
+      (
+        network_data_packet.length -
+        1
+      )
+    );
+
+    clic3_bytes_copy(
+      (
+        network_data_packet_client_poll.bytes +
+        1
+      ),
+      &index,
+      data_length_unsigned_int
+    );
+
+    network_data_packet_bytes_add(
+      &network_data_packet_client_poll,
+      &network_host_client->length_shots_fired_outgoing,
+      data_length_unsigned_int
+    );
+
+    network_data_packet_bytes_add(
+      &network_data_packet_client_poll,
+      network_host_client->shots_fired_outgoing,
+      (
+        data_length_network_data_shot_fired *
+        network_host_client->length_shots_fired_outgoing
+      )
+    );
+
+    network_host_client_shots_fired_outgoing_clear(
+      network_host_client
+    );
+
+    pthread_mutex_unlock(
+      &network_host_client->mutex_shots_fired_outgoing
+    );
+
+    network_data_packet_send(
+      &network_data_packet_client_poll,
+      network_host_client->socket
+    );
+
+    network_data_packet_destroy(
+      &network_data_packet_client_poll
+    );
+
+    index = (
+      index +
+      1
+    );
   }
 
   network_data_packet_destroy(
@@ -1049,6 +1271,23 @@ void network_host_destroy(
         index_client
       ]
     );
+
+    pthread_mutex_unlock(
+      &network_host_client->mutex
+    );
+
+    if (
+      (
+        network_host_client->status &
+        network_client_status_connected
+      ) == 0
+    ) {
+      pthread_mutex_unlock(
+        &network_host_client->mutex_sending
+      );
+      
+      continue;
+    }
 
     network_host_client->command_sending = (
       network_command_disconnecting
@@ -1132,6 +1371,10 @@ void network_host_destroy(
     &network_host->mutex_position
   );
 
+  pthread_mutex_destroy(
+    &network_host->mutex_shots_fired
+  );
+
   network_data_map_destroy(
     &network_host->data_map
   );
@@ -1142,5 +1385,9 @@ void network_host_destroy(
 
   clic3_memory_free_raw(
     network_host->threads
+  );
+
+  clic3_memory_free_raw(
+    network_host->shots_fired
   );
 }

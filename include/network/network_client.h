@@ -45,6 +45,7 @@ struct network_client {
   pthread_mutex_t mutex_thread_sending;
   pthread_mutex_t mutex_network_data_packets_outgoing;
   pthread_mutex_t mutex_poll;
+  pthread_mutex_t mutex_shots_fired;
 
   struct network_data_packet** network_data_packets_outgoing;
   unsigned int length_network_data_packets_outgoing;
@@ -52,6 +53,9 @@ struct network_client {
   unsigned int connected_players;
 
   struct network_data_packet* network_data_packet_poll;
+
+  struct network_data_shot_fired* shots_fired;
+  unsigned int length_shots_fired;
 };
 
 struct network_client_thread_data {

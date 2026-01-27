@@ -19,6 +19,7 @@
 #include <objects/object_crosshair.h>
 #include <objects/object_enemy.h>
 #include <objects/object_player.h>
+#include <objects/object_projectile.h>
 #include <player/player.h>
 #include <scenes/scene_gameplay/scene_gameplay_group_players.h>
 #include <textures/textures_buildings.h>
@@ -1097,6 +1098,72 @@ void scene_gameplay_poll(
             data_length_math_c_vector3_float
           );
         }
+
+        unsigned int length_shots_fired = 0;
+
+        network_data_packet_read(
+          network_client->network_data_packet_poll,
+          &length_shots_fired,
+          data_length_unsigned_int
+        );
+
+        unsigned int index_projectile = (
+          metil_group_projectiles->length
+        );
+
+        metil_group_add_length_initialize(
+          metil_group_projectiles,
+          length_shots_fired,
+          metil_renderable_type_object
+        );
+
+        struct network_data_shot_fired network_data_shot_fired;
+        
+        for (
+          unsigned int index_shot_fired = 0;
+          index_shot_fired < length_shots_fired;
+          ++index_shot_fired
+        ) {
+          network_data_packet_read(
+            network_client->network_data_packet_poll,
+            &network_data_shot_fired,
+            data_length_network_data_shot_fired
+          );
+
+          struct metil_object* metil_object_projectile = (
+            metil_group_projectiles->renderables[
+              index_projectile
+            ]->renderable
+          );
+
+          index_projectile = (
+            index_projectile +
+            1
+          );
+
+          object_projectile_initialize(
+            metil_object_projectile,
+            metil->renderer_interface.metal_device,
+            network_data_shot_fired.position,
+            (struct math_c_vector3_float) {
+              .x = network_data_shot_fired.angle.x,
+              .y = network_data_shot_fired.angle.y,
+              .z = 0.0f
+            },
+            network_data_shot_fired.time,
+            200.0f
+          );
+        }
+
+        network_data_packet_destroy(
+          network_client->network_data_packet_poll
+        );
+
+        clic3_memory_free_raw(
+          network_client->network_data_packet_poll
+        );
+
+        network_client->network_data_packet_poll = 0;
       }
 
       pthread_mutex_unlock(
@@ -1145,79 +1212,83 @@ void scene_gameplay_poll(
           );
 
           if (
-            network_host_client->status &
-            network_client_status_connected
+            (
+              network_host_client->status &
+              network_client_status_connected
+            ) == 0
           ) {
-            pthread_mutex_lock(
-              &network_host_client->mutex_position
-            );
+            continue;
+          }
 
-            metil_object_player->position.x = (
-              network_host_client->position.x
-            );
+          offset_network_host_client = (
+            index_client +
+            1
+          );
 
-            metil_object_player->position.y = (
-              network_host_client->position.y
-            );
+          pthread_mutex_lock(
+            &network_host_client->mutex_position
+          );
 
-            metil_object_player->position.z = (
-              network_host_client->position.z
-            );
+          metil_object_player->position.x = (
+            network_host_client->position.x
+          );
 
-            pthread_mutex_unlock(
-              &network_host_client->mutex_position
-            );
+          metil_object_player->position.y = (
+            network_host_client->position.y
+          );
 
-            offset_network_host_client = (
-              index_client +
-              1
-            );
+          metil_object_player->position.z = (
+            network_host_client->position.z
+          );
 
-            struct metil_object* metil_object_building = (
-              metil_group_buildings->renderables[
-                player_data->index_target_building
-              ]->renderable
-            );
+          pthread_mutex_unlock(
+            &network_host_client->mutex_position
+          );
+
+          struct metil_object* metil_object_building = (
+            metil_group_buildings->renderables[
+              player_data->index_target_building
+            ]->renderable
+          );
+
+          if (
+            metil_object_player->position.y == (
+              metil_object_building->position.y +
+              metil_object_building->mesh.size.y
+            )
+          ) {
+            struct math_c_vector2_float size_half_object = {
+              .x = metil_object_building->mesh.size.x / 2.0f,
+              .y = metil_object_building->mesh.size.z / 2.0f
+            };
+
+            struct math_c_vector2_float position_minimum_object = {
+              .x = metil_object_building->position.x - size_half_object.x,
+              .y = metil_object_building->position.z - size_half_object.y
+            };
+
+            struct math_c_vector2_float position_maximum_object = {
+              .x = metil_object_building->position.x + size_half_object.x,
+              .y = metil_object_building->position.z + size_half_object.y
+            };
 
             if (
-              metil_object_player->position.y == (
-                metil_object_building->position.y +
-                metil_object_building->mesh.size.y
-              )
+              metil_object_player->position.x >= position_minimum_object.x - metil_object_player->mesh.size.x &&
+              metil_object_player->position.x <= position_maximum_object.x + metil_object_player->mesh.size.x &&
+              metil_object_player->position.z >= position_minimum_object.y - metil_object_player->mesh.size.z &&
+              metil_object_player->position.z <= position_maximum_object.y + metil_object_player->mesh.size.z
             ) {
-              struct math_c_vector2_float size_half_object = {
-                .x = metil_object_building->mesh.size.x / 2.0f,
-                .y = metil_object_building->mesh.size.z / 2.0f
-              };
+              scene_gameplay_populate(
+                metil,
+                metil_scene_gameplay,
+                0
+              );
 
-              struct math_c_vector2_float position_minimum_object = {
-                .x = metil_object_building->position.x - size_half_object.x,
-                .y = metil_object_building->position.z - size_half_object.y
-              };
-
-              struct math_c_vector2_float position_maximum_object = {
-                .x = metil_object_building->position.x + size_half_object.x,
-                .y = metil_object_building->position.z + size_half_object.y
-              };
-
-              if (
-                metil_object_player->position.x >= position_minimum_object.x - metil_object_player->mesh.size.x &&
-                metil_object_player->position.x <= position_maximum_object.x + metil_object_player->mesh.size.x &&
-                metil_object_player->position.z >= position_minimum_object.y - metil_object_player->mesh.size.z &&
-                metil_object_player->position.z <= position_maximum_object.y + metil_object_player->mesh.size.z
-              ) {
-                scene_gameplay_populate(
-                  metil,
-                  metil_scene_gameplay,
-                  0
-                );
-
-                return;
-              }
+              return;
             }
-
-            break;
           }
+
+          break;
         }
       }
     }
@@ -1471,24 +1542,62 @@ void scene_gameplay_poll(
         )
       );
 
+      pthread_mutex_lock(
+        &network_client->mutex_shots_fired
+      );
+
       network_data_packet_initialize(
         network_data_packet,
         network_command_poll,
-        sizeof(
-          struct math_c_vector3_float
+        (
+          data_length_math_c_vector3_float +
+          data_length_unsigned_int +
+          (
+            data_length_network_data_shot_fired *
+            network_client->length_shots_fired
+          )
         )
       );
 
       network_data_packet_bytes_add(
         network_data_packet,
         &metil_scene_gameplay->player.position,
-        sizeof(
-          struct math_c_vector3_float
-        )
+        data_length_math_c_vector3_float
       );
 
-      network_client_send(
-        &c938_data->network_client,
+      network_data_packet_bytes_add(
+        network_data_packet,
+        &network_client->length_shots_fired,
+        data_length_unsigned_int
+      );
+
+      for (
+        unsigned int index_shot_fired = 0;
+        index_shot_fired < network_client->length_shots_fired;
+        ++index_shot_fired
+      ) {
+        network_data_packet_bytes_add(
+          network_data_packet,
+          &network_client->shots_fired[
+            index_shot_fired
+          ],
+          data_length_network_data_shot_fired
+        );
+      }
+
+      network_client->length_shots_fired = 0;
+
+      clic3_memory_reallocate_raw(
+        &network_client->shots_fired,
+        0
+      );
+
+      pthread_mutex_unlock(
+        &network_client->mutex_shots_fired
+      );
+
+      network_client_send( 
+        network_client,
         network_data_packet
       );
     } else if (
@@ -1515,8 +1624,90 @@ void scene_gameplay_poll(
         &network_host->mutex_position
       );
 
+      for (
+        unsigned int index_network_host_client = 0;
+        index_network_host_client < network_host->length_clients;
+        ++index_network_host_client
+      ) {
+        struct network_host_client* network_host_client = (
+          network_host->clients[
+            index_network_host_client
+          ]
+        );
+
+        if (
+          (
+            network_host_client->status &
+            network_client_status_connected
+          ) == 0
+        ) {
+          continue;
+        }
+
+        pthread_mutex_lock(
+          &network_host_client->mutex_shots_fired
+        );
+
+        unsigned int index_projectile = (
+          metil_group_projectiles->length
+        );
+
+        metil_group_add_length_initialize(
+          metil_group_projectiles,
+          network_host_client->length_shots_fired,
+          metil_renderable_type_object
+        );
+        
+        for (
+          unsigned int index_shot_fired = 0;
+          index_shot_fired < network_host_client->length_shots_fired;
+          ++index_shot_fired
+        ) {
+          struct network_data_shot_fired* network_data_shot_fired = &(
+            network_host_client->shots_fired[
+              index_shot_fired
+            ]
+          );
+
+          struct metil_object* metil_object_projectile = (
+            metil_group_projectiles->renderables[
+              index_projectile
+            ]->renderable
+          );
+
+          index_projectile = (
+            index_projectile +
+            1
+          );
+
+          object_projectile_initialize(
+            metil_object_projectile,
+            metil->renderer_interface.metal_device,
+            network_data_shot_fired->position,
+            (struct math_c_vector3_float) {
+              .x = network_data_shot_fired->angle.x,
+              .y = network_data_shot_fired->angle.y,
+              .z = 0.0f
+            },
+            network_data_shot_fired->time,
+            200.0f
+          );
+        }
+
+        network_host_client->length_shots_fired = 0;
+
+        clic3_memory_reallocate_raw(
+          &network_host_client->shots_fired,
+          0
+        );
+
+        pthread_mutex_unlock(
+          &network_host_client->mutex_shots_fired
+        );
+      }
+
       network_host_send_poll(
-        &c938_data->network_host
+        network_host
       );
     }
   }
