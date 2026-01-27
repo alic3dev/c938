@@ -1099,6 +1099,62 @@ void scene_gameplay_poll(
           );
         }
 
+        unsigned int length_shots_fired = 0;
+
+        network_data_packet_read(
+          network_client->network_data_packet_poll,
+          &length_shots_fired,
+          data_length_unsigned_int
+        );
+
+        unsigned int index_projectile = (
+          metil_group_projectiles->length
+        );
+
+        metil_group_add_length_initialize(
+          metil_group_projectiles,
+          length_shots_fired,
+          metil_renderable_type_object
+        );
+
+        struct network_data_shot_fired network_data_shot_fired;
+        
+        for (
+          unsigned int index_shot_fired = 0;
+          index_shot_fired < length_shots_fired;
+          ++index_shot_fired
+        ) {
+          network_data_packet_read(
+            network_client->network_data_packet_poll,
+            &network_data_shot_fired,
+            data_length_network_data_shot_fired
+          );
+
+          struct metil_object* metil_object_projectile = (
+            metil_group_projectiles->renderables[
+              index_projectile
+            ]->renderable
+          );
+
+          index_projectile = (
+            index_projectile +
+            1
+          );
+
+          object_projectile_initialize(
+            metil_object_projectile,
+            metil->renderer_interface.metal_device,
+            network_data_shot_fired.position,
+            (struct math_c_vector3_float) {
+              .x = network_data_shot_fired.angle.x,
+              .y = network_data_shot_fired.angle.y,
+              .z = 0.0f
+            },
+            network_data_shot_fired.time,
+            200.0f
+          );
+        }
+
         network_data_packet_destroy(
           network_client->network_data_packet_poll
         );
