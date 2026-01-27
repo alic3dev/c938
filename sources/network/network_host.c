@@ -1139,6 +1139,10 @@ void network_host_destroy(
       network_command_disconnecting
     );
 
+    pthread_mutex_unlock(
+      &network_host_client->mutex
+    );
+
     pthread_mutex_lock(
       &network_host_client->mutex
     );
