@@ -1,7 +1,7 @@
 name=c938
 
 ifndef target_device
-	target_device=mac
+target_device=mac
 endif
 
 ifndef target_device_version
@@ -79,7 +79,7 @@ version_target_cer0=0
 version_target_clic3=0
 version_target_interrupt_handler=0
 version_target_math_c=0
-version_target_metil=1
+version_target_metil=2
 version_target_rand=0
 
 directory_include=include
