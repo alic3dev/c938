@@ -27,6 +27,10 @@ void object_projectile_initialize(
     &object->mesh
   );
 
+  object->type_primitive = (
+    MTLPrimitiveTypeLineStrip
+  );
+
   object->poll = object_projectile_poll;
 
   object->index_pipeline_render = (
@@ -53,9 +57,9 @@ void object_projectile_initialize(
     ].buffer.contents
   );
 
-  projectile_data->colour.x = 0.7f;
-  projectile_data->colour.y = 0.3f;
-  projectile_data->colour.z = 1.0f;
+  projectile_data->colour.x = 0.1f;
+  projectile_data->colour.y = 0.7f;
+  projectile_data->colour.z = 0.8f;
 
   projectile_data->time_fired = time_fired;
   projectile_data->time_current = time_fired;

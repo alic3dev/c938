@@ -29,6 +29,10 @@ void object_enemy_initialize(
     &object->mesh
   );
 
+  object->type_primitive = (
+    MTLPrimitiveTypeLine
+  );
+
   object->poll = object_enemy_poll;
 
   object->index_pipeline_render = (
@@ -38,7 +42,9 @@ void object_enemy_initialize(
   metil_object_buffers_initialize_with_data_size(
     object,
     metal_device,
-    sizeof(struct enemy_data)
+    sizeof(
+      struct enemy_data
+    )
   );
 
   object->position.x = position.x;

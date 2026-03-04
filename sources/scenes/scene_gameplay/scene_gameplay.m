@@ -199,6 +199,10 @@ void scene_gameplay_initialize(
       metil->renderer_interface.metal_device
     );
 
+    metil_object_hud->type_primitive = (
+      MTLPrimitiveTypeLine
+    );
+
     metil_object_hud->positioning = metil_positioning_static;
 
     metil_object_hud->index_pipeline_render = (

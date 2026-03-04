@@ -39,68 +39,55 @@
     data_frame->brightness
   );
 
-  if (
-    id_vertex == 0
-  ) {
-    c938_data_vertex_textured_coloured.position_texture.x = (
-      0.5f
-    );
+  unsigned char offset_frame = (
+    (
+      data_frame->frame /
+      10
+    ) %
+    100
+  );
 
-    c938_data_vertex_textured_coloured.position_texture.y = (
-      metal::fabs(
-        1.0f -
-        (
-          (
-            (float)
-            (
-              data_frame->frame %
-              221
-            )
-          ) /
-          110.0f
-        )
-      )
-    );
-  } else {
-    c938_data_vertex_textured_coloured.position_texture.x = (
+  c938_data_vertex_textured_coloured.colour.r = (
+    (float)
+    (
       (
-        (float)
-        (
-          id_vertex -
-          1
-        )
-      ) /
-      6.0f
-    );
-    
-    if (
-      c938_data_vertex_textured_coloured.position_texture.x > 1.0f
-    ) {
-      c938_data_vertex_textured_coloured.position_texture.x = (
-        1.0f -
-        (
-          c938_data_vertex_textured_coloured.position_texture.x -
-          1.0f
-        )
-      );
-    }
+        id_vertex -
+        offset_frame
+      ) %
+      10
+    ) /
+    10.0f
+  );
 
-    c938_data_vertex_textured_coloured.position_texture.y = (
-      metal::fabs(
-        (
-          (
-            (float)
-            (
-              data_frame->frame %
-              667
-            )
-          ) /
-          333.0f
-        ) -
-        1.0f
-      )
-    );
-  }
+  c938_data_vertex_textured_coloured.colour.g = (
+    (float)
+    (
+      (
+        id_vertex -
+        offset_frame +
+        3
+      ) %
+      10
+    ) /
+    10.0f
+  );
+
+  c938_data_vertex_textured_coloured.colour.b = (
+    (float)
+    (
+      (
+        id_vertex -
+        offset_frame +
+        6
+      ) %
+      10
+    ) /
+    10.0f
+  );
+
+  c938_data_vertex_textured_coloured.colour.a = (
+    1.0f
+  );
 
   return (
     c938_data_vertex_textured_coloured
@@ -108,41 +95,23 @@
 }
 
 [[fragment]] metal::float4 c938_player_fragment(
-  struct c938_data_vertex_textured_coloured c938_data_vertex_textured_coloured [[stage_in]],
-  metal::texture2d<half> metal_texture_player [[texture(0)]]
+  struct c938_data_vertex_textured_coloured c938_data_vertex_textured_coloured [[stage_in]]
 ) {
-  constexpr metal::sampler sampler_texture(
-    metal::filter::linear,
-    metal::mip_filter::linear
-  );
-
-  metal::float4 colour_texture_player = metal::float4(
-    metal_texture_player.sample(
-      sampler_texture,
-      c938_data_vertex_textured_coloured.position_texture
-    )
-  );
-
   return metal::float4(
     (
-      colour_texture_player[0] *
       c938_data_vertex_textured_coloured.colour.r *
       c938_data_vertex_textured_coloured.brightness *
-      0.7f +
-      0.15f
+      0.7f
     ),
     (
-      colour_texture_player[1] *
       c938_data_vertex_textured_coloured.colour.g *
       c938_data_vertex_textured_coloured.brightness *
-      0.5f
+      0.7f
     ),
     (
-      colour_texture_player[2] *
       c938_data_vertex_textured_coloured.colour.b *
       c938_data_vertex_textured_coloured.brightness *
-      0.7f +
-      0.3f
+      0.7f
     ),
     (
       c938_data_vertex_textured_coloured.colour.a
