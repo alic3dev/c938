@@ -86,22 +86,34 @@
 
   return metal::float4(
     (
-      colour_texture[0] *
+      (
+        1.0f -
+        colour_texture[0]
+      ) *
       c938_data_vertex_textured_coloured.colour.r *
       c938_data_vertex_textured_coloured.brightness
     ),
     (
-      colour_texture[1] *
+      (
+        1.0f -
+        colour_texture[1]
+      ) *
       c938_data_vertex_textured_coloured.colour.g *
       c938_data_vertex_textured_coloured.brightness
     ),
     (
-      colour_texture[2] *
+      (
+        1.0f -
+        colour_texture[2] 
+      ) *
       c938_data_vertex_textured_coloured.colour.b *
       c938_data_vertex_textured_coloured.brightness
     ),
     (
-      colour_texture[3] *
+      (
+        1.0f -
+        colour_texture[3]
+      ) *
       c938_data_vertex_textured_coloured.colour.a
     )
   );

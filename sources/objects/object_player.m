@@ -23,6 +23,10 @@ void object_player_initialize(
     &metil->player_defaults
   );
 
+  metil_object_player->type_primitive = (
+    MTLPrimitiveTypeLineStrip
+  );
+
   if (
     user_player == 1
   ) {

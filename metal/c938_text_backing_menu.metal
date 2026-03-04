@@ -70,28 +70,11 @@
   );
 
   c938_data_vertex_textured_coloured.position_texture.x = (
-    0.1f * (
-      (
-        id_vertex %
-        2
-      ) - 
-      (float) data_object->noise /
-      10.0f
-    )
+    id_vertex > 4 == 0 ? 1.7f : -0.1f
   );
 
   c938_data_vertex_textured_coloured.position_texture.y = (
-    0.1f *
-    (
-      (
-        (
-          id_vertex +
-          1
-        ) % 2
-      ) +
-      (float) data_object->noise /
-      10.0f
-    )
+    id_vertex % 2 == 0 ? 1.1f : -0.1f
   );
 
   return (
@@ -104,40 +87,48 @@
   metal::texture2d<half> texture [[texture(0)]]
 ) {
   constexpr metal::sampler sampler_texture(
-    metal::t_address::repeat,
-    metal::r_address::repeat,
-    metal::s_address::repeat
+    metal::t_address::clamp_to_border,
+    metal::r_address::clamp_to_border,
+    metal::s_address::clamp_to_border,
+    metal::border_color::opaque_white
   );
 
   metal::float4 colour_texture = metal::float4(
     texture.sample(
       sampler_texture,
-      (
-        c938_data_vertex_textured_coloured.position_texture /
-        2.0f
-      )
+      c938_data_vertex_textured_coloured.position_texture
     )
   );
 
   return metal::float4(
     (
-      colour_texture[0] *
-      c938_data_vertex_textured_coloured.colour.r *
-      c938_data_vertex_textured_coloured.brightness
+      1.0f -
+      (
+        colour_texture[0] *
+        c938_data_vertex_textured_coloured.colour.r *
+        c938_data_vertex_textured_coloured.brightness
+      )
     ),
     (
-      colour_texture[1] *
-      c938_data_vertex_textured_coloured.colour.g *
-      c938_data_vertex_textured_coloured.brightness
+      1.0f -
+      (
+        colour_texture[1] *
+        c938_data_vertex_textured_coloured.colour.g *
+        c938_data_vertex_textured_coloured.brightness
+      )
     ),
     (
-      colour_texture[2] *
-      c938_data_vertex_textured_coloured.colour.b *
-      c938_data_vertex_textured_coloured.brightness
+      1.0f -
+      (
+        colour_texture[2] *
+        c938_data_vertex_textured_coloured.colour.b *
+        c938_data_vertex_textured_coloured.brightness
+      )
     ),
     (
       colour_texture[3] *
-      c938_data_vertex_textured_coloured.colour.a
+      c938_data_vertex_textured_coloured.colour.a *
+      0.8f
     )
   );
 }

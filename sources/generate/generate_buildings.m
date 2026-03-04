@@ -241,6 +241,10 @@ void generate_buildings(
       texture
     );
 
+    object->type_primitive = (
+      MTLPrimitiveTypeLine
+    );
+
     metil_object_buffers_initialize(
       object,
       metal_device
