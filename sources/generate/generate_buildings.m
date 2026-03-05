@@ -335,6 +335,10 @@ void generate_buildings(
     )
   );
 
+  object->type_primitive = (
+    MTLPrimitiveTypeLine
+  );
+
   object->index_pipeline_render = (
     c938_pipeline_index_ground
   );
