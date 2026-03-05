@@ -60,11 +60,11 @@ void mesh_player_initialize(
   );
 
   mesh->vertices[0].x = 0;
-  
+
   mesh->vertices[0].y = (
     metil_player_defaults->size.y
   );
-  
+
   mesh->vertices[0].z = 0;
 
   mesh->vertices[0].w = 1.0f;
@@ -92,7 +92,7 @@ void mesh_player_initialize(
       M_PI *
       2.0f
     );
-    
+
     mesh->vertices[
       index_vertex
     ].x = (
@@ -101,11 +101,11 @@ void mesh_player_initialize(
       ) *
       metil_player_defaults->size.x
     );
-    
+
     mesh->vertices[
       index_vertex
     ].y = 0;
-    
+
     mesh->vertices[
       index_vertex
     ].z = (
@@ -114,7 +114,7 @@ void mesh_player_initialize(
       ) *
       metil_player_defaults->size.z
     );
-    
+
     mesh->vertices[
       index_vertex
     ].w = 1.0f;

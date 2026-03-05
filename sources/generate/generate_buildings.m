@@ -313,7 +313,7 @@ void generate_buildings(
       size_maximum.y = (
         limits.y
       );
-    } 
+    }
   }
 
   object = (

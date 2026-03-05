@@ -51,7 +51,7 @@ unsigned char network_host_listen_with_notification(
   network_host->address_socket.sin_family = (
     AF_INET
   );
-  
+
   network_host->address_socket.sin_port = (
     htons(
       c938_network_port
@@ -185,7 +185,7 @@ unsigned char network_host_listen_with_notification(
     network_host_routing_thread,
     network_host
   );
-  
+
   return 0;
 }
 
@@ -500,7 +500,7 @@ void* network_host_client_receiving_thread(
     char data_received_client[
       c938_network_data_transfer_limit
     ];
-    
+
     long int length_data_received_client = (
       recv(
         network_host_client->socket,
@@ -878,7 +878,7 @@ void* network_host_client_sending_thread(
 
     if (
       (
-        network_host->online == 0 && 
+        network_host->online == 0 &&
         network_host_client->command_sending != network_command_disconnecting
       ) ||
       (
@@ -923,7 +923,7 @@ void* network_host_client_sending_thread(
         close(
           network_host_client->socket
         );
-        
+
         break;
       }
       case network_command_data_map: {
@@ -933,7 +933,7 @@ void* network_host_client_sending_thread(
             network_host_client->socket
           )
         );
-        
+
         if (
           length_bytes_sent != network_host->data_map.packet->length
         ) {
@@ -1054,7 +1054,7 @@ void network_host_send_poll(
       ) *
       2 +
       sizeof(
-        struct math_c_vector3_float 
+        struct math_c_vector3_float
       ) *
       (
         network_host->connected_players +
@@ -1285,7 +1285,7 @@ void network_host_destroy(
       pthread_mutex_unlock(
         &network_host_client->mutex_sending
       );
-      
+
       continue;
     }
 

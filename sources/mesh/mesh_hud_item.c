@@ -20,7 +20,7 @@ void mesh_hud_item_initialize(
   mesh->size.y = (
     0.05f
   );
-  
+
   mesh->size.z = (
     0.0f
   );

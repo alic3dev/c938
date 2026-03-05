@@ -61,4 +61,3 @@ void mesh_crosshair_initialize(
   mesh->indices[1] = 1;
   mesh->indices[3] = 3;
 }
-  

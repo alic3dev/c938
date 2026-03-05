@@ -43,7 +43,7 @@ void scene_gameplay_group_players_resize(
           index_player_new
         ]->renderable
       );
-      
+
       object_player_initialize(
         metil,
         metil_object_player,

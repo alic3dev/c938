@@ -40,7 +40,7 @@ void scene_gameplay_group_enemies_resize(
           index_enemy_new
         ]->renderable
       );
-      
+
       object_enemy_initialize(
         metil_object_enemy,
         metil->renderer_interface.metal_device,

@@ -297,7 +297,7 @@ void* network_client_receiving_thread(
     }
 
     static struct network_data_packet* network_data_packet;
-    
+
     network_data_packet = (
       clic3_memory_allocate_raw(
         sizeof(
@@ -577,7 +577,7 @@ void* network_client_sending_thread(
   pthread_mutex_unlock(
     &network_client->mutex_thread_sending
   );
-  
+
   clic3_memory_free(
     network_client_thread_data
   );
@@ -764,7 +764,7 @@ void network_client_destroy(
   clic3_memory_free_raw(
     network_client->network_data_packets_outgoing
   );
-  
+
   clic3_memory_free_raw(
     network_client->shots_fired
   );

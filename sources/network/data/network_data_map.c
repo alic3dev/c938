@@ -46,7 +46,7 @@ void network_data_map_packet_set(
   network_data_map->packet = (
     network_data_packet
   );
-  
+
   pthread_mutex_unlock(
     &network_data_map->mutex
   );

@@ -135,7 +135,7 @@ void network_data_map_set(
       &metil_object_enemy->position,
       data_length_math_c_vector3_float
     );
-    
+
     network_data_packet_bytes_add(
       network_data_packet,
       &enemy_data->speed,
@@ -272,7 +272,7 @@ void network_data_map_parse(
         metil_object_buffer_default_index_data
       ].buffer.contents
     );
-    
+
     metil_object_building_data->colour.x = 1.0f;
     metil_object_building_data->colour.y = 1.0f;
     metil_object_building_data->colour.z = 1.0f;
