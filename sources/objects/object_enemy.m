@@ -164,7 +164,7 @@ void object_enemy_travel(
       (float) *time_delta /
       1000.0f
     ) *
-    speed  
+    speed
   );
 
   if (

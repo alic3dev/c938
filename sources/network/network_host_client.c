@@ -86,7 +86,7 @@ void network_host_client_shots_fired_clear(
   );
 
   network_host_client->length_shots_fired = 0;
-  
+
   clic3_memory_reallocate_raw(
     &network_host_client->shots_fired,
     0
@@ -121,7 +121,7 @@ void network_host_client_shots_fired_outgoing_clear(
   struct network_host_client* network_host_client
 ) {
   network_host_client->length_shots_fired_outgoing = 0;
-  
+
   clic3_memory_reallocate_raw(
     &network_host_client->shots_fired_outgoing,
     0

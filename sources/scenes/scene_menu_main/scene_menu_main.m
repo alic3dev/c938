@@ -57,7 +57,7 @@ void scene_menu_main_initialize(
   struct parameters_gameplay* parameters_gameplay = (
     &c938_data->parameters_gameplay
   );
-  
+
   metil_scene_initialize_with_renderables(
     metil,
     scene,
@@ -285,7 +285,7 @@ void scene_menu_main_initialize(
           metil_object_text,
           "exit"
         );
-        
+
         break;
     }
 
@@ -749,7 +749,7 @@ void scene_menu_main_poll(
     ) *
     -1500.0f
   );
-  
+
   scene->player.position.z = (
     sin(
       data->angle
@@ -806,7 +806,7 @@ void scene_menu_main_poll(
       scene_menu_main_renderables_index_group_text_menu_network
     ].renderable
   );
-  
+
   for (
     unsigned char index_metil_group_text_main_renderable = 0;
     index_metil_group_text_main_renderable < (
@@ -1073,7 +1073,7 @@ void scene_menu_main_poll(
     data->time_started != 0
   ) {
     unsigned long int time_delta = (
-      scene->time - 
+      scene->time -
       data->time_started
     );
 
@@ -1348,7 +1348,7 @@ void scene_menu_main_poll(
           data->parameters_gameplay->networked = (
             parameters_gameplay_networked_client
           );
-          
+
           metil_debug_log(
             metil->configuration.debug_log_level,
             "setting::parameters_gameplay::networked->{client};\n"
@@ -1412,7 +1412,7 @@ void scene_menu_main_poll_input(
   struct scene_menu_main_data* scene_menu_main_data = (
     scene->data
   );
-  
+
   struct metil_menu* menu = (
     scene_menu_main_data->menu_current
   );
@@ -1800,7 +1800,7 @@ void scene_menu_main_poll_custom_menu_item(
   clic3_memory_free(
     value
   );
-}        
+}
 
 void scene_menu_main_destroy(
   struct metil* metil,
@@ -1814,7 +1814,7 @@ void scene_menu_main_destroy(
   struct scene_menu_main_data* scene_menu_main_data = (
     scene->data
   );
-  
+
   metil_menu_destroy(
     &scene_menu_main_data->menu_main
   );
@@ -2067,7 +2067,7 @@ int scene_menu_main_io_proc(
       );
     }
   }
-  
+
   return 0;
 }
 #else
@@ -2119,7 +2119,7 @@ OSStatus scene_menu_main_io_proc(
     unsigned long int count_channel_out = (
       audio_buffer_current.mNumberChannels
     );
-    
+
     for (
       unsigned long int index_buffer_out = 0;
       index_buffer_out < size_buffer_out;

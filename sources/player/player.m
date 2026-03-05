@@ -41,7 +41,7 @@ void player_poll_input(
     player_data->is_boosted == 0 &&
     (metil->input.keydown_map[
       metil_keycode_x
-    ] == 1 || 
+    ] == 1 ||
     metil->input.keydown_map[
       metil_keycode_period
     ] == 1 || (
@@ -136,7 +136,7 @@ void player_poll_input(
       ] == 1 ||
       metil->input.keydown_map[
         metil_keycode_shift_right
-      ] == 1 
+      ] == 1
     )
   ) {
     player->speed_movement = (
@@ -219,7 +219,7 @@ void player_poll_input(
     player->rotation.y,
     (M_PI * 2.0f)
   );
-  
+
   float ratio_axis = -(
     player->rotation.y / (
       M_PI *
@@ -238,7 +238,7 @@ void player_poll_input(
     ratio_movement_strafe.x = (0.25f - ratio_axis) / 0.25f;
   } else if (
     ratio_axis >= 0.25f &&
-    ratio_axis <= 0.5f 
+    ratio_axis <= 0.5f
   ) {
     ratio_axis = ratio_axis - 0.25f;
 
@@ -249,7 +249,7 @@ void player_poll_input(
     ratio_movement_strafe.x = -(ratio_axis / 0.25f);
   } else if (
     ratio_axis >= 0.5f &&
-    ratio_axis <= 0.75f 
+    ratio_axis <= 0.75f
   ) {
     ratio_axis = ratio_axis - 0.5f;
 
@@ -289,7 +289,7 @@ void player_poll_input(
     ratio_movement_strafe.x = -(ratio_axis / -0.25f);
   } else if (
     ratio_axis <= -0.5f &&
-    ratio_axis >= -0.75f 
+    ratio_axis >= -0.75f
   ) {
     ratio_axis = ratio_axis + 0.5f;
 
@@ -349,7 +349,7 @@ void player_poll_input(
         ) - (
           metil->input.keydown_map[
             metil_keycode_semi_colon
-          ] || 
+          ] ||
           metil->input.keydown_map[
             metil_keycode_s
           ]
@@ -432,16 +432,16 @@ void player_poll_input(
       metil->input.controller_state.cross >= 0.1f
     )) &&
     (
-      player_data->is_jumping == 0 || 
+      player_data->is_jumping == 0 ||
       (player_data->is_jumping_secondary == 0 &&
       delta_time_jump >= delta_time_jump_threshold)
     )
   ) {
     player->velocity.y = (
-      player->velocity.y + 
+      player->velocity.y +
       player_jump_velocity
     );
-    
+
     if (player_data->is_jumping == 0) {
       player_data->is_jumping = 1;
       player_data->time_jump = time;
@@ -469,7 +469,7 @@ void player_poll_input(
       )
     ),
     .y = (
-      player->position.y + 
+      player->position.y +
       addition_y
     ),
     .z = (
@@ -674,7 +674,7 @@ void player_poll(
         1
       );
     }
-    
+
     scene_gameplay_data->fired_projectiles[
       scene_gameplay_data->length_projectiles -
       1

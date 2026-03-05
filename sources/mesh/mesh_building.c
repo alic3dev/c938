@@ -113,13 +113,13 @@ void mesh_building_initialize(
     ].x = (
       -size_half.x
     );
-    
+
     mesh->vertices[
       index_vertex
     ].y = (
       position_y
     );
-    
+
     mesh->vertices[
       index_vertex
     ].z = (
@@ -180,7 +180,7 @@ void mesh_building_initialize(
     ].z = (
       size_half.z
     );
-    
+
     mesh->vertices[
       index_vertex +
       2
@@ -194,21 +194,21 @@ void mesh_building_initialize(
     ].x = (
       -size_half.x
     );
-    
+
     mesh->vertices[
       index_vertex +
       3
     ].y = (
       position_y
     );
-    
+
     mesh->vertices[
       index_vertex +
       3
     ].z = (
       size_half.z
     );
-    
+
     mesh->vertices[
       index_vertex +
       3

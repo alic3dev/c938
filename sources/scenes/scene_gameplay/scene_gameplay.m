@@ -66,7 +66,7 @@ void scene_gameplay_initialize(
   );
 
   struct parameters_gameplay* parameters_gameplay = (
-    &c938_data->parameters_gameplay  
+    &c938_data->parameters_gameplay
   );
 
   metil->rendering_properties.brightness = (
@@ -174,7 +174,7 @@ void scene_gameplay_initialize(
           index_renderable,
           metil_renderable_type_object
         );
-        
+
         break;
     }
   }
@@ -591,7 +591,7 @@ void scene_gameplay_populate(
     unsigned char networked = (
       scene_gameplay_data->parameters->networked
     );
-    
+
     network_data_map_parse(
       metil,
       &network_client->data_map,
@@ -781,7 +781,7 @@ void scene_gameplay_populate(
   );
 
   metil_scene_gameplay->player.position.x = object->position.x;
-  
+
   metil_scene_gameplay->player.position.y = (
     object->position.y +
     object->mesh.size.y
@@ -1123,7 +1123,7 @@ void scene_gameplay_poll(
         );
 
         struct network_data_shot_fired network_data_shot_fired;
-        
+
         for (
           unsigned int index_shot_fired = 0;
           index_shot_fired < length_shots_fired;
@@ -1374,7 +1374,7 @@ void scene_gameplay_poll(
       scene_gameplay_data_action_data_map_none
     );
   }
-  
+
   if (
     scene_gameplay_data->parameters->networked !=
     parameters_gameplay_networked_client &&
@@ -1531,7 +1531,7 @@ void scene_gameplay_poll(
         player_data->life -
         1
       );
-      
+
       metil_group_destroy_renderable_at_index(
         metil,
         metil_group_enemies,
@@ -1590,7 +1590,7 @@ void scene_gameplay_poll(
   metil_object_player->position.y = (
     metil_scene_gameplay->player.position.y -
     metil->rendering_properties.camera.height +
-    metil_object_player->mesh.size.y / 
+    metil_object_player->mesh.size.y /
     1.1
   );
 
@@ -1615,7 +1615,7 @@ void scene_gameplay_poll(
       );
 
       static struct network_data_packet* network_data_packet;
-      
+
       network_data_packet =(
         clic3_memory_allocate_raw(
           sizeof(
@@ -1678,7 +1678,7 @@ void scene_gameplay_poll(
         &network_client->mutex_shots_fired
       );
 
-      network_client_send( 
+      network_client_send(
         network_client,
         network_data_packet
       );
@@ -1739,7 +1739,7 @@ void scene_gameplay_poll(
           network_host_client->length_shots_fired,
           metil_renderable_type_object
         );
-        
+
         for (
           unsigned int index_shot_fired = 0;
           index_shot_fired < network_host_client->length_shots_fired;
@@ -1868,11 +1868,11 @@ void scene_gameplay_poll(
     struct c938_data* c938_data = (
       metil->data
     );
-    
+
     struct network_host* network_host = &(
       c938_data->network_host
     );
-  
+
     struct network_data_packet network_data_packet_enemies;
 
     network_data_packet_initialize(
@@ -2020,7 +2020,7 @@ float scene_gameplay_io_proc_value_get(
     );
 
     float a = 0.0f;
-    
+
     if (
       v <= b
     ) {
@@ -2099,7 +2099,6 @@ float scene_gameplay_io_proc_value_get(
   return value;
 }
 
-
 #if target_os_ios
 int scene_gameplay_io_proc(
   unsigned char silence,
@@ -2154,7 +2153,7 @@ int scene_gameplay_io_proc(
       );
     }
   }
-  
+
   return 0;
 }
 #else
@@ -2208,7 +2207,7 @@ OSStatus scene_gameplay_io_proc(
     unsigned long int count_channel_out = (
       audio_buffer_current.mNumberChannels
     );
-    
+
     for (
       unsigned long int index_buffer_out = 0;
       index_buffer_out < size_buffer_out;

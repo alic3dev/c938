@@ -66,7 +66,7 @@ void object_projectile_initialize(
 
   projectile_data->lifespan = projectile_lifespan;
 
-  matrix_float4x4 matrix_projection_object_with_rotation = 
+  matrix_float4x4 matrix_projection_object_with_rotation =
     (matrix_float4x4) {{
       { cos(object->rotation.y), 0.0f, -sin(object->rotation.y), 0.0f },
       { 0.0f, 1.0f, 0.0f, 0.0f },

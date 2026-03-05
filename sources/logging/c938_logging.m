@@ -322,7 +322,7 @@ void c938_logging_poll(
         metil_group_logging,
         index_log
       );
-      
+
       for (
         unsigned int index_stopwatch = index_log;
         index_stopwatch < metil_group_logging->length;

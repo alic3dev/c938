@@ -31,7 +31,7 @@ void mesh_enemy_initialize(
       mesh->length_indices
     )
   );
-  
+
   mesh->indices[0] = 0;
   mesh->indices[1] = 1;
   mesh->indices[2] = 1;

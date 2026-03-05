@@ -89,7 +89,7 @@ void c938_renderer_on_initialize(
     0.0f *
     metil->rendering_properties.brightness
   );
-  
+
   metil->renderer_interface.rendering_properties->colour_clear.y = (
     0.0f *
     metil->rendering_properties.brightness
