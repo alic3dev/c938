@@ -253,6 +253,10 @@ void network_data_map_parse(
       size_building.z
     );
 
+    metil_object_building->type_primitive = (
+      MTLPrimitiveTypeLine
+    );
+
     metil_object_texture_add(
       metil_object_building,
       texture_building
