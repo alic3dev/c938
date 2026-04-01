@@ -104,7 +104,7 @@
     (
       (
         1.0f -
-        colour_texture[2] 
+        colour_texture[2]
       ) *
       c938_data_vertex_textured_coloured.colour.b *
       c938_data_vertex_textured_coloured.brightness
