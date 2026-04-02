@@ -1,7 +1,29 @@
 # c938
 
-| <img width="1966" height="1250" alt="c938_menu" src="https://github.com/user-attachments/assets/e3acecc6-9a6b-49c0-bc86-73b9167968a0" /> | <img width="1966" height="1250" alt="c938_gameplay" src="https://github.com/user-attachments/assets/b55d700c-ef04-4a99-961a-6c8dd3005dc1" /> | <img width="1966" height="1250" alt="c938_gameplay_fire" src="https://github.com/user-attachments/assets/99a495c2-f655-4a4b-9ece-9225deb5ccee" /> |
-|---|---|---|
+<img width=1052 height=195 alt=c938::logo src=https://github.com/user-attachments/assets/0bad47bd-a51a-4a21-bd07-08c75cf4a11e />
+
+## single_player
+
+<img width=1966 height=1250 alt=c938::menu src=https://github.com/user-attachments/assets/65728c10-e960-4af4-98a9-307680d26c86 />
+
+| | |
+|-|-|
+| <img width=1966 height=1250 alt=c938::single_player src=https://github.com/user-attachments/assets/8e7ecba0-8f7f-48e5-a12c-706c7ea275ab /> | <img width=1966 height=1250 alt=c938::single_player::second src=https://github.com/user-attachments/assets/6fddbc52-7a2d-427a-8a12-667c490c0ace /> |
+
+## multi_player
+
+| | |
+|-|-|
+| <img width=1811 height=1200 alt=c938::multiplayer src=https://github.com/user-attachments/assets/57a8a7b0-c62f-4403-876d-e484e941254d /> | <img width=1920 height=1205 alt=c938::multiplayer::second src=https://github.com/user-attachments/assets/024f4976-f80a-439f-b983-fc9bbdee1307 /> |
+
+<img width=1920 height=1206 alt=c938::multiplayer::third src=https://github.com/user-attachments/assets/2ea41731-9462-445d-968b-5a18830bebf7 />
+
+### [host|client]::architecture
+
+| host | client |
+|-|-|
+| <img width=239 height=57 alt=c938::network_host::notification src=https://github.com/user-attachments/assets/b0f87f21-bb2a-4678-bc13-aef578cb60f4 /> | <img width=227 height=19 alt=c938::network_client::notification src=https://github.com/user-attachments/assets/36561ecc-720d-4e01-8af2-65bb20640711 /> |
+| <img width=295 height=256 alt=c938::network_host::terminal src=https://github.com/user-attachments/assets/d5ef49d9-a303-4c54-b91c-8554199bcc35 /> | <img width=221 height=95 alt=c938::network_client::terminal src=https://github.com/user-attachments/assets/9aa7ee71-9adf-4547-b466-c8cad12dc3b7 /> |
 
 ## requirements
 
