@@ -18,6 +18,8 @@
 
 <img width=1920 height=1206 alt=c938::multiplayer::third src=https://github.com/user-attachments/assets/2ea41731-9462-445d-968b-5a18830bebf7 />
 
+### [host|client]::architecture
+
 | host | client |
 |-|-|
 | <img width=239 height=57 alt=c938::network_host::notification src=https://github.com/user-attachments/assets/b0f87f21-bb2a-4678-bc13-aef578cb60f4 /> | <img width=227 height=19 alt=c938::network_client::notification src=https://github.com/user-attachments/assets/36561ecc-720d-4e01-8af2-65bb20640711 /> |
