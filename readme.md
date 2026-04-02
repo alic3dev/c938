@@ -18,10 +18,10 @@
 
 <img width=1920 height=1206 alt=c938::multiplayer::third src=https://github.com/user-attachments/assets/2ea41731-9462-445d-968b-5a18830bebf7 />
 
-| | |
+| host | client |
 |-|-|
 | <img width=239 height=57 alt=c938::network_host::notification src=https://github.com/user-attachments/assets/b0f87f21-bb2a-4678-bc13-aef578cb60f4 /> | <img width=227 height=19 alt=c938::network_client::notification src=https://github.com/user-attachments/assets/36561ecc-720d-4e01-8af2-65bb20640711 /> |
-|<img width=295 height=256 alt=c938::network_host::terminal src=https://github.com/user-attachments/assets/d5ef49d9-a303-4c54-b91c-8554199bcc35 /> | <img width=221 height=95 alt=c938::network_client::terminal src=https://github.com/user-attachments/assets/9aa7ee71-9adf-4547-b466-c8cad12dc3b7 /> |
+| <img width=295 height=256 alt=c938::network_host::terminal src=https://github.com/user-attachments/assets/d5ef49d9-a303-4c54-b91c-8554199bcc35 /> | <img width=221 height=95 alt=c938::network_client::terminal src=https://github.com/user-attachments/assets/9aa7ee71-9adf-4547-b466-c8cad12dc3b7 /> |
 
 ## requirements
 
