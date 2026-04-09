@@ -1,5 +1,6 @@
 #include <scenes/scene_gameplay/scene_gameplay.h>
 
+#include <audio/io_procs/io_proc_scene_gameplay.h>
 #include <rendering/c938_pipeline_index.h>
 #include <data/c938_data.h>
 #include <data/data_length.h>
@@ -1992,113 +1993,6 @@ void scene_gameplay_destroy(
   );
 }
 
-// todo: put these in gameplay data or something
-unsigned int b = 100;
-unsigned int d = 1000;
-
-float scene_gameplay_io_proc_value_get(
-  struct scene_gameplay_data* scene_gameplay_data,
-  unsigned long int time_current,
-  unsigned long int channel,
-  unsigned long int frame
-) {
-  float value = 0.0f;
-
-  for (
-    unsigned int index_projectile = 0;
-    index_projectile < scene_gameplay_data->length_projectiles;
-  ) {
-    unsigned long int time_fired = (
-      scene_gameplay_data->fired_projectiles[
-        index_projectile
-      ]
-    );
-
-    unsigned long int v = (
-      time_current -
-      time_fired
-    );
-
-    float a = 0.0f;
-
-    if (
-      v <= b
-    ) {
-      a = (float) (
-        b - v
-      ) / (((float) b) / 2.0f) - 1.0f;
-    } else {
-      if (v > d) {
-        for (
-          unsigned int index_projectile_shift = index_projectile;
-          index_projectile_shift < scene_gameplay_data->length_projectiles - 1;
-          ++index_projectile_shift
-        ) {
-          scene_gameplay_data->fired_projectiles[
-            index_projectile_shift
-          ] = (
-            scene_gameplay_data->fired_projectiles[
-              index_projectile_shift +
-              1
-            ]
-          );
-        }
-
-        scene_gameplay_data->length_projectiles = (
-          scene_gameplay_data->length_projectiles -
-          1
-        );
-
-        continue;
-      }
-
-      a = ((float) (
-        d - v
-      ) / (((float) d) / 2.0f) - 1.0f) * 0.5f;
-    }
-
-    if (
-      v % 2 == 0
-    ) {
-      a = -a;
-    }
-
-    value = (
-      value +
-      a
-    );
-
-    index_projectile = (
-      index_projectile +
-      1
-    );
-  }
-
-  if (value > 1.0f) {
-    value = (
-      value - (
-        (float) (
-          (unsigned long int) value
-        )
-      )
-    );
-  } else if (value < -1.0f) {
-    value = (
-      value + (
-        (float) (
-          (unsigned long int) (-value)
-        )
-      )
-    );
-  }
-
-  value = (
-    value
-  );
-
-  return value;
-}
-
 #if target_os_ios
 int scene_gameplay_io_proc(
   unsigned char silence,
@@ -2145,11 +2039,13 @@ int scene_gameplay_io_proc(
 
       buffer_out[
         index_frame
-      ] = scene_gameplay_io_proc_value_get(
-        scene_gameplay_data,
-        metil_scene_gameplay->time,
-        index_buffer,
-        index_frame
+      ] = (
+        c938_audio_io_proc_scene_gameplay_frame_get(
+          scene_gameplay_data,
+          metil_scene_gameplay->time,
+          index_buffer,
+          index_frame
+        )
       );
     }
   }
@@ -2221,7 +2117,7 @@ OSStatus scene_gameplay_io_proc(
       buffer_out[
         index_buffer_out
       ] = (
-        scene_gameplay_io_proc_value_get(
+        c938_audio_io_proc_scene_gameplay_frame_get(
           scene_gameplay_data,
           metil_scene_gameplay->time,
           channel,
