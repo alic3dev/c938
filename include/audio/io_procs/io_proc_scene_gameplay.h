@@ -3,12 +3,38 @@
 
 #include <scenes/scene_gameplay/scene_gameplay.h>
 
+#if target_os_ios
+#include <AVFAudio/AVFAudio.h>
+#else
+#include <CoreAudio/CoreAudio.h>
+#endif
+
 float c938_audio_io_proc_scene_gameplay_frame_get(
   struct scene_gameplay_data*,
   unsigned long int,
   unsigned long int,
   unsigned long int
 );
+
+#if target_os_ios
+int c938_audio_io_proc_scene_gameplay(
+  unsigned char,
+  const AudioTimeStamp*,
+  unsigned int,
+  AudioBufferList*,
+  void*
+);
+#else
+OSStatus c938_audio_io_proc_scene_gameplay(
+  AudioObjectID,
+  const AudioTimeStamp*,
+  const AudioBufferList*,
+  const AudioTimeStamp*,
+  AudioBufferList*,
+  const AudioTimeStamp*,
+  void*
+);
+#endif
 
 #endif
 
