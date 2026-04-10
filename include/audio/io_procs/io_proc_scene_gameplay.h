@@ -9,6 +9,9 @@
 #include <CoreAudio/CoreAudio.h>
 #endif
 
+#define c938_audio_io_proc_scene_gameplay_length_time_switch 0x0064
+#define c938_audio_io_proc_scene_gameplay_length_time_life   0x03e8
+
 float c938_audio_io_proc_scene_gameplay_frame_get(
   struct scene_gameplay_data*,
   unsigned long int,
