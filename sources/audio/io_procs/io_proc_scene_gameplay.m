@@ -15,9 +15,6 @@
 #include <CoreAudio/CoreAudio.h>
 #endif
 
-unsigned int b = 100;
-unsigned int d = 1000;
-
 float c938_audio_io_proc_scene_gameplay_frame_get(
   struct scene_gameplay_data* scene_gameplay_data,
   unsigned long int time_current,
@@ -43,29 +40,29 @@ float c938_audio_io_proc_scene_gameplay_frame_get(
       ]
     );
 
-    unsigned long int v = (
+    unsigned long int time_alive = (
       time_current -
       time_fired
     );
 
-    float a = (
+    float value_additive = (
       0x00
     );
 
     if (
-      v <=
-      b
+      time_alive <=
+      c938_audio_io_proc_scene_gameplay_length_time_switch
     ) {
-      a = (
+      value_additive = (
         (float)
         (
           (
-            b -
-            v
+            c938_audio_io_proc_scene_gameplay_length_time_switch -
+            time_alive
           ) /
           (
             (float)
-            b /
+            c938_audio_io_proc_scene_gameplay_length_time_switch /
             2.0f
           ) -
           1.0f
@@ -73,8 +70,8 @@ float c938_audio_io_proc_scene_gameplay_frame_get(
       );
     } else {
       if (
-        v >
-        d
+        time_alive >
+        c938_audio_io_proc_scene_gameplay_length_time_life
       ) {
         for (
           unsigned int index_projectile_shift = (
@@ -107,15 +104,15 @@ float c938_audio_io_proc_scene_gameplay_frame_get(
         continue;
       }
 
-      a = (
+      value_additive = (
         (float)
         (
-          d -
-          v
+          c938_audio_io_proc_scene_gameplay_length_time_life -
+          time_alive
         ) /
         (
           (float)
-          d /
+          c938_audio_io_proc_scene_gameplay_length_time_life /
           2.0f -
           1.0f
         ) *
@@ -125,19 +122,19 @@ float c938_audio_io_proc_scene_gameplay_frame_get(
 
     if (
       (
-        v %
+        time_alive %
         0x02
       ) ==
       0x00
     ) {
-      a = (
-        -a
+      value_additive = (
+        -value_additive
       );
     }
 
     value = (
       value +
-      a
+      value_additive
     );
 
     index_projectile = (
