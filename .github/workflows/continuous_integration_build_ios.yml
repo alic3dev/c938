@@ -16,7 +16,7 @@ env:
   key_cache_clic3: cache_clic3_ios_0_0_0
   key_cache_interrupt_handler: cache_interrupt_handler_ios_0_0_0
   key_cache_math_c: cache_math_c_ios_0_0_0
-  key_cache_metil: cache_metil_ios_1_0_0
+  key_cache_metil: cache_metil_ios_3_0_0
   key_cache_rand: cache_rand_ios_0_0_0
   target_device_version: 18.5
   target_metal_standard: metal3.2
