@@ -145,7 +145,7 @@ float c938_audio_io_proc_scene_gameplay_frame_get(
 
   if (
     value >
-    1.0f
+    0x01
   ) {
     value = (
       value -
@@ -159,7 +159,7 @@ float c938_audio_io_proc_scene_gameplay_frame_get(
     );
   } else if (
     value <
-    -1.0f
+    -0x01
   ) {
     value = (
       value +
@@ -178,170 +178,34 @@ float c938_audio_io_proc_scene_gameplay_frame_get(
   );
 }
 
-#if target_os_ios
-int c938_audio_io_proc_scene_gameplay(
-  unsigned char silence,
-  const AudioTimeStamp* timestamp,
-  AVAudioFrameCount frame_count,
-  AudioBufferList* output_data,
-  void* data
+metil_audio_io_proc_macro_definition(
+  c938_audio_io_proc_scene_gameplay
 ) {
-  struct metil_audio_io_proc_data* metil_audio_io_proc_data = (
-    data
-  );
+  metil_audio_io_proc_macro_definition_initializer
 
-  struct metil* metil = (
-    metil_audio_io_proc_data->metil
-  );
-
-  struct metil_scene_controller* metil_scene_controller = (
+  struct metil_scene_controller* metil_scene_controller
+= (
     metil->scene_controller
   );
 
-  struct metil_scene* metil_scene_gameplay = &(
+  struct metil_scene* metil_scene = &(
     metil_scene_controller->scene
   );
 
   struct scene_gameplay_data* scene_gameplay_data = (
-    metil_scene_gameplay->data
+    metil_scene->data
   );
+  metil_audio_io_proc_macro_definition_frame_loop {
+    metil_audio_io_proc_macro_definition_index_channel
 
-  for (
-    unsigned int index_frame = (
-      0x00
-    );
-    (
-      index_frame <
-      frame_count
-    );
-    ++index_frame
-  ) {
-    for (
-      unsigned long int index_buffer = (
-        0x00
-      );
-      (
-        index_buffer <
-        output_data->mNumberBuffers
-      );
-      ++index_buffer
-    ) {
-      AudioBuffer audio_buffer_current = (
-        output_data->mBuffers[
-          index_buffer
-        ]
-      );
-      
-      float* buffer_out = (
-        audio_buffer_current.mData
-      );
-
-      buffer_out[
+    metil_audio_io_proc_macro_definition_frame_set(
+      c938_audio_io_proc_scene_gameplay_frame_get(
+        scene_gameplay_data,
+        metil_scene->time,
+        index_channel,
         index_frame
-      ] = (
-        c938_audio_io_proc_scene_gameplay_frame_get(
-          scene_gameplay_data,
-          metil_scene_gameplay->time,
-          index_buffer,
-          index_frame
-        )
-      );
-    }
-  }
-  
-  return (
-    0x00
-  );
+      )
+    )      }
+
+  metil_audio_io_proc_macro_definition_return
 }
-#else
-OSStatus c938_audio_io_proc_scene_gameplay(
-  AudioObjectID id_audio_object,
-  const AudioTimeStamp* time_stamp_audio,
-  const AudioBufferList* list_buffer_audio_in,
-  const AudioTimeStamp* time_stamp_audio_in,
-  AudioBufferList* list_buffer_audio_out,
-  const AudioTimeStamp* time_stamp_audio_out,
-  void* data
-) {
-  struct metil_audio_io_proc_data* metil_audio_io_proc_data = (
-    data
-  );
-
-  struct metil* metil = (
-    metil_audio_io_proc_data->metil
-  );
-
-  struct metil_scene_controller* metil_scene_controller = (
-    metil->scene_controller
-  );
-
-  struct metil_scene* metil_scene_gameplay = &(
-    metil_scene_controller->scene
-  );
-
-  struct scene_gameplay_data* scene_gameplay_data = (
-    metil_scene_gameplay->data
-  );
-
-  for (
-    unsigned long int index_buffer = (
-      0x00
-    );
-    (
-      index_buffer <
-      list_buffer_audio_out->mNumberBuffers
-    );
-    ++index_buffer
-  ) {
-    AudioBuffer audio_buffer_current = (
-      list_buffer_audio_out->mBuffers[
-        index_buffer
-      ]
-    );
-
-    float* buffer_out = (
-      audio_buffer_current.mData
-    );
-
-    unsigned long int size_buffer_out = (
-      audio_buffer_current.mDataByteSize /
-      data_length_float
-    );
-
-    unsigned long int count_channel_out = (
-      audio_buffer_current.mNumberChannels
-    );
-
-    for (
-      unsigned long int index_buffer_out = (
-        0x00
-      );
-      (
-        index_buffer_out <
-        size_buffer_out
-      );
-      ++index_buffer_out
-    ) {
-      unsigned long int channel = (
-        index_buffer_out %
-        count_channel_out
-      );
-
-      buffer_out[
-        index_buffer_out
-      ] = (
-        c938_audio_io_proc_scene_gameplay_frame_get(
-          scene_gameplay_data,
-          metil_scene_gameplay->time,
-          channel,
-          index_buffer_out
-        )
-      );
-    }
-  }
-
-  return (
-    0x00
-  );
-}
-#endif

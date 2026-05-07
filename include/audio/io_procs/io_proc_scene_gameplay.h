@@ -3,6 +3,8 @@
 
 #include <scenes/scene_gameplay/scene_gameplay.h>
 
+#include <metil_audio/metil_audio_io_proc.h>
+
 #if target_os_ios
 #include <AVFAudio/AVFAudio.h>
 #else
@@ -13,31 +15,14 @@
 #define c938_audio_io_proc_scene_gameplay_length_time_life   0x03e8
 
 float c938_audio_io_proc_scene_gameplay_frame_get(
-  struct scene_gameplay_data*,
+  struct scene_gameplay_data* _Nonnull,
   unsigned long int,
   unsigned long int,
   unsigned long int
 );
 
-#if target_os_ios
-int c938_audio_io_proc_scene_gameplay(
-  unsigned char,
-  const AudioTimeStamp*,
-  unsigned int,
-  AudioBufferList*,
-  void*
+metil_audio_io_proc_macro_type(
+  c938_audio_io_proc_scene_gameplay
 );
-#else
-OSStatus c938_audio_io_proc_scene_gameplay(
-  AudioObjectID,
-  const AudioTimeStamp*,
-  const AudioBufferList*,
-  const AudioTimeStamp*,
-  AudioBufferList*,
-  const AudioTimeStamp*,
-  void*
-);
-#endif
 
 #endif
-
