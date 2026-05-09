@@ -1,6 +1,6 @@
 #include <scenes/scene_menu_main/scene_menu_main.h>
 
-#include <rendering/c938_pipeline_index.h>
+#include <audio/io_procs/io_proc_scene_menu_main.h>
 #include <data/c938_data.h>
 #include <data/parameters_gameplay.h>
 #include <data/scene_menu_main_data.h>
@@ -8,6 +8,7 @@
 #include <menus/menu_main.h>
 #include <menus/menu_main_custom.h>
 #include <network/network_host.h>
+#include <rendering/c938_pipeline_index.h>
 #include <scenes/scene_id.h>
 #include <textures/textures_buildings.h>
 
@@ -15,8 +16,11 @@
 #include <clic3_colours.h>
 #include <clic3_memory.h>
 
+#include <math_c_modulus.h>
+#include <math_c_pi.h>
+#include <math_c_sine.h>
+
 #include <metil_audio/metil_audio_io_proc.h>
-#include <metil_audio/metil_audio_io_proc_data.h>
 #include <metil_debug/metil_debug_log.h>
 #include <metil_group.h>
 #include <metil_input/metil_keycodes.h>
@@ -40,9 +44,7 @@
 
 #if !target_os_ios
 #include <AppKit/AppKit.h>
-#include <CoreAudio/CoreAudio.h>
 #else
-#include <AVFAudio/AVFAudio.h>
 #include <UIKit/UIKit.h>
 #endif
 
@@ -65,8 +67,13 @@ void scene_menu_main_initialize(
   );
 
   for (
-    unsigned char index_renderable = 0;
-    index_renderable < scene->length_renderables;
+    unsigned char index_renderable = (
+      0x00
+    );
+    (
+      index_renderable <
+      scene->length_renderables
+    );
     ++index_renderable
   ) {
     switch (
@@ -78,7 +85,7 @@ void scene_menu_main_initialize(
       case scene_menu_main_renderables_index_group_text_menu_custom_backing:
       case scene_menu_main_renderables_index_group_text_menu_custom:
       case scene_menu_main_renderables_index_group_text_menu_network_backing:
-      case scene_menu_main_renderables_index_group_text_menu_network:
+      case scene_menu_main_renderables_index_group_text_menu_network: {
         metil_renderable_initialize_at_index(
           scene->renderables,
           index_renderable,
@@ -86,7 +93,8 @@ void scene_menu_main_initialize(
         );
 
         break;
-      case scene_menu_main_renderables_index_group_logging:
+      }
+      case scene_menu_main_renderables_index_group_logging: {
         scene->renderables[
           index_renderable
         ].type = (
@@ -100,7 +108,8 @@ void scene_menu_main_initialize(
         );
 
         break;
-      default:
+      }
+      default: {
         metil_renderable_initialize_at_index(
           scene->renderables,
           index_renderable,
@@ -108,6 +117,7 @@ void scene_menu_main_initialize(
         );
 
         break;
+      }
     }
   }
 
@@ -140,11 +150,11 @@ void scene_menu_main_initialize(
   );
 
   data->angle = (
-    0.0f
+    0x00
   );
 
   data->time_started = (
-    0
+    0x00
   );
 
   menu_main_initialize(
@@ -168,8 +178,9 @@ void scene_menu_main_initialize(
     scene_menu_main_length_textures
   );
 
-  scene->textures = realloc(
-    scene->textures, (
+  clic3_memory_reallocate_raw(
+    &scene->textures,
+    (
       sizeof(
         id<MTLTexture>
       ) *
@@ -178,19 +189,28 @@ void scene_menu_main_initialize(
   );
 
   MTKTextureLoader* texture_loader = [
-    [MTKTextureLoader alloc]
-    initWithDevice: metil->renderer_interface.metal_device
+    [
+      MTKTextureLoader
+      alloc
+    ]
+    initWithDevice: (
+      metil->renderer_interface.metal_device
+    )
   ];
 
   textures_buildings_load(
     metil,
-    texture_loader, (
+    texture_loader,
+    (
       scene->textures +
       scene_menu_main_textures_index_buildings
     )
   );
 
-  [texture_loader release];
+  [
+    texture_loader
+    release
+  ];
 
   struct metil_object* metil_object_text_title = (
     scene->renderables[
@@ -205,9 +225,10 @@ void scene_menu_main_initialize(
   );
 
   metil_object_text_title->position.y = (
-    0.5f - (
+    0.5f -
+    (
       metil_object_text_title->mesh.size.y /
-      4.0f
+      0x04
     )
   );
 
@@ -236,8 +257,13 @@ void scene_menu_main_initialize(
   );
 
   for (
-    unsigned char index_metil_group_text_main_renderable = 0;
-    index_metil_group_text_main_renderable < scene_menu_main_length_group_renderables_text_main;
+    unsigned char index_metil_group_text_main_renderable = (
+      0x00
+    );
+    (
+      index_metil_group_text_main_renderable <
+      scene_menu_main_length_group_renderables_text_main
+    );
     ++index_metil_group_text_main_renderable
   ) {
     struct metil_object* metil_object_text_backing = (
@@ -255,7 +281,7 @@ void scene_menu_main_initialize(
     switch (
       index_metil_group_text_main_renderable
     ) {
-      case scene_menu_main_renderables_group_text_main_index_menu_start:
+      case scene_menu_main_renderables_group_text_main_index_menu_start: {
         metil_object_text_initialize(
           metil,
           metil_object_text,
@@ -263,7 +289,8 @@ void scene_menu_main_initialize(
         );
 
         break;
-      case scene_menu_main_renderables_group_text_main_index_menu_custom:
+      }
+      case scene_menu_main_renderables_group_text_main_index_menu_custom: {
         metil_object_text_initialize(
           metil,
           metil_object_text,
@@ -271,7 +298,8 @@ void scene_menu_main_initialize(
         );
 
         break;
-      case scene_menu_main_renderables_group_text_main_index_menu_network:
+      }
+      case scene_menu_main_renderables_group_text_main_index_menu_network: {
         metil_object_text_initialize(
           metil,
           metil_object_text,
@@ -279,7 +307,8 @@ void scene_menu_main_initialize(
         );
 
         break;
-      case scene_menu_main_renderables_group_text_main_index_menu_exit:
+      }
+      case scene_menu_main_renderables_group_text_main_index_menu_exit: {
         metil_object_text_initialize(
           metil,
           metil_object_text,
@@ -287,14 +316,18 @@ void scene_menu_main_initialize(
         );
 
         break;
+      }
     }
 
     metil_mesh_box_initialize(
       &metil_object_text_backing->mesh,
       (struct math_c_vector3_float) {
-        .x = 0.5f,
+        .x = (
+          0.5f
+        ),
         .y = (
-          metil_object_text->mesh.size.y * 1.5f
+          metil_object_text->mesh.size.y *
+          1.5f
         ),
         .z = (
           0.5f
@@ -302,10 +335,17 @@ void scene_menu_main_initialize(
       }
     );
 
-    metil_object_text_backing->position.z = 0.5f;
+    metil_object_text_backing->position.z = (
+      0.5f
+    );
 
-    metil_object_text_backing->rotation.x = -0.025f;
-    metil_object_text_backing->rotation.y = -0.025f;
+    metil_object_text_backing->rotation.x = -(
+      0.025f
+    );
+
+    metil_object_text_backing->rotation.y = -(
+      0.025f
+    );
 
     metil_object_texture_add(
       metil_object_text_backing,
@@ -339,11 +379,12 @@ void scene_menu_main_initialize(
 
     metil_object_text->position.y = (
       0.05f *
+      (float)
       (
-        -6.0f -
+        -0x06 -
         (
           index_metil_group_text_main_renderable *
-          4.0f
+          0x04
         )
       ) +
       0.15f
@@ -378,12 +419,22 @@ void scene_menu_main_initialize(
     metil_renderable_type_object
   );
 
-  metil_group_text_menu_custom_backing->visible = 0;
-  metil_group_text_menu_custom->visible = 0;
+  metil_group_text_menu_custom_backing->visible = (
+    0x00
+  );
+
+  metil_group_text_menu_custom->visible = (
+    0x00
+  );
 
   for (
-    unsigned char index_metil_group_text_main_renderable = 0;
-    index_metil_group_text_main_renderable < scene_menu_main_length_group_renderables_text_menu_custom;
+    unsigned char index_metil_group_text_main_renderable = (
+      0x00
+    );
+    (
+      index_metil_group_text_main_renderable <
+      scene_menu_main_length_group_renderables_text_menu_custom
+    );
     ++index_metil_group_text_main_renderable
   ) {
     struct metil_object* metil_object_text_backing = (
@@ -426,7 +477,9 @@ void scene_menu_main_initialize(
           "objective: enemies"
         );
 
-        metil_object_text->visible = 0;
+        metil_object_text->visible = (
+          0x00
+        );
 
         break;
       }
@@ -447,7 +500,8 @@ void scene_menu_main_initialize(
         index_menu = (
           index_menu -
           (
-            index_menu > 1
+            index_menu >
+            0x01
           )
         );
 
@@ -458,7 +512,7 @@ void scene_menu_main_initialize(
           metil_object_text,
           &data->menu_main_custom,
           index_menu,
-          0
+          0x00
         );
         continue;
       }
@@ -466,10 +520,14 @@ void scene_menu_main_initialize(
 
     metil_mesh_box_initialize(
       &metil_object_text_backing->mesh,
-      (struct math_c_vector3_float) {
-        .x = 0.5f,
+      (struct math_c_vector3_float)
+      {
+        .x = (
+          0.5f
+        ),
         .y = (
-          metil_object_text->mesh.size.y * 1.5f
+          metil_object_text->mesh.size.y *
+          1.5f
         ),
         .z = (
           0.5f
@@ -477,10 +535,17 @@ void scene_menu_main_initialize(
       }
     );
 
-    metil_object_text_backing->position.z = 0.5f;
+    metil_object_text_backing->position.z = (
+      0.5f
+    );
 
-    metil_object_text_backing->rotation.x = -0.025f;
-    metil_object_text_backing->rotation.y = -0.025f;
+    metil_object_text_backing->rotation.x = -(
+      0.025f
+    );
+
+    metil_object_text_backing->rotation.y = -(
+      0.025f
+    );
 
     metil_object_text_backing->visible = (
       metil_object_text->visible
@@ -518,16 +583,18 @@ void scene_menu_main_initialize(
 
     metil_object_text->position.y = (
       0.025f *
+      (float)
       (
-        -6.0f -
+        -0x06 -
         (
           (
             index_metil_group_text_main_renderable -
             (
-              index_metil_group_text_main_renderable > 1
+              index_metil_group_text_main_renderable >
+              0x01
             )
           ) *
-          4.0f
+          0x04
         )
       ) +
       0.125f
@@ -562,12 +629,22 @@ void scene_menu_main_initialize(
     metil_renderable_type_object
   );
 
-  metil_group_text_network_backing->visible = 0;
-  metil_group_text_network->visible = 0;
+  metil_group_text_network_backing->visible = (
+    0x00
+  );
+
+  metil_group_text_network->visible = (
+    0x00
+  );
 
   for (
-    unsigned char index_metil_group_text_network_renderable = 0;
-    index_metil_group_text_network_renderable < scene_menu_main_length_group_renderables_text_menu_network;
+    unsigned char index_metil_group_text_network_renderable = (
+      0x00
+    );
+    (
+      index_metil_group_text_network_renderable <
+      scene_menu_main_length_group_renderables_text_menu_network
+    );
     ++index_metil_group_text_network_renderable
   ) {
     struct metil_object* metil_object_text_backing = (
@@ -617,9 +694,12 @@ void scene_menu_main_initialize(
     metil_mesh_box_initialize(
       &metil_object_text_backing->mesh,
       (struct math_c_vector3_float) {
-        .x = 0.5f,
+        .x = (
+          0.5f
+        ),
         .y = (
-          metil_object_text->mesh.size.y * 1.5f
+          metil_object_text->mesh.size.y *
+          1.5f
         ),
         .z = (
           0.5f
@@ -627,10 +707,17 @@ void scene_menu_main_initialize(
       }
     );
 
-    metil_object_text_backing->position.z = 0.5f;
+    metil_object_text_backing->position.z = (
+      0.5f
+    );
 
-    metil_object_text_backing->rotation.x = -0.025f;
-    metil_object_text_backing->rotation.y = -0.025f;
+    metil_object_text_backing->rotation.x = -(
+      0.025f
+    );
+
+    metil_object_text_backing->rotation.y = -(
+      0.025f
+    );
 
     metil_object_text_backing->visible = (
       metil_object_text->visible
@@ -668,12 +755,11 @@ void scene_menu_main_initialize(
 
     metil_object_text->position.y = (
       0.05f *
+      (float)
       (
-        -6.0f -
-        (
-          index_metil_group_text_network_renderable *
-          4.0f
-        )
+        -0x06 -
+        index_metil_group_text_network_renderable *
+        0x04
       ) +
       0.15f
     );
@@ -698,19 +784,20 @@ void scene_menu_main_initialize(
   );
 
   scene->player.position.y = (
-    1600.0f
+    0x0640
   );
 
   scene->player.position.z = (
-    -1500.0f
+    -0x05dc
   );
 
-  scene->player.rotation.x = -0.3f;
+  scene->player.rotation.x = -(
+    0.3f
+  );
 
-  metil_audio_io_proc_add_with_data(
+  metil_audio_io_proc_add(
     &metil->audio,
-    scene_menu_main_io_proc,
-    scene->data
+    c938_audio_io_proc_scene_menu_main
   );
 }
 
@@ -730,38 +817,37 @@ void scene_menu_main_poll(
     metil
   );
 
-  data->angle = fmod((
-      data->angle +
-      scene->time_delta /
-      20000.0f
-    ), (
-      M_PI *
-      2.0f
+  data->angle = (
+    math_c_modulus_float(
+      (
+        data->angle +
+        (float)
+        scene->time_delta /
+        0x4e20
+      ),
+      math_c_pi_doubled
     )
   );
 
   scene->player.position.x = (
-    cos(
-      data->angle
+    math_c_cosine(
+      data->angle,
+      math_c_pi
     ) *
-    -1500.0f
+    -0x05dc
   );
 
   scene->player.position.z = (
-    sin(
-      data->angle
+    math_c_sine(
+      data->angle,
+      math_c_pi
     ) *
-    -1500.0f
+    -0x05dc
   );
 
   scene->player.rotation.y = (
-    (
-      data->angle *
-      1.0f
-    ) - (
-      M_PI /
-      2.0f
-    )
+    data->angle -
+    math_c_pi_half
   );
 
   struct metil_menu* menu = (
@@ -805,13 +891,26 @@ void scene_menu_main_poll(
   );
 
   for (
-    unsigned char index_metil_group_text_main_renderable = 0;
-    index_metil_group_text_main_renderable < (
-      menu == &data->menu_main
-      ? scene_menu_main_length_group_renderables_text_main
-      : menu == &data->menu_main_custom
-      ? scene_menu_main_length_group_renderables_text_menu_custom
-      : scene_menu_main_length_group_renderables_text_menu_network
+    unsigned char index_metil_group_text_main_renderable = (
+      0x00
+    );
+    (
+      index_metil_group_text_main_renderable <
+      (
+        (
+          menu ==
+          &data->menu_main
+        )
+        ? scene_menu_main_length_group_renderables_text_main
+        : (
+          (
+            menu ==
+            &data->menu_main_custom
+          )
+          ? scene_menu_main_length_group_renderables_text_menu_custom
+          : scene_menu_main_length_group_renderables_text_menu_network
+        )
+      )
     );
     ++index_metil_group_text_main_renderable
   ) {
@@ -827,11 +926,12 @@ void scene_menu_main_poll(
     );
 
     float offset_position_y = (
-      0.0f
+      0x00
     );
 
     if (
-      menu == &data->menu_main
+      menu ==
+      &data->menu_main
     ) {
       metil_object_text_backing = (
         metil_group_text_main_backing->renderables[
@@ -866,7 +966,8 @@ void scene_menu_main_poll(
       index_menu = (
         index_menu -
         (
-          index_menu > 1
+          index_menu >
+          0x01
         )
       );
 
@@ -885,10 +986,11 @@ void scene_menu_main_poll(
         metil_object_text,
         menu,
         index_menu,
-        1
+        0x01
       );
     } else if (
-      menu == &data->menu_main_network
+      menu ==
+      &data->menu_main_network
     ) {
       metil_object_text_backing = (
         metil_group_text_menu_network_backing->renderables[
@@ -920,7 +1022,8 @@ void scene_menu_main_poll(
     );
 
     if (
-      menu->index_current == index_menu
+      menu->index_current ==
+      index_menu
     ) {
       if (
         menu == &data->menu_main_custom &&
@@ -940,25 +1043,43 @@ void scene_menu_main_poll(
         if (
           metil_menu_item_data_scroll->index == index_menu_scroll
         ) {
-          metil_object_text_backing->visible = 1;
-          metil_object_text->visible = 1;
+          metil_object_text_backing->visible = (
+            0x01
+          );
+
+          metil_object_text->visible = (
+            0x01
+          );
         } else {
-          metil_object_text_backing->visible = 0;
-          metil_object_text->visible = 0;
+          metil_object_text_backing->visible = (
+            0x00
+          );
+
+          metil_object_text->visible = (
+            0x00
+          );
         }
       } else {
-        metil_object_text_backing->rotation.x = -0.00625f;
-        metil_object_text_backing->rotation.y = -0.00625f;
+        metil_object_text_backing->rotation.x = -(
+          0.00625f
+        );
 
-        metil_object_text->position.x = 0.0f;
+        metil_object_text_backing->rotation.y = -(
+          0.00625f
+        );
+
+        metil_object_text->position.x = (
+          0x00
+        );
 
         metil_object_text->position.y = (
           multiplier_position_y *
           (
             -6.075f -
+            (float)
             (
               index_menu *
-              4.0f
+              0x04
             )
           ) +
           offset_position_y
@@ -970,12 +1091,30 @@ void scene_menu_main_poll(
       );
 
       if (
-        menu == &data->menu_main &&
-        index_menu == menus_menu_main_index_exit ||
-        menu == &data->menu_main_custom &&
-        index_menu == menus_menu_main_custom_index_back ||
-        menu == &data->menu_main_network &&
-        index_menu == menus_menu_main_network_index_back
+        (
+          menu ==
+          &data->menu_main
+        ) &&
+        (
+          index_menu ==
+          menus_menu_main_index_exit
+        ) ||
+        (
+          menu ==
+          &data->menu_main_custom
+        ) &&
+        (
+          index_menu ==
+          menus_menu_main_custom_index_back
+        ) ||
+        (
+          menu ==
+          &data->menu_main_network
+        ) &&
+        (
+          index_menu ==
+          menus_menu_main_network_index_back
+        )
       ) {
         metil_renderer_data_text_backing->colour.y = (
           0.4f
@@ -1006,34 +1145,58 @@ void scene_menu_main_poll(
         0.8f
       );
     } else {
-      metil_object_text_backing->rotation.x = -0.0125f;
-      metil_object_text_backing->rotation.y = -0.0125f;
+      metil_object_text_backing->rotation.x = -(
+        0.0125f
+      );
 
-      metil_object_text->position.x = 0.001f;
+      metil_object_text_backing->rotation.y = -(
+        0.0125f
+      );
+
+      metil_object_text->position.x = (
+        0.001f
+      );
 
       metil_object_text->position.y = (
         multiplier_position_y *
         (
           -6.05f -
-          (
-            index_menu *
-            4.0f
-          )
+          (float)
+          index_menu *
+          0x04
         ) +
         offset_position_y
       );
 
       metil_renderer_data_text_backing->colour.x = (
-        1.0f
+        0x01
       );
 
       if (
-        menu == &data->menu_main &&
-        index_menu == menus_menu_main_index_exit ||
-        menu == &data->menu_main_custom &&
-        index_menu == menus_menu_main_custom_index_back ||
-        menu == &data->menu_main_network &&
-        index_menu == menus_menu_main_network_index_back
+        (
+          menu ==
+          &data->menu_main
+        ) &&
+        (
+          index_menu ==
+          menus_menu_main_index_exit
+        ) ||
+        (
+          menu ==
+          &data->menu_main_custom
+        ) &&
+        (
+          index_menu ==
+          menus_menu_main_custom_index_back
+        ) ||
+        (
+          menu ==
+          &data->menu_main_network
+        ) &&
+        (
+          index_menu ==
+          menus_menu_main_network_index_back
+        )
       ) {
         metil_renderer_data_text_backing->colour.y = (
           0.5f
@@ -1044,30 +1207,31 @@ void scene_menu_main_poll(
         );
       } else {
         metil_renderer_data_text_backing->colour.y = (
-          1.0f
+          0x01
         );
 
         metil_renderer_data_text_backing->colour.z = (
-          1.0f
+          0x01
         );
       }
 
       metil_renderer_data_text->colour.x = (
-        1.0f
+        0x01
       );
 
       metil_renderer_data_text->colour.y = (
-        1.0f
+        0x01
       );
 
       metil_renderer_data_text->colour.z = (
-        1.0f
+        0x01
       );
     }
   }
 
   if (
-    data->time_started != 0
+    data->time_started !=
+    0x00
   ) {
     unsigned long int time_delta = (
       scene->time -
@@ -1075,10 +1239,16 @@ void scene_menu_main_poll(
     );
 
     if (
-      time_delta >= scene_menu_main_time_scene_transition
+      time_delta >=
+      scene_menu_main_time_scene_transition
     ) {
-      metil->rendering_properties.brightness = 0.0f;
-      metil->rendering_properties.brightness_text = 0.0f;
+      metil->rendering_properties.brightness = (
+        0x00
+      );
+
+      metil->rendering_properties.brightness_text = (
+        0x00
+      );
 
       metil_scene_controller_scene_change(
         metil,
@@ -1087,11 +1257,13 @@ void scene_menu_main_poll(
       );
     } else {
       float brightness = (
-        (float) (
+        (float)
+        (
           scene_menu_main_time_scene_transition -
           time_delta
         ) /
-        (float) scene_menu_main_time_scene_transition
+        (float)
+        scene_menu_main_time_scene_transition
       );
 
       metil->rendering_properties.brightness = (
@@ -1105,13 +1277,22 @@ void scene_menu_main_poll(
       );
     }
   } else if (
-    menu->index_selected != -1 &&
-    menu->handled == 0
+    (
+      menu->index_selected !=
+      -0x01
+    ) &&
+    (
+      menu->handled ==
+      0x00
+    )
   ) {
-    menu->handled = 1;
+    menu->handled = (
+      0x01
+    );
 
     if (
-      data->menu_current == &data->menu_main
+      data->menu_current ==
+      &data->menu_main
     ) {
       switch (
         menu->index_selected
@@ -1134,21 +1315,36 @@ void scene_menu_main_poll(
           break;
         }
         case menus_menu_main_index_custom: {
-          menu->index_selected = -1;
-          menu->handled = 0;
+          menu->index_selected = -(
+            0x01
+          );
 
-          metil_group_text_main_backing->visible = 0;
-          metil_group_text_main->visible = 0;
+          menu->handled = (
+            0x00
+          );
 
-          metil_group_text_menu_custom_backing->visible = 1;
-          metil_group_text_menu_custom->visible = 1;
+          metil_group_text_main_backing->visible = (
+            0x00
+          );
+
+          metil_group_text_main->visible = (
+            0x00
+          );
+
+          metil_group_text_menu_custom_backing->visible = (
+            0x01
+          );
+
+          metil_group_text_menu_custom->visible = (
+            0x01
+          );
 
           data->menu_current = &(
             data->menu_main_custom
           );
 
           data->menu_current->index_current = (
-            0
+            0x00
           );
 
           metil_stopwatch_start(
@@ -1158,21 +1354,36 @@ void scene_menu_main_poll(
           break;
         }
         case menus_menu_main_index_network: {
-          menu->index_selected = -1;
-          menu->handled = 0;
+          menu->index_selected = -(
+            0x01
+          );
 
-          metil_group_text_main_backing->visible = 0;
-          metil_group_text_main->visible = 0;
+          menu->handled = (
+            0x00
+          );
 
-          metil_group_text_menu_network_backing->visible = 1;
-          metil_group_text_menu_network->visible = 1;
+          metil_group_text_main_backing->visible = (
+            0x00
+          );
+
+          metil_group_text_main->visible = (
+            0x00
+          );
+
+          metil_group_text_menu_network_backing->visible = (
+            0x01
+          );
+
+          metil_group_text_menu_network->visible = (
+            0x01
+          );
 
           data->menu_current = &(
             data->menu_main_network
           );
 
           data->menu_current->index_current = (
-            0
+            0x00
           );
 
           metil_stopwatch_start(
@@ -1191,15 +1402,28 @@ void scene_menu_main_poll(
           metil_termination_terminate(
             &metil->termination
           );
-          exit(0);
+
+          exit(
+            0x00
+          );
+
           #else
-          [[NSApplication sharedApplication] terminate: 0];
+          [
+            [
+              NSApplication
+              sharedApplication
+            ]
+            terminate: (
+              0x00
+            )
+          ];
           #endif
           break;
         }
       }
     } else if (
-       data->menu_current == &data->menu_main_custom
+      data->menu_current ==
+      &data->menu_main_custom
     ) {
       switch (
         menu->index_selected
@@ -1232,7 +1456,8 @@ void scene_menu_main_poll(
             );
 
             if (
-              status_network_host_listen != 0
+              status_network_host_listen !=
+              0x00
             ) {
               metil_debug_log(
                 metil->configuration.debug_log_level,
@@ -1245,8 +1470,13 @@ void scene_menu_main_poll(
                 metil
               );
 
-              menu->index_selected = -1;
-              menu->handled = 0;
+              menu->index_selected = -(
+                0x01
+              );
+
+              menu->handled = (
+                0x00
+              );
             } else {
               network_host_connections_accept(
                 &c938_data->network_host
@@ -1266,11 +1496,21 @@ void scene_menu_main_poll(
         }
         default:
         case menus_menu_main_custom_index_back: {
-          menu->index_selected = -1;
-          menu->handled = 0;
+          menu->index_selected = -(
+            0x01
+          );
 
-          metil_group_text_menu_custom_backing->visible = 0;
-          metil_group_text_menu_custom->visible = 0;
+          menu->handled = (
+            0x00
+          );
+
+          metil_group_text_menu_custom_backing->visible = (
+            0x00
+          );
+
+          metil_group_text_menu_custom->visible = (
+            0x00
+          );
 
           if (
             data->parameters_gameplay->networked ==
@@ -1280,19 +1520,29 @@ void scene_menu_main_poll(
               data->menu_main
             );
 
-            metil_group_text_main_backing->visible = 1;
-            metil_group_text_main->visible = 1;
+            metil_group_text_main_backing->visible = (
+              0x01
+            );
+
+            metil_group_text_main->visible = (
+              0x01
+            );
           } else {
             data->menu_current = &(
               data->menu_main_network
             );
 
-            metil_group_text_menu_network_backing->visible = 1;
-            metil_group_text_menu_network->visible = 1;
+            metil_group_text_menu_network_backing->visible = (
+              0x01
+            );
+
+            metil_group_text_menu_network->visible = (
+              0x01
+            );
           }
 
           data->menu_current->index_current = (
-            0
+            0x00
           );
 
           metil_stopwatch_start(
@@ -1318,21 +1568,36 @@ void scene_menu_main_poll(
             "setting::parameters_gameplay::networked->{host};\n"
           );
 
-          menu->index_selected = -1;
-          menu->handled = 0;
+          menu->index_selected = -(
+            0x01
+          );
 
-          metil_group_text_menu_custom_backing->visible = 1;
-          metil_group_text_menu_custom->visible = 1;
+          menu->handled = (
+            0x00
+          );
 
-          metil_group_text_menu_network_backing->visible = 0;
-          metil_group_text_menu_network->visible = 0;
+          metil_group_text_menu_custom_backing->visible = (
+            0x01
+          );
+
+          metil_group_text_menu_custom->visible = (
+            0x01
+          );
+
+          metil_group_text_menu_network_backing->visible = (
+            0x00
+          );
+
+          metil_group_text_menu_network->visible = (
+            0x00
+          );
 
           data->menu_current = &(
             data->menu_main_custom
           );
 
           data->menu_current->index_current = (
-            0
+            0x00
           );
 
           metil_stopwatch_start(
@@ -1374,21 +1639,36 @@ void scene_menu_main_poll(
             "setting::parameters_gameplay::networked->{none};\n"
           );
 
-          menu->index_selected = -1;
-          menu->handled = 0;
+          menu->index_selected = -(
+            0x01
+          );
 
-          metil_group_text_main_backing->visible = 1;
-          metil_group_text_main->visible = 1;
+          menu->handled = (
+            0x00
+          );
 
-          metil_group_text_menu_network_backing->visible = 0;
-          metil_group_text_menu_network->visible = 0;
+          metil_group_text_main_backing->visible = (
+            0x01
+          );
+
+          metil_group_text_main->visible = (
+            0x01
+          );
+
+          metil_group_text_menu_network_backing->visible = (
+            0x00
+          );
+
+          metil_group_text_menu_network->visible = (
+            0x00
+          );
 
           data->menu_current = &(
             data->menu_main
           );
 
           data->menu_current->index_current = (
-            0
+            0x00
           );
 
           metil_stopwatch_start(
@@ -1435,10 +1715,17 @@ void scene_menu_main_poll_custom_menu_item(
     ].data_menu_item
   );
 
-  char* text = 0;
-  char* value = 0;
+  char* text = (
+    0x00
+  );
 
-  unsigned char changed = 0;
+  char* value = (
+    0x00
+  );
+
+  unsigned char changed = (
+    0x00
+  );
 
   switch (
     index_item
@@ -1452,24 +1739,36 @@ void scene_menu_main_poll_custom_menu_item(
     }
     case menus_menu_main_custom_index_length_buildings: {
       if (
-        with_checks != 0 &&
-        metil_menu_item_data_scroll->index == parameters_gameplay->length_buildings
+        (
+          with_checks !=
+          0x00
+        ) &&
+        (
+          metil_menu_item_data_scroll->index ==
+          parameters_gameplay->length_buildings
+        )
       ) {
         break;
       }
 
-      changed = 1;
+      changed = (
+        0x01
+      );
 
       if (
-        metil_menu_item_data_scroll->index == 0
+        metil_menu_item_data_scroll->index ==
+        0x00
       ) {
-        metil_menu_item_data_scroll->index = 3;
+        metil_menu_item_data_scroll->index = (
+          0x03
+        );
       } else if (
-        metil_menu_item_data_scroll->index < 3
+        metil_menu_item_data_scroll->index <
+        0x03
       ) {
         metil_menu_item_data_scroll->index = (
           metil_menu_item_data_scroll->length -
-          1
+          0x01
         );
       }
 
@@ -1490,9 +1789,11 @@ void scene_menu_main_poll_custom_menu_item(
         metil_menu_item_data_scroll->index
       );
 
-      text = clic3_char_arrays_concatenate(
-        "buildings: ",
-        value
+      text = (
+        clic3_char_arrays_concatenate(
+          "buildings: ",
+          value
+        )
       );
 
       metil_object_text_initialize(
@@ -1505,20 +1806,29 @@ void scene_menu_main_poll_custom_menu_item(
     }
     case menus_menu_main_custom_index_multiplier_buildings: {
       if (
-        with_checks != 0 &&
-        metil_menu_item_data_scroll->index == (
-          parameters_gameplay->multiplier_buildings *
-          100
+        (
+          with_checks !=
+          0x00
+        ) &&
+        (
+          metil_menu_item_data_scroll->index ==
+          (
+            parameters_gameplay->multiplier_buildings *
+            0x64
+          )
         )
       ) {
         break;
       }
 
-      changed = 1;
+      changed = (
+        0x01
+      );
 
       parameters_gameplay->multiplier_buildings = (
-        (float) metil_menu_item_data_scroll->index /
-        100.0f
+        (float)
+        metil_menu_item_data_scroll->index /
+        0x64
       );
 
       metil_object_text->destroy(
@@ -1530,13 +1840,17 @@ void scene_menu_main_poll_custom_menu_item(
         metil_object_text
       );
 
-      value = clic3_char_array_from_float(
-        parameters_gameplay->multiplier_buildings
+      value = (
+        clic3_char_array_from_float(
+          parameters_gameplay->multiplier_buildings
+        )
       );
 
-      text = clic3_char_arrays_concatenate(
-        "length_buildings_multiplier: ",
-        value
+      text = (
+        clic3_char_arrays_concatenate(
+          "length_buildings_multiplier: ",
+          value
+        )
       );
 
       metil_object_text_initialize(
@@ -1549,13 +1863,21 @@ void scene_menu_main_poll_custom_menu_item(
     }
     case menus_menu_main_custom_index_length_enemies: {
       if (
-        with_checks != 0 &&
-        metil_menu_item_data_scroll->index == parameters_gameplay->length_enemies
+        (
+          with_checks !=
+          0x00
+        ) &&
+        (
+          metil_menu_item_data_scroll->index ==
+          parameters_gameplay->length_enemies
+        )
       ) {
         break;
       }
 
-      changed = 1;
+      changed = (
+        0x01
+      );
 
       parameters_gameplay->length_enemies = (
         metil_menu_item_data_scroll->index
@@ -1589,17 +1911,29 @@ void scene_menu_main_poll_custom_menu_item(
     }
     case menus_menu_main_custom_index_multiplier_enemies: {
       if (
-        with_checks != 0 &&
-        metil_menu_item_data_scroll->index == parameters_gameplay->multiplier_enemies * 100
+        (
+          with_checks !=
+          0x00
+        ) &&
+        (
+          metil_menu_item_data_scroll->index ==
+          (
+            parameters_gameplay->multiplier_enemies *
+            0x64
+          )
+        )
       ) {
         break;
       }
 
-      changed = 1;
+      changed = (
+        0x01
+      );
 
       parameters_gameplay->multiplier_enemies = (
-        (float) metil_menu_item_data_scroll->index /
-        100.0f
+        (float)
+        metil_menu_item_data_scroll->index /
+        0x64
       );
 
       metil_object_text->destroy(
@@ -1611,13 +1945,17 @@ void scene_menu_main_poll_custom_menu_item(
         metil_object_text
       );
 
-      value = clic3_char_array_from_float(
-        parameters_gameplay->multiplier_enemies
+      value = (
+        clic3_char_array_from_float(
+          parameters_gameplay->multiplier_enemies
+        )
       );
 
-      text = clic3_char_arrays_concatenate(
-        "enemies_multiplier: ",
-        value
+      text = (
+        clic3_char_arrays_concatenate(
+          "enemies_multiplier: ",
+          value
+        )
       );
 
       metil_object_text_initialize(
@@ -1630,16 +1968,25 @@ void scene_menu_main_poll_custom_menu_item(
     }
     case menus_menu_main_custom_index_speed_movement: {
       if (
-        with_checks != 0 &&
-        metil_menu_item_data_scroll->index == parameters_gameplay->speed_movement
+        (
+          with_checks !=
+          0x00
+        ) &&
+        (
+          metil_menu_item_data_scroll->index ==
+          parameters_gameplay->speed_movement
+        )
       ) {
         break;
       }
 
-      changed = 1;
+      changed = (
+        0x01
+      );
 
       parameters_gameplay->speed_movement = (
-        (float) metil_menu_item_data_scroll->index
+        (float)
+        metil_menu_item_data_scroll->index
       );
 
       metil_object_text->destroy(
@@ -1651,13 +1998,17 @@ void scene_menu_main_poll_custom_menu_item(
         metil_object_text
       );
 
-      value = clic3_char_array_from_float(
-        parameters_gameplay->speed_movement
+      value = (
+        clic3_char_array_from_float(
+          parameters_gameplay->speed_movement
+        )
       );
 
-      text = clic3_char_arrays_concatenate(
-        "speed_movement: ",
-        value
+      text = (
+        clic3_char_arrays_concatenate(
+          "speed_movement: ",
+          value
+        )
       );
 
       metil_object_text_initialize(
@@ -1670,17 +2021,29 @@ void scene_menu_main_poll_custom_menu_item(
     }
     case menus_menu_main_custom_index_multiplier_speed_movement: {
       if (
-        with_checks != 0 &&
-        metil_menu_item_data_scroll->index == parameters_gameplay->multiplier_speed_movement * 100
+        (
+          with_checks !=
+          0x00
+        ) &&
+        (
+          metil_menu_item_data_scroll->index ==
+          (
+            parameters_gameplay->multiplier_speed_movement *
+            0x64
+          )
+        )
       ) {
         break;
       }
 
-      changed = 1;
+      changed = (
+        0x01
+      );
 
       parameters_gameplay->multiplier_speed_movement = (
-        (float) metil_menu_item_data_scroll->index /
-        100.0f
+        (float)
+        metil_menu_item_data_scroll->index /
+        0x64
       );
 
       metil_object_text->destroy(
@@ -1692,13 +2055,17 @@ void scene_menu_main_poll_custom_menu_item(
         metil_object_text
       );
 
-      value = clic3_char_array_from_float(
-        parameters_gameplay->multiplier_speed_movement
+      value = (
+        clic3_char_array_from_float(
+          parameters_gameplay->multiplier_speed_movement
+        )
       );
 
-      text = clic3_char_arrays_concatenate(
-        "multiplier_speed_movement: ",
-        value
+      text = (
+        clic3_char_arrays_concatenate(
+          "multiplier_speed_movement: ",
+          value
+        )
       );
 
       metil_object_text_initialize(
@@ -1712,7 +2079,8 @@ void scene_menu_main_poll_custom_menu_item(
   }
 
   if (
-    changed != 0
+    changed !=
+    0x00
   ) {
     metil_object_text_backing->destroy(
       metil,
@@ -1725,12 +2093,15 @@ void scene_menu_main_poll_custom_menu_item(
 
     metil_mesh_box_initialize(
       &metil_object_text_backing->mesh,
-      (struct math_c_vector3_float) {
+      (struct math_c_vector3_float)
+      {
         .x = (
-          metil_object_text->mesh.size.x * 1.25f
+          metil_object_text->mesh.size.x *
+          1.25f
         ),
         .y = (
-          metil_object_text->mesh.size.y * 1.5f
+          metil_object_text->mesh.size.y *
+          1.5f
         ),
         .z = (
           0.5f
@@ -1742,10 +2113,9 @@ void scene_menu_main_poll_custom_menu_item(
       0.025f *
       (
         -6.075f -
-        (
-          index_item *
-          4.0f
-        )
+        (float)
+        index_item *
+        0x04
       ) +
       0.125f
     );
@@ -1754,14 +2124,24 @@ void scene_menu_main_poll_custom_menu_item(
       metil_object_text->position.y
     );
 
-    metil_object_text_backing->position.z = 0.5f;
+    metil_object_text_backing->position.z = (
+      0.5f
+    );
 
-    metil_object_text_backing->rotation.x = -0.025f;
-    metil_object_text_backing->rotation.y = -0.025f;
+    metil_object_text_backing->rotation.x = -(
+      0.025f
+    );
+
+    metil_object_text_backing->rotation.y = -(
+      0.025f
+    );
 
     metil_object_texture_add(
       metil_object_text_backing,
-      ((struct metil_scene_controller*) metil->scene_controller)->scene.textures[
+      (
+        (struct metil_scene_controller*)
+        metil->scene_controller
+      )->scene.textures[
         scene_menu_main_textures_index_text_backing
       ]
     );
@@ -1805,7 +2185,7 @@ void scene_menu_main_destroy(
 ) {
   metil_audio_io_proc_remove(
     &metil->audio,
-    scene_menu_main_io_proc
+    c938_audio_io_proc_scene_menu_main
   );
 
   struct scene_menu_main_data* scene_menu_main_data = (
@@ -1822,7 +2202,7 @@ void scene_menu_main_destroy(
 
   scene->length_renderables = (
     scene->length_renderables -
-    1
+    0x01
   );
 
   metil_scene_destroy_default(
@@ -1866,12 +2246,16 @@ void network_client_notification(
         stderr
       );
 
-      colour = clic3_colours_bold_red;
+      colour = (
+        clic3_colours_bold_red
+      );
 
       break;
     }
     case network_client_notification_type_data_map_sent: {
-      colour = clic3_colours_bold_green;
+      colour = (
+        clic3_colours_bold_green
+      );
 
       break;
     }
@@ -1881,7 +2265,9 @@ void network_client_notification(
     }
     case network_client_notification_type_default:
     default: {
-      colour = clic3_colours_bold_blue;
+      colour = (
+        clic3_colours_bold_blue
+      );
 
       break;
     }
@@ -1971,26 +2357,49 @@ void network_notification_log_to_stream(
     )
   );
 
-  unsigned char index_notification_part = 0;
+  unsigned char index_notification_part = (
+    0x00
+  );
 
   while (
     index_notification_part++ <
     (unsigned long int)
     notification_parts[
-      0
+      0x00
     ]
   ) {
     fprintf(
       stream_output,
       "%s%s%s",
-      index_notification_part == 1
-      ? colour
-      : index_notification_part % 2 == 0
-      ? clic3_colours_bold_foreground
-      : clic3_colours_reset,
-      index_notification_part % 2 == 0
-      ? "::"
-      : "",
+      (
+        (
+          index_notification_part ==
+          0x01
+        )
+        ? colour
+        : (
+          (
+            (
+              index_notification_part %
+              0x02
+            ) ==
+            0x00
+          )
+        )
+        ? clic3_colours_bold_foreground
+        : clic3_colours_reset
+      ),
+      (
+        (
+          (
+            index_notification_part %
+            0x02
+          ) ==
+          0x00
+        )
+        ? "::"
+        : ""
+      ),
       notification_parts[
         index_notification_part
       ]
@@ -2012,129 +2421,3 @@ void network_notification_log_to_stream(
     notification_parts
   );
 }
-
-#if target_os_ios
-int scene_menu_main_io_proc(
-  unsigned char silence,
-  const AudioTimeStamp* _Nonnull timestamp,
-  AVAudioFrameCount frame_count,
-  AudioBufferList* _Nonnull output_data,
-  void* data
-) {
-  struct metil_audio_io_proc_data* metil_audio_io_proc_data = (
-    data
-  );
-
-  struct metil* metil = (
-    metil_audio_io_proc_data->metil
-  );
-
-  struct metil_scene_controller* metil_scene_controller = (
-    metil->scene_controller
-  );
-
-  struct metil_scene* metil_scene_menu_main= &(
-    metil_scene_controller->scene
-  );
-
-  struct scene_menu_main_data* scene_menu_main_data = (
-    metil_scene_menu_main->data
-  );
-
-  for (
-    unsigned int index_frame = 0;
-    index_frame < frame_count;
-    ++index_frame
-  ) {
-    for (
-      unsigned long int index_buffer = 0;
-      index_buffer < output_data->mNumberBuffers;
-      ++index_buffer
-    ) {
-      AudioBuffer audio_buffer_current = output_data->mBuffers[
-        index_buffer
-      ];
-
-      float* buffer_out = audio_buffer_current.mData;
-
-      buffer_out[
-        index_frame
-      ] = (
-        0.0f
-      );
-    }
-  }
-
-  return 0;
-}
-#else
-OSStatus scene_menu_main_io_proc(
-  AudioObjectID id_audio_object,
-  const AudioTimeStamp* time_stamp_audio,
-  const AudioBufferList* list_buffer_audio_in,
-  const AudioTimeStamp* time_stamp_audio_in,
-  AudioBufferList* list_buffer_audio_out,
-  const AudioTimeStamp* time_stamp_audio_out,
-  void* data
-) {
-  struct metil_audio_io_proc_data* metil_audio_io_proc_data = (
-    data
-  );
-
-  struct metil* metil = (
-    metil_audio_io_proc_data->metil
-  );
-
-  struct metil_scene_controller* metil_scene_controller = (
-    metil->scene_controller
-  );
-
-  struct metil_scene* metil_scene_menu_main= &(
-    metil_scene_controller->scene
-  );
-
-  struct scene_menu_main_data* scene_menu_main_data = (
-    metil_scene_menu_main->data
-  );
-
-  for (
-    unsigned long int index_buffer = 0;
-    index_buffer < list_buffer_audio_out->mNumberBuffers;
-    ++index_buffer
-  ) {
-    AudioBuffer audio_buffer_current = list_buffer_audio_out->mBuffers[
-      index_buffer
-    ];
-
-    float* buffer_out = audio_buffer_current.mData;
-
-    unsigned long int size_buffer_out = (
-      audio_buffer_current.mDataByteSize /
-      sizeof(float)
-    );
-
-    unsigned long int count_channel_out = (
-      audio_buffer_current.mNumberChannels
-    );
-
-    for (
-      unsigned long int index_buffer_out = 0;
-      index_buffer_out < size_buffer_out;
-      ++index_buffer_out
-    ) {
-      unsigned long int channel = (
-        index_buffer_out %
-        count_channel_out
-      );
-
-      buffer_out[
-        index_buffer_out
-      ] = (
-        0.0f
-      );
-    }
-  }
-
-  return 0;
-}
-#endif

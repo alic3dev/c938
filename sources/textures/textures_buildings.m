@@ -12,16 +12,18 @@ void textures_buildings_load(
   id<MTLTexture>* textures
 ) {
   NSError* error = (
-    (void*) 0
+    0x00
   );
 
   textures[
-    0
+    0x00
   ] = [texture_loader
     newTextureWithContentsOfURL: [
       NSURL
       fileURLWithPath: @"preliminary_concrete.png"
-      isDirectory: 0
+      isDirectory: (
+        0x00
+      )
       relativeToURL: [
         NSURL
         fileURLWithPath:[
@@ -30,31 +32,45 @@ void textures_buildings_load(
             metil->paths.directory_textures
           )
         ]
-        isDirectory: 1
+        isDirectory: (
+          0x01
+        )
       ]
     ]
-    options: (void*) 0
-    error: &error
+    options: (
+      0x00
+    )
+    error: &(
+      error
+    )
   ];
 
   if (
-    error != (void*) 0
+    error !=
+    0x00
   ) {
     textures[
-      0
+      0x00
     ] = metil_texture_concrete_secondary_generate(
       (struct math_c_vector2_unsigned_short_int) {
-        .x = 0xc8,
-        .y = 0xc8
+        .x = (
+          0xc8
+        ),
+        .y = (
+          0xc8
+        )
       },
-      (unsigned char*) textures_building_seed,
+      (
+        (unsigned char*)
+        textures_building_seed
+      ),
       textures_building_length_seed,
       metil->renderer_interface.metal_device
     );
 
     metil_texture_brightness_linear(
       textures[
-        0
+        0x00
       ],
       0.05f
     );

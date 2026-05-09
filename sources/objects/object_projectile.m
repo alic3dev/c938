@@ -103,7 +103,8 @@ void object_projectile_initialize(
   );
 
   matrix_float4x4 matrix_projection_object_with_rotation =
-    (matrix_float4x4) {{
+    (matrix_float4x4)
+    {{
       {
         math_c_cosine(
           object->rotation.y,

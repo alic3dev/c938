@@ -181,9 +181,10 @@ float c938_audio_io_proc_scene_gameplay_frame_get(
 metil_audio_io_proc_macro_definition(
   c938_audio_io_proc_scene_gameplay
 ) {
-  metil_audio_io_proc_macro_definition_initializer
+  metil_audio_io_proc_macro_definition_initializer;
 
-  struct metil_scene_controller* metil_scene_controller = (    metil->scene_controller
+  struct metil_scene_controller* metil_scene_controller = (
+    metil->scene_controller
   );
 
   struct metil_scene* metil_scene = &(
@@ -193,8 +194,9 @@ metil_audio_io_proc_macro_definition(
   struct scene_gameplay_data* scene_gameplay_data = (
     metil_scene->data
   );
+
   metil_audio_io_proc_macro_definition_frame_loop {
-    metil_audio_io_proc_macro_definition_index_channel
+    metil_audio_io_proc_macro_definition_index_channel;
 
     metil_audio_io_proc_macro_definition_frame_set(
       c938_audio_io_proc_scene_gameplay_frame_get(
@@ -203,8 +205,8 @@ metil_audio_io_proc_macro_definition(
         index_channel,
         index_frame
       )
-    )
+    );
   }
 
-  metil_audio_io_proc_macro_definition_return
+  metil_audio_io_proc_macro_definition_return;
 }

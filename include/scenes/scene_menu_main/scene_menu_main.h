@@ -12,12 +12,6 @@
 #include <metil_rendering/metil_renderer_interface.h>
 #include <metil_scenes/metil_scene.h>
 
-#if target_os_ios
-#include <AVFAudio/AVFAudio.h>
-#else
-#include <CoreAudio/CoreAudio.h>
-#endif
-
 #define scene_menu_main_length_buildings_default 0xc8
 #define scene_menu_main_time_scene_transition 0x014d
 
@@ -142,25 +136,5 @@ void network_notification_log_to_stream(
   const char* _Nonnull,
   char* _Nonnull
 );
-
-#if target_os_ios
-int scene_menu_main_io_proc(
-  unsigned char,
-  const AudioTimeStamp* _Nonnull,
-  unsigned int,
-  AudioBufferList* _Nonnull,
-  void* _Nonnull
-);
-#else
-OSStatus scene_menu_main_io_proc(
-  AudioObjectID,
-  const AudioTimeStamp* _Nonnull,
-  const AudioBufferList* _Nonnull,
-  const AudioTimeStamp* _Nonnull,
-  AudioBufferList* _Nonnull,
-  const AudioTimeStamp* _Nonnull,
-  void* _Nonnull
-);
-#endif
 
 #endif
