@@ -40,13 +40,16 @@ ifeq (${debug}, 1)
 name:=${name}_debug
 directory_objects=${directory_objects_os}/debug
 directory_output=${directory_output_os}/debug
+target_build=debug
 else
 ifeq (${release}, 1)
 directory_objects=${directory_objects_os}/release
 directory_output=${directory_output_os}/release
+target_build=release
 else
 directory_objects=${directory_objects_os}/development
 directory_output=${directory_output_os}/development
+target_build=release
 endif
 endif
 
@@ -100,31 +103,21 @@ directory_interrupt_handler_include=${directory_interrupt_handler}/include
 
 directory_math_c=../math_c
 directory_math_c_include=${directory_math_c}/include
+directory_math_c_metalar=${directory_math_c}/metalar/${target_os}
 
 directory_metil=../metil
-directory_metil_library=${directory_metil}/library/${target_os}
+directory_metil_library=${directory_metil}/library
 directory_metil_include=${directory_metil}/include
 
 directory_rand=../rand
 directory_rand_include=${directory_rand}/include
 
-ifeq (${debug}, 1)
-directory_cer0_library=${directory_cer0}/library/${target_os}/debug
-directory_clic3_library=${directory_clic3}/library/${target_os}/debug
-directory_interrupt_handler_library=${directory_interrupt_handler}/library/${target_os}/debug
-directory_math_c_library=${directory_math_c}/library/${target_os}/debug
-directory_metil_library:=${directory_metil_library}/debug
-directory_rand_library=${directory_rand}/library/${target_os}/debug
-
-else
-directory_cer0_library=${directory_cer0}/library/${target_os}/release
-directory_clic3_library=${directory_clic3}/library/${target_os}/release
-directory_interrupt_handler_library=${directory_interrupt_handler}/library/${target_os}/release
-directory_math_c_library=${directory_math_c}/library/${target_os}/release
-directory_metil_library:=${directory_metil_library}/release
-directory_rand_library=${directory_rand}/library/${target_os}/release
-
-endif
+directory_cer0_library=${directory_cer0}/library/${target_os}/${target_build}
+directory_clic3_library=${directory_clic3}/library/${target_os}/${target_build}
+directory_interrupt_handler_library=${directory_interrupt_handler}/library/${target_os}/${target_build}
+directory_math_c_library=${directory_math_c}/library/${target_os}/${target_build}
+directory_metil_library:=${directory_metil_library}/${target_os}/${target_build}
+directory_rand_library=${directory_rand}/library/${target_os}/${target_build}
 
 ifeq (${target_os},ios)
 file_cer0_library=${directory_cer0_library}/cer0_ios.o
@@ -189,6 +182,8 @@ files_objects_objc=${patsubst ${directory_sources}/%.m,${directory_objects_objc}
 files_metal=${wildcard ${directory_metal}/*.metal}
 files_air=${patsubst ${directory_metal}/%.metal,${directory_air}/%.air,${files_metal}}
 
+files_metalar_math_c=${directory_math_c_metalar}/math_c_absolute.metalar ${directory_math_c_metalar}/math_c_bound.metalar ${directory_math_c_metalar}/math_c_maximum.metalar ${directory_math_c_metalar}/math_c_minimum.metalar ${directory_math_c_metalar}/math_c_power.metalar ${directory_math_c_metalar}/math_c_square_root.metalar ${directory_math_c_metalar}/math_c_vector_distance.metalar
+
 ifeq (${target_os},macos)
 files_storyboards=${directory_storyboards}/c938.storyboard
 
@@ -200,19 +195,6 @@ files_storyboards=${directory_storyboards}/c938_ios.storyboard
 
 files_storyboards_compiled=${patsubst ${directory_storyboards}/%.storyboard,${directory_output_storyboards}/%.storyboardc,${files_storyboards}}
 endif
-
-prefix_content_texture=__content_texture
-prefix_content_texture_always=${prefix_content_texture}_always
-
-files_content_textures_names=preliminary_concrete.png
-files_content_textures=${addprefix ${prefix_content_texture}/,${files_content_textures_names}}
-files_content_textures_always=${addprefix ${prefix_content_texture_always}/,${files_content_textures_names}}
-
-files_textures=${wildcard ${directory_textures}/*}
-files_textures_resources=${patsubst ${directory_textures}/%,${directory_output_textures}/%,${files_textures}}
-
-url_content=https://content.alic3.dev/${name}
-url_content_textures=${url_content}/textures
 
 frameworks=Metal MetalKit GameController CoreAudio CoreGraphics CoreText
 
@@ -313,7 +295,7 @@ ${directory_output_textures}/%: ${directory_textures}/%
 
 ${file_output_metal}: ${file_metalar}
 	mkdir -p ${directory_output_metal}
-	${metallib} ${metal_flags_output} ${file_metalar} ${file_metil_metalar_fps_display} ${file_metil_metalar_wireframe}  -o ${file_output_metal}
+	${metallib} ${metal_flags_output} ${file_metalar} ${file_metil_metalar_fps_display} ${file_metil_metalar_wireframe} ${files_metalar_math_c} -o ${file_output_metal}
 
 ${file_metalar}: ${files_air}
 	mkdir -p ${directory_metalar}

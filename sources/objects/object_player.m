@@ -11,7 +11,6 @@
 void object_player_initialize(
   struct metil* metil,
   struct metil_object* metil_object_player,
-  id<MTLTexture> metal_texture_player,
   unsigned char user_player
 ) {
   metil_object_player->index_pipeline_render = (
@@ -28,7 +27,8 @@ void object_player_initialize(
   );
 
   if (
-    user_player == 1
+    user_player ==
+    0x01
   ) {
     metil_object_player->positioning = (
       metil_positioning_player
@@ -38,10 +38,5 @@ void object_player_initialize(
   metil_object_buffers_initialize(
     metil_object_player,
     metil->renderer_interface.metal_device
-  );
-
-  metil_object_texture_add(
-    metil_object_player,
-    metal_texture_player
   );
 }

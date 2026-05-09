@@ -9,7 +9,7 @@
 #include <metal_texture>
 
 [[vertex]] struct c938_data_vertex_textured_coloured c938_text_vertex(
-  const device metal::float4* positions [[
+  const device metal::float4* vertices [[
     buffer(
       metil_renderer_vertex_index_parameter_vertices
     )
@@ -24,13 +24,17 @@
       metil_renderer_vertex_index_parameter_data_object
     )
   ]],
-  unsigned int id_vertex [[vertex_id]]
+  unsigned int index_vertex [[
+    vertex_id
+  ]]
 ) {
   struct c938_data_vertex_textured_coloured c938_data_vertex_textured_coloured;
 
   c938_data_vertex_textured_coloured.position = (
     data_object->view_model_matrix_projection *
-    positions[id_vertex]
+    vertices[
+      index_vertex
+    ]
   );
 
   c938_data_vertex_textured_coloured.brightness = (
@@ -54,67 +58,103 @@
   );
 
   c938_data_vertex_textured_coloured.position_texture.x = (
-    id_vertex == 0 || id_vertex == 3
-    ? 0
-    : 1
+    (
+      (
+        index_vertex ==
+        0x00
+      ) ||
+      (
+        index_vertex ==
+        0x03
+      )
+    )
+    ? 0x00
+    : 0x01
   );
 
   c938_data_vertex_textured_coloured.position_texture.y = (
-    id_vertex == 0 || id_vertex == 1
-    ? 1
-    : 0
+    (
+      (
+        index_vertex ==
+        0x00
+      ) ||
+      (
+        index_vertex ==
+        0x01
+      )
+    )
+    ? 0x01
+    : 0x00
   );
 
-  return c938_data_vertex_textured_coloured;
+  return (
+    c938_data_vertex_textured_coloured
+  );
 }
 
 [[fragment]] metal::float4 c938_text_fragment(
-  c938_data_vertex_textured_coloured c938_data_vertex_textured_coloured [[stage_in]],
-  metal::texture2d<half> texture [[texture(0)]]
+  c938_data_vertex_textured_coloured c938_data_vertex_textured_coloured [[
+    stage_in
+  ]],
+  metal::texture2d<float> texture [[
+    texture(
+      0x00
+    )
+  ]]
 ) {
   constexpr metal::sampler sampler_texture(
     metal::filter::linear,
     metal::mip_filter::linear
   );
 
-  metal::float4 colour_texture = metal::float4(
+  float4 colour_texture = (
     texture.sample(
       sampler_texture,
       c938_data_vertex_textured_coloured.position_texture
     )
   );
 
-  return metal::float4(
-    (
+  return (
+    float4(
       (
-        1.0f -
-        colour_texture[0]
-      ) *
-      c938_data_vertex_textured_coloured.colour.r *
-      c938_data_vertex_textured_coloured.brightness
-    ),
-    (
+        (
+          0x01 -
+          colour_texture[
+            0x00
+          ]
+        ) *
+        c938_data_vertex_textured_coloured.colour.r *
+        c938_data_vertex_textured_coloured.brightness
+      ),
       (
-        1.0f -
-        colour_texture[1]
-      ) *
-      c938_data_vertex_textured_coloured.colour.g *
-      c938_data_vertex_textured_coloured.brightness
-    ),
-    (
+        (
+          0x01 -
+          colour_texture[
+            0x01
+          ]
+        ) *
+        c938_data_vertex_textured_coloured.colour.g *
+        c938_data_vertex_textured_coloured.brightness
+      ),
       (
-        1.0f -
-        colour_texture[2]
-      ) *
-      c938_data_vertex_textured_coloured.colour.b *
-      c938_data_vertex_textured_coloured.brightness
-    ),
-    (
+        (
+          0x01 -
+          colour_texture[
+            0x02
+          ]
+        ) *
+        c938_data_vertex_textured_coloured.colour.b *
+        c938_data_vertex_textured_coloured.brightness
+      ),
       (
-        1.0f -
-        colour_texture[3]
-      ) *
-      c938_data_vertex_textured_coloured.colour.a
+        (
+          0x01 -
+          colour_texture[
+            0x03
+          ]
+        ) *
+        c938_data_vertex_textured_coloured.colour.a
+      )
     )
   );
 }

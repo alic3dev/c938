@@ -24,10 +24,11 @@
 #include <player/player.h>
 #include <scenes/scene_gameplay/scene_gameplay_group_enemies.h>
 #include <scenes/scene_gameplay/scene_gameplay_group_players.h>
-#include <textures/textures_buildings.h>
 
 #include <clic3_bytes.h>
 #include <clic3_memory.h>
+
+#include <math_c_minimum.h>
 
 #include <metil.h>
 #include <metil_audio/metil_audio_io_proc.h>
@@ -72,6 +73,7 @@ void scene_gameplay_initialize(
   metil->rendering_properties.brightness = (
     metil->configuration.rendering_properties.brightness
   );
+
   metil->rendering_properties.brightness_text = (
     metil->configuration.rendering_properties.brightness_text
   );
@@ -98,27 +100,42 @@ void scene_gameplay_initialize(
     parameters_gameplay
   );
 
-  scene_gameplay_data->length_projectiles = 0;
+  scene_gameplay_data->length_projectiles = (
+    0x00
+  );
 
   scene_gameplay_data->action_data_map = (
     scene_gameplay_data_action_data_map_none
   );
 
   for (
-    unsigned char index_projectile = 0;
-    index_projectile < scene_gameplay_data_length_projectiles_maximum;
+    unsigned char index_projectile = (
+      0x00
+    );
+    (
+      index_projectile <
+      scene_gameplay_data_length_projectiles_maximum
+    );
     ++index_projectile
   ) {
     scene_gameplay_data->fired_projectiles[
       index_projectile
     ] = (
-      0
+      0x00
     );
   }
 
-  metil_scene_gameplay->player.poll = player_poll;
-  metil_scene_gameplay->player.poll_input = player_poll_input;
-  metil_scene_gameplay->player.destroy = player_destroy;
+  metil_scene_gameplay->player.poll = (
+    player_poll
+  );
+
+  metil_scene_gameplay->player.poll_input = (
+    player_poll_input
+  );
+
+  metil_scene_gameplay->player.destroy = (
+    player_destroy
+  );
 
   static struct player_data* player_data;
 
@@ -130,14 +147,26 @@ void scene_gameplay_initialize(
     )
   );
 
-  metil_scene_gameplay->player.data = player_data;
+  metil_scene_gameplay->player.data = (
+    player_data
+  );
 
-  metil_scene_gameplay->poll = scene_gameplay_poll;
-  metil_scene_gameplay->destroy = scene_gameplay_destroy;
+  metil_scene_gameplay->poll = (
+    scene_gameplay_poll
+  );
+
+  metil_scene_gameplay->destroy = (
+    scene_gameplay_destroy
+  );
 
   for (
-    unsigned char index_renderable = 0;
-    index_renderable < metil_scene_gameplay->length_renderables;
+    unsigned char index_renderable = (
+      0x00
+    );
+    (
+      index_renderable <
+      metil_scene_gameplay->length_renderables
+    );
     ++index_renderable
   ) {
     switch (
@@ -147,6 +176,7 @@ void scene_gameplay_initialize(
       case scene_gameplay_renderables_index_group_players:
       case scene_gameplay_renderables_index_projectiles:
       case scene_gameplay_renderables_index_enemies:
+      case scene_gameplay_renderables_index_group_hud_health: {
         metil_renderable_initialize_at_index(
           metil_scene_gameplay->renderables,
           index_renderable,
@@ -154,21 +184,11 @@ void scene_gameplay_initialize(
         );
 
         break;
-      case scene_gameplay_renderables_index_group_logging:
-        metil_scene_gameplay->renderables[
-          index_renderable
-        ].type = (
-          metil_renderable_type_group
-        );
-
-        metil_scene_gameplay->renderables[
-          index_renderable
-        ].renderable = (
-          &c938_data->logging.group
-        );
-
+      }
+      case scene_gameplay_renderables_index_group_logging: {
         break;
-      default:
+      }
+      default: {
         metil_renderable_initialize_at_index(
           metil_scene_gameplay->renderables,
           index_renderable,
@@ -176,12 +196,33 @@ void scene_gameplay_initialize(
         );
 
         break;
+      }
     }
   }
 
+  metil_scene_gameplay->renderables[
+    scene_gameplay_renderables_index_group_logging
+  ].type = (
+    metil_renderable_type_group
+  );
+
+  metil_scene_gameplay->renderables[
+    scene_gameplay_renderables_index_group_logging
+  ].renderable = &(
+    c938_data->logging.group
+  );
+
   for (
-    unsigned char index_renderable = scene_gameplay_renderables_index_range_hud_start;
-    index_renderable < scene_gameplay_renderables_index_range_hud_end + 1;
+    unsigned char index_renderable = (
+      scene_gameplay_renderables_index_range_hud_start
+    );
+    (
+      index_renderable <
+      (
+        scene_gameplay_renderables_index_range_hud_end +
+        0x01
+      )
+    );
     ++index_renderable
   ) {
     struct metil_object* metil_object_hud = (
@@ -203,87 +244,42 @@ void scene_gameplay_initialize(
       MTLPrimitiveTypeLine
     );
 
-    metil_object_hud->positioning = metil_positioning_static;
+    metil_object_hud->positioning = (
+      metil_positioning_static
+    );
 
     metil_object_hud->index_pipeline_render = (
       c938_pipeline_index_hud_item
     );
 
-    struct metil_renderer_data_object* metil_renderer_data_object_hud;
+    struct metil_renderer_data_object* metil_renderer_data_object_hud = (
+      metil_object_hud->buffers_vertex[
+        metil_object_buffer_default_index_data
+      ].buffer.contents
+    );
 
-    switch (
-      index_renderable
-    ) {
-      case scene_gameplay_renderables_index_hud_boosted:
-        metil_renderer_data_object_hud = (
-          metil_object_hud->buffers_vertex[
-            metil_object_buffer_default_index_data
-          ].buffer.contents
-        );
+    metil_renderer_data_object_hud->noise = (
+      0x07d0
+    );
 
-        metil_renderer_data_object_hud->noise = 2000;
+    metil_object_hud->position.x = -(
+      0.9f
+    );
 
-        metil_object_hud->position.x = -0.9f;
-        metil_object_hud->position.y = -0.9f;
-        metil_object_hud->position.z = 0.0f;
+    metil_object_hud->position.y = -(
+      0.9f -
+      (float)
+      (
+        index_renderable -
+        scene_gameplay_renderables_index_range_hud_start
+      ) /
+      0x0a
+    );
 
-        break;
-      case scene_gameplay_renderables_index_hud_jumping:
-        metil_renderer_data_object_hud = (
-          metil_object_hud->buffers_vertex[
-            metil_object_buffer_default_index_data
-          ].buffer.contents
-        );
-
-        metil_renderer_data_object_hud->noise = 1;
-
-        metil_object_hud->position.x = -0.9f;
-        metil_object_hud->position.y = -0.8f;
-        metil_object_hud->position.z = 0.0f;
-
-        break;
-      case scene_gameplay_renderables_index_hud_jumping_secondary:
-        metil_renderer_data_object_hud = (
-          metil_object_hud->buffers_vertex[
-            metil_object_buffer_default_index_data
-          ].buffer.contents
-        );
-
-        metil_renderer_data_object_hud->noise = 2000;
-
-        metil_object_hud->position.x = -0.9f;
-        metil_object_hud->position.y = -0.7f;
-        metil_object_hud->position.z = 0.0f;
-
-        break;
-      default:
-        break;
-    }
+    metil_object_hud->position.z = (
+      0x00
+    );
   }
-
-  metil_scene_gameplay->length_textures = 1;
-  clic3_memory_reallocate_raw(
-    &metil_scene_gameplay->textures,
-    (
-      sizeof(
-        id<MTLTexture>
-      ) *
-      metil_scene_gameplay->length_textures
-    )
-  );
-
-  MTKTextureLoader* texture_loader = [
-    [MTKTextureLoader alloc]
-    initWithDevice: metil->renderer_interface.metal_device
-  ];
-
-  textures_buildings_load(
-    metil,
-    texture_loader,
-    metil_scene_gameplay->textures
-  );
-
-  [texture_loader release];
 
   struct metil_group* metil_group_players = (
     metil_scene_gameplay->renderables[
@@ -293,23 +289,19 @@ void scene_gameplay_initialize(
 
   metil_group_add_length_initialize(
     metil_group_players,
-    1,
+    0x01,
     metil_renderable_type_object
   );
 
   struct metil_object* metil_object_player = (
     metil_group_players->renderables[
-      0
+      0x00
     ]->renderable
   );
 
   object_player_initialize(
     metil,
-    metil_object_player,
-    metil_scene_gameplay->textures[
-      scene_gameplay_textures_index_player
-    ],
-    1
+    metil_object_player,    0x01
   );
 
   struct metil_object* metil_object_crosshair = (
@@ -514,13 +506,29 @@ void scene_gameplay_populate(
     metil_group_projectiles
   );
 
-  metil_scene_gameplay->player.rotation.x = 0.0f;
-  metil_scene_gameplay->player.rotation.y = 0.0f;
-  metil_scene_gameplay->player.rotation.z = 0.0f;
+  metil_scene_gameplay->player.rotation.x = (
+    0x00
+  );
 
-  metil_scene_gameplay->player.velocity.x = 0.0f;
-  metil_scene_gameplay->player.velocity.y = 0.0f;
-  metil_scene_gameplay->player.velocity.z = 0.0f;
+  metil_scene_gameplay->player.rotation.y = (
+    0x00
+  );
+
+  metil_scene_gameplay->player.rotation.z = (
+    0x00
+  );
+
+  metil_scene_gameplay->player.velocity.x = (
+    0x00
+  );
+
+  metil_scene_gameplay->player.velocity.y = (
+    0x00
+  );
+
+  metil_scene_gameplay->player.velocity.z = (
+    0x00
+  );
 
   player_data_initialize(
     player_data,
@@ -531,17 +539,24 @@ void scene_gameplay_populate(
     metil_scene_gameplay->time
   );
 
-  scene_gameplay_data->length_projectiles = 0;
+  scene_gameplay_data->length_projectiles = (
+    0x00
+  );
 
   for (
-    unsigned char index_projectile = 0;
-    index_projectile < scene_gameplay_data_length_projectiles_maximum;
+    unsigned char index_projectile = (
+      0x00
+    );
+    (
+      index_projectile <
+      scene_gameplay_data_length_projectiles_maximum
+    );
     ++index_projectile
   ) {
     scene_gameplay_data->fired_projectiles[
       index_projectile
     ] = (
-      0
+      0x00
     );
   }
 
@@ -569,7 +584,7 @@ void scene_gameplay_populate(
 
   struct metil_object* metil_object_player = (
     metil_group_players->renderables[
-      0
+      0x00
     ]->renderable
   );
 
@@ -580,12 +595,18 @@ void scene_gameplay_populate(
     ) &&
     (
       (
-        network_client->status & (
-          network_client_status_disconnecting |
-          network_client_status_disconnected
-        )
-      ) == 0 &&
-      network_client->status != network_client_status_none
+        (
+          network_client->status & (
+            network_client_status_disconnecting |
+            network_client_status_disconnected
+          )
+        ) ==
+        0x00
+      ) &&
+      (
+        network_client->status !=
+        network_client_status_none
+      )
     )
   ) {
     unsigned char networked = (
@@ -642,7 +663,7 @@ void scene_gameplay_populate(
     network_data_packet_initialize(
       network_data_packet,
       network_command_data_map_loaded,
-      0
+      0x00
     );
 
     network_client_send(
@@ -661,7 +682,7 @@ void scene_gameplay_populate(
     &rand_parameters,
     &rand_result,
     &rand_source,
-    10,
+    0x0a,
     rand_mode_bytes,
     rand_source_type_divisive
   );
@@ -673,7 +694,8 @@ void scene_gameplay_populate(
   );
 
   if (
-    reset != 0
+    reset !=
+    0x00
   ) {
     scene_gameplay_data->speed_movement = (
       scene_gameplay_data->parameters->speed_movement
@@ -697,21 +719,27 @@ void scene_gameplay_populate(
     );
 
     if (
+      (unsigned int)
       (
-        (unsigned long int) scene_gameplay_data->length_buildings *
-        (float) scene_gameplay_data->parameters->multiplier_buildings
-      ) > 65000
+        scene_gameplay_data->length_buildings *
+        scene_gameplay_data->parameters->multiplier_buildings
+      ) >
+      0xfde8
     ) {
       scene_gameplay_data->length_buildings = (
-        65000
+        0xfde8
       );
     } else if (
+      (unsigned int)
       (
-        (long int) scene_gameplay_data->length_buildings *
-        (float) scene_gameplay_data->parameters->multiplier_buildings
-      ) < 3
+        scene_gameplay_data->length_buildings *
+        scene_gameplay_data->parameters->multiplier_buildings
+      ) <
+      0x03
     ) {
-      scene_gameplay_data->length_buildings = 3;
+      scene_gameplay_data->length_buildings = (
+        0x03
+      );
     } else {
       scene_gameplay_data->length_buildings = (
         scene_gameplay_data->length_buildings *
@@ -720,21 +748,16 @@ void scene_gameplay_populate(
     }
 
     if (
+      (unsigned int)
       (
-        (unsigned long int) scene_gameplay_data->length_enemies *
-        (float) scene_gameplay_data->parameters->multiplier_enemies
-      ) > 65000
+        scene_gameplay_data->length_enemies *
+        scene_gameplay_data->parameters->multiplier_enemies
+      ) >
+      0xfde8
     ) {
       scene_gameplay_data->length_enemies = (
-        65000
+        0xfde8
       );
-    } else if (
-      (
-        (long int) scene_gameplay_data->length_enemies *
-        (float) scene_gameplay_data->parameters->multiplier_enemies
-      ) < 0
-    ) {
-      scene_gameplay_data->length_enemies = 0;
     } else {
       scene_gameplay_data->length_enemies = (
         scene_gameplay_data->length_enemies *
@@ -744,18 +767,25 @@ void scene_gameplay_populate(
   }
 
   if (
-    scene_gameplay_data->parameters->objective == gameplay_objective_target
+    scene_gameplay_data->parameters->objective ==
+    gameplay_objective_target
   ) {
     player_data->index_target_building = (
       (
-        rand_result.bytes[0] *
-        rand_result.bytes[1] +
-        rand_result.bytes[2]
+        rand_result.bytes[
+          0x00
+        ] *
+        rand_result.bytes[
+          0x01
+        ] +
+        rand_result.bytes[
+          0x02
+        ]
       ) % (
         scene_gameplay_data->length_buildings -
-        2
+        0x02
       ) +
-      2
+      0x02
     );
   } else {
     player_data->index_target_building = (
@@ -768,10 +798,7 @@ void scene_gameplay_populate(
     metil->renderer_interface.metal_device,
     metil_group_buildings,
     scene_gameplay_data->length_buildings,
-    player_data->index_target_building,
-    metil_scene_gameplay->textures[
-      scene_gameplay_textures_index_buildings
-    ]
+    player_data->index_target_building
   );
 
   struct metil_object* object = (
@@ -780,7 +807,9 @@ void scene_gameplay_populate(
     ]->renderable
   );
 
-  metil_scene_gameplay->player.position.x = object->position.x;
+  metil_scene_gameplay->player.position.x = (
+    object->position.x
+  );
 
   metil_scene_gameplay->player.position.y = (
     object->position.y +
@@ -804,7 +833,9 @@ void scene_gameplay_populate(
     metil_group_enemies
   );
 
-  float distance_minimum = 200.0f;
+  float distance_minimum = (
+    0xc8
+  );
 
   metil_group_add_length_initialize(
     metil_group_enemies,
@@ -813,8 +844,13 @@ void scene_gameplay_populate(
   );
 
   for (
-    unsigned int index_enemy = 0;
-    index_enemy < metil_group_enemies->length;
+    unsigned int index_enemy = (
+      0x00
+    );
+    (
+      index_enemy <
+      metil_group_enemies->length
+    );
     ++index_enemy
   ) {
     rand_get(
@@ -831,38 +867,68 @@ void scene_gameplay_populate(
 
     struct math_c_vector3_float position_enemy = {
       .x = (
-        1250 - (
-          rand_result.bytes[0] *
-          rand_result.bytes[1]
-        ) % 2500
+        0x04e2 -
+        (
+          rand_result.bytes[
+            0x00
+          ] *
+          rand_result.bytes[
+            0x01
+          ]
+        ) %
+        0x09c4
       ),
-      .y = 1000 + (
-        rand_result.bytes[2] *
-        rand_result.bytes[3]
-      ) % 500,
+      .y = (
+        0x03e8 +
+        (
+          (
+            rand_result.bytes[
+              0x02
+            ] *
+            rand_result.bytes[
+              0x03
+            ]
+          ) %
+          0x01f4
+        )
+      ),
       .z = (
-        1250 - (
-          rand_result.bytes[4] *
-          rand_result.bytes[5]
-        ) % 2500
+        0x04e2 -
+        (
+          rand_result.bytes[
+            0x04
+          ] *
+          rand_result.bytes[
+            0x05
+          ]
+        ) %
+        0x09c4
       )
     };
 
     if (
-      position_enemy.x <= distance_minimum &&
-      position_enemy.x >= -distance_minimum
+      (
+        position_enemy.x <=
+        distance_minimum
+      ) &&
+      (
+        position_enemy.x >=
+        -distance_minimum
+      )
     ) {
       float offset = (
-        rand_result.bytes[7] +
+        rand_result.bytes[
+          0x07
+        ] +
         distance_minimum
       );
 
       if (
-        position_enemy.x < 0.0f
+        position_enemy.x <
+        0x00
       ) {
-        offset = (
-          offset *
-          -1
+        offset = -(
+          offset
         );
       }
 
@@ -873,20 +939,28 @@ void scene_gameplay_populate(
     }
 
     if (
-      position_enemy.z <= distance_minimum &&
-      position_enemy.z >= -distance_minimum
+      (
+        position_enemy.z <=
+        distance_minimum
+      ) &&
+      (
+        position_enemy.z >=
+        -distance_minimum
+      )
     ) {
       float offset = (
-        rand_result.bytes[6] +
+        rand_result.bytes[
+          0x06
+        ] +
         distance_minimum
       );
 
       if (
-        position_enemy.z < 0.0f
+        position_enemy.z <
+        0x00
       ) {
-        offset = (
-          offset *
-          -1
+        offset = -(
+          offset
         );
       }
 
@@ -897,19 +971,25 @@ void scene_gameplay_populate(
     }
 
     float speed_enemy = (
-      (float) (
-        rand_result.bytes[8] +
-        rand_result.bytes[9]
-      ) / 255.0f *
-      16.0f +
-      32.0f
+      (float)
+      (
+        rand_result.bytes[
+          0x08
+        ] +
+        rand_result.bytes[
+          0x09
+        ]
+      ) /
+      0xff *
+      0x10 +
+      0x20
     );
 
     object_enemy_initialize(
       metil_object_enemy,
       metil->renderer_interface.metal_device,
       position_enemy,
-      4,
+      0x04,
       speed_enemy
     );
   }
@@ -1009,7 +1089,7 @@ void scene_gameplay_poll(
         scene_gameplay_populate(
           metil,
           metil_scene_gameplay,
-          1
+          0x01
         );
 
         break;
@@ -1027,6 +1107,7 @@ void scene_gameplay_poll(
         network_host_data_map_send(
           network_host
         );
+
         break;
       }
       default: {
@@ -1043,7 +1124,8 @@ void scene_gameplay_poll(
       );
 
       if (
-        network_client->network_data_packet_poll != 0
+        network_client->network_data_packet_poll !=
+        0x00
       ) {
         unsigned int index_client;
         unsigned int length_players;
@@ -1063,23 +1145,30 @@ void scene_gameplay_poll(
         scene_gameplay_group_players_resize(
           metil,
           metil_group_players,
-          length_players,
-          metil_scene_gameplay->textures[
-            scene_gameplay_textures_index_player
-          ]
+          length_players
         );
 
-        unsigned char offset_player = 0;
+        unsigned char offset_player = (
+          0x00
+        );
 
         for (
-          unsigned int index_player = 0;
-          index_player < length_players;
+          unsigned int index_player = (
+            0x00
+          );
+          (
+            index_player <
+            length_players
+          );
           ++index_player
         ) {
           if (
-            index_client == index_player
+            index_client ==
+            index_player
           ) {
-            offset_player = 1;
+            offset_player = (
+              0x01
+            );
 
             network_client->network_data_packet_poll->offset = (
               network_client->network_data_packet_poll->offset +
@@ -1092,7 +1181,7 @@ void scene_gameplay_poll(
           struct metil_object* metil_object_player = (
             metil_group_players->renderables[
               index_player +
-              1 -
+              0x01 -
               offset_player
             ]->renderable
           );
@@ -1104,7 +1193,9 @@ void scene_gameplay_poll(
           );
         }
 
-        unsigned int length_shots_fired = 0;
+        unsigned int length_shots_fired = (
+          0x00
+        );
 
         network_data_packet_read(
           network_client->network_data_packet_poll,
@@ -1125,8 +1216,13 @@ void scene_gameplay_poll(
         struct network_data_shot_fired network_data_shot_fired;
 
         for (
-          unsigned int index_shot_fired = 0;
-          index_shot_fired < length_shots_fired;
+          unsigned int index_shot_fired = (
+            0x00
+          );
+          (
+            index_shot_fired <
+            length_shots_fired
+          );
           ++index_shot_fired
         ) {
           network_data_packet_read(
@@ -1143,7 +1239,7 @@ void scene_gameplay_poll(
 
           index_projectile = (
             index_projectile +
-            1
+            0x01
           );
 
           object_projectile_initialize(
@@ -1151,12 +1247,18 @@ void scene_gameplay_poll(
             metil->renderer_interface.metal_device,
             network_data_shot_fired.position,
             (struct math_c_vector3_float) {
-              .x = network_data_shot_fired.angle.x,
-              .y = network_data_shot_fired.angle.y,
-              .z = 0.0f
+              .x = (
+                network_data_shot_fired.angle.x
+              ),
+              .y = (
+                network_data_shot_fired.angle.y
+              ),
+              .z = (
+                0x00
+              )
             },
             network_data_shot_fired.time,
-            200.0f
+            0xc8
           );
         }
 
@@ -1168,7 +1270,9 @@ void scene_gameplay_poll(
           network_client->network_data_packet_poll
         );
 
-        network_client->network_data_packet_poll = 0;
+        network_client->network_data_packet_poll = (
+          0x00
+        );
       }
 
       pthread_mutex_unlock(
@@ -1180,7 +1284,8 @@ void scene_gameplay_poll(
       );
 
       if (
-        network_client->network_data_packet_enemies != 0
+        network_client->network_data_packet_enemies !=
+        0x00
       ) {
         unsigned int length_enemies;
 
@@ -1197,8 +1302,13 @@ void scene_gameplay_poll(
         );
 
         for (
-          unsigned int index_enemy = 0;
-          index_enemy < length_enemies;
+          unsigned int index_enemy = (
+            0x00
+          );
+          (
+            index_enemy <
+            length_enemies
+          );
           ++index_enemy
         ) {
           struct metil_object* metil_object_enemy = (
@@ -1216,7 +1326,7 @@ void scene_gameplay_poll(
           network_data_packet_read(
             network_client->network_data_packet_enemies,
             &enemy_data->life,
-            1
+            0x01
           );
 
           network_data_packet_read(
@@ -1240,7 +1350,9 @@ void scene_gameplay_poll(
           network_client->network_data_packet_enemies
         );
 
-        network_client->network_data_packet_enemies = 0;
+        network_client->network_data_packet_enemies = (
+          0x00
+        );
       }
 
       pthread_mutex_unlock(
@@ -1252,23 +1364,27 @@ void scene_gameplay_poll(
     ) {
       unsigned int length_players = (
         network_host->connected_players +
-        1
+        0x01
       );
 
       scene_gameplay_group_players_resize(
         metil,
         metil_group_players,
-        length_players,
-        metil_scene_gameplay->textures[
-          scene_gameplay_textures_index_player
-        ]
+        length_players
       );
 
-      unsigned int offset_network_host_client = 0;
+      unsigned int offset_network_host_client = (
+        0x00
+      );
 
       for (
-        unsigned int index_player = 1;
-        index_player < metil_group_players->length;
+        unsigned int index_player = (
+          0x01
+        );
+        (
+          index_player <
+          metil_group_players->length
+        );
         ++index_player
       ) {
         struct metil_object* metil_object_player = (
@@ -1292,14 +1408,15 @@ void scene_gameplay_poll(
             (
               network_host_client->status &
               network_client_status_connected
-            ) == 0
+            ) ==
+            0x00
           ) {
             continue;
           }
 
           offset_network_host_client = (
             index_client +
-            1
+            0x01
           );
 
           pthread_mutex_lock(
@@ -1335,30 +1452,72 @@ void scene_gameplay_poll(
             )
           ) {
             struct math_c_vector2_float size_half_object = {
-              .x = metil_object_building->mesh.size.x / 2.0f,
-              .y = metil_object_building->mesh.size.z / 2.0f
+              .x = (
+                metil_object_building->mesh.size.x /
+                0x02
+              ),
+              .y = (
+                metil_object_building->mesh.size.z /
+                0x02
+              )
             };
 
             struct math_c_vector2_float position_minimum_object = {
-              .x = metil_object_building->position.x - size_half_object.x,
-              .y = metil_object_building->position.z - size_half_object.y
+              .x = (
+                metil_object_building->position.x -
+                size_half_object.x
+              ),
+              .y = (
+                metil_object_building->position.z -
+                size_half_object.y
+              )
             };
 
             struct math_c_vector2_float position_maximum_object = {
-              .x = metil_object_building->position.x + size_half_object.x,
-              .y = metil_object_building->position.z + size_half_object.y
+              .x = (
+                metil_object_building->position.x +
+                size_half_object.x
+              ),
+              .y = (
+                metil_object_building->position.z +
+                size_half_object.y
+              )
             };
 
             if (
-              metil_object_player->position.x >= position_minimum_object.x - metil_object_player->mesh.size.x &&
-              metil_object_player->position.x <= position_maximum_object.x + metil_object_player->mesh.size.x &&
-              metil_object_player->position.z >= position_minimum_object.y - metil_object_player->mesh.size.z &&
-              metil_object_player->position.z <= position_maximum_object.y + metil_object_player->mesh.size.z
+              (
+                metil_object_player->position.x >=
+                (
+                  position_minimum_object.x -
+                  metil_object_player->mesh.size.x
+                )
+              ) &&
+              (
+                metil_object_player->position.x <=
+                (
+                  position_maximum_object.x +
+                  metil_object_player->mesh.size.x
+                )
+              ) &&
+              (
+                metil_object_player->position.z >=
+                (
+                  position_minimum_object.y -
+                  metil_object_player->mesh.size.z
+                )
+              ) &&
+              (
+                metil_object_player->position.z <=
+                (
+                  position_maximum_object.y +
+                  metil_object_player->mesh.size.z
+                )
+              )
             ) {
               scene_gameplay_populate(
                 metil,
                 metil_scene_gameplay,
-                0
+                0x00
               );
 
               return;
@@ -1380,36 +1539,43 @@ void scene_gameplay_poll(
     parameters_gameplay_networked_client &&
     player_data->on_ground == (
       player_data->index_target_building +
-      1
+      0x01
     )
   ) {
     scene_gameplay_populate(
       metil,
       metil_scene_gameplay,
-      0
+      0x00
     );
 
     return;
   } else if (
-    metil_scene_gameplay->player.position.y <= 10.0f
+    metil_scene_gameplay->player.position.y <=
+    0x0a
   ) {
     scene_gameplay_populate(
       metil,
       metil_scene_gameplay,
-      1
+      0x01
     );
 
     return;
   }
 
   float time_delta_percent = (
-    (float) metil_scene_gameplay->time_delta /
-    1000.0f
+    (float)
+    metil_scene_gameplay->time_delta /
+    0x03e8
   );
 
   for (
-    unsigned int index_projectile = 0;
-    index_projectile < metil_group_projectiles->length;
+    unsigned int index_projectile = (
+      0x00
+    );
+    (
+      index_projectile <
+      metil_group_projectiles->length
+    );
   ) {
     struct metil_object* metil_object_projectile = (
       metil_group_projectiles->renderables[
@@ -1418,7 +1584,7 @@ void scene_gameplay_poll(
     );
 
     unsigned int collision = (
-      0
+      0x00
     );
 
     if (
@@ -1426,8 +1592,13 @@ void scene_gameplay_poll(
       parameters_gameplay_networked_client
     ) {
       for (
-        unsigned int index_enemy = 0;
-        index_enemy < metil_group_enemies->length;
+        unsigned int index_enemy = (
+          0x00
+        );
+        (
+          index_enemy <
+          metil_group_enemies->length
+        );
         ++index_enemy
       ) {
         struct metil_object* metil_object_enemy = (
@@ -1437,16 +1608,58 @@ void scene_gameplay_poll(
         );
 
         if (
-          metil_object_projectile->position.x >= metil_object_enemy->position.x - (metil_object_enemy->mesh.size.x / 2.0f) &&
-          metil_object_projectile->position.x <= metil_object_enemy->position.x + (metil_object_enemy->mesh.size.x / 2.0f) &&
-
-          metil_object_projectile->position.y >= metil_object_enemy->position.y - (metil_object_enemy->mesh.size.y / 2.0f) &&
-          metil_object_projectile->position.y <= metil_object_enemy->position.y + (metil_object_enemy->mesh.size.y / 2.0f) &&
-
-          metil_object_projectile->position.z >= metil_object_enemy->position.z - (metil_object_enemy->mesh.size.z / 2.0f) &&
-          metil_object_projectile->position.z <= metil_object_enemy->position.z + (metil_object_enemy->mesh.size.z / 2.0f)
+          (
+            metil_object_projectile->position.x >=
+            (
+              metil_object_enemy->position.x -
+              metil_object_enemy->mesh.size.x /
+              0x02
+            )
+          ) &&
+          (
+            metil_object_projectile->position.x <=
+            (
+              metil_object_enemy->position.x +
+              metil_object_enemy->mesh.size.x /
+              0x02
+            )
+          ) &&
+          (
+            metil_object_projectile->position.y >=
+            (
+              metil_object_enemy->position.y -
+              metil_object_enemy->mesh.size.y /
+              0x02
+            )
+          ) &&
+          (
+            metil_object_projectile->position.y <=
+            (
+              metil_object_enemy->position.y +
+              metil_object_enemy->mesh.size.y /
+              0x02
+            )
+          ) &&
+          (
+            metil_object_projectile->position.z >=
+            (
+              metil_object_enemy->position.z -
+              metil_object_enemy->mesh.size.z /
+              0x02
+            )
+          ) &&
+          (
+            metil_object_projectile->position.z <=
+            (
+              metil_object_enemy->position.z +
+              metil_object_enemy->mesh.size.z /
+              0x02
+            )
+          )
         ) {
-          collision = 1;
+          collision = (
+            0x01
+          );
 
           struct enemy_data* enemy_data = (
             metil_object_enemy->buffers_vertex[
@@ -1456,11 +1669,12 @@ void scene_gameplay_poll(
 
           enemy_data->life = (
             enemy_data->life -
-            1
+            0x01
           );
 
           if (
-            enemy_data->life <= 0
+            enemy_data->life <=
+            0x00
           ) {
             metil_group_destroy_renderable_at_index(
               metil,
@@ -1489,10 +1703,17 @@ void scene_gameplay_poll(
     );
 
     if (
-      collision == 1 ||
-      projectile_data->time_current -
-      projectile_data->time_fired >
-      projectile_data->lifespan
+      (
+        collision ==
+        0x01
+      ) ||
+      (
+        (
+          projectile_data->time_current -
+          projectile_data->time_fired
+        ) >
+        projectile_data->lifespan
+      )
     ) {
       metil_group_destroy_renderable_at_index(
         metil,
@@ -1502,14 +1723,19 @@ void scene_gameplay_poll(
     } else {
       index_projectile = (
         index_projectile +
-        1
+        0x01
       );
     }
   }
 
   for (
-    unsigned int index_enemy = 0;
-    index_enemy < metil_group_enemies->length;
+    unsigned int index_enemy = (
+      0x00
+    );
+    (
+      index_enemy <
+      metil_group_enemies->length
+    );
   ) {
     struct metil_object* metil_object_enemy = (
       metil_group_enemies->renderables[
@@ -1518,18 +1744,64 @@ void scene_gameplay_poll(
     );
 
     if (
-      metil_scene_gameplay->player.position.x >= metil_object_enemy->position.x - (metil_object_enemy->mesh.size.x / 2.0f) &&
-      metil_scene_gameplay->player.position.x <= metil_object_enemy->position.x + (metil_object_enemy->mesh.size.x / 2.0f) &&
-
-      (metil_scene_gameplay->player.position.y + player_data->height) >= metil_object_enemy->position.y - (metil_object_enemy->mesh.size.y / 2.0f) &&
-      (metil_scene_gameplay->player.position.y + player_data->height) <= metil_object_enemy->position.y + (metil_object_enemy->mesh.size.y / 2.0f) &&
-
-      metil_scene_gameplay->player.position.z >= metil_object_enemy->position.z - (metil_object_enemy->mesh.size.z / 2.0f) &&
-      metil_scene_gameplay->player.position.z <= metil_object_enemy->position.z + (metil_object_enemy->mesh.size.z / 2.0f)
+      (
+        metil_scene_gameplay->player.position.x >=
+        (
+          metil_object_enemy->position.x -
+          metil_object_enemy->mesh.size.x /
+          0x02
+        )
+      ) &&
+      (
+        metil_scene_gameplay->player.position.x <=
+        (
+          metil_object_enemy->position.x +
+          metil_object_enemy->mesh.size.x /
+          0x02
+        )
+      ) &&
+      (
+        (
+          metil_scene_gameplay->player.position.y +
+          player_data->height
+        ) >=
+        (
+          metil_object_enemy->position.y -
+          metil_object_enemy->mesh.size.y /
+          0x02
+        )
+      ) &&
+      (
+        (
+          metil_scene_gameplay->player.position.y +
+          player_data->height
+        ) <=
+        (
+          metil_object_enemy->position.y +
+          metil_object_enemy->mesh.size.y /
+          0x02
+        )
+      ) &&
+      (
+        metil_scene_gameplay->player.position.z >=
+        (
+          metil_object_enemy->position.z -
+          metil_object_enemy->mesh.size.z /
+          0x02
+        )
+      ) &&
+      (
+        metil_scene_gameplay->player.position.z <=
+        (
+          metil_object_enemy->position.z +
+          metil_object_enemy->mesh.size.z /
+          0x02
+        )
+      )
     ) {
       player_data->life = (
         player_data->life -
-        1
+        0x01
       );
 
       metil_group_destroy_renderable_at_index(
@@ -1539,12 +1811,13 @@ void scene_gameplay_poll(
       );
 
       if (
-        player_data->life <= 0
+        player_data->life <=
+        0x00
       ) {
         scene_gameplay_populate(
           metil,
           metil_scene_gameplay,
-          1
+          0x01
         );
 
         return;
@@ -1554,19 +1827,25 @@ void scene_gameplay_poll(
     } else {
       index_enemy = (
         index_enemy +
-        1
+        0x01
       );
     }
   }
 
   if (
-    scene_gameplay_data->parameters->objective == gameplay_objective_enemies &&
-    metil_group_enemies->length == 0
+    (
+      scene_gameplay_data->parameters->objective ==
+      gameplay_objective_enemies
+    ) &&
+    (
+      metil_group_enemies->length ==
+      0x00
+    )
   ) {
     scene_gameplay_populate(
       metil,
       metil_scene_gameplay,
-      1
+      0x01
     );
 
     return;
@@ -1579,7 +1858,7 @@ void scene_gameplay_poll(
 
   struct metil_object* metil_object_player = (
     metil_group_players->renderables[
-      0
+      0x00
     ]->renderable
   );
 
@@ -1616,7 +1895,7 @@ void scene_gameplay_poll(
 
       static struct network_data_packet* network_data_packet;
 
-      network_data_packet =(
+      network_data_packet = (
         clic3_memory_allocate_raw(
           sizeof(
             struct network_data_packet
@@ -1654,8 +1933,13 @@ void scene_gameplay_poll(
       );
 
       for (
-        unsigned int index_shot_fired = 0;
-        index_shot_fired < network_client->length_shots_fired;
+        unsigned int index_shot_fired = (
+          0x00
+        );
+        (
+          index_shot_fired <
+          network_client->length_shots_fired
+        );
         ++index_shot_fired
       ) {
         network_data_packet_bytes_add(
@@ -1667,11 +1951,13 @@ void scene_gameplay_poll(
         );
       }
 
-      network_client->length_shots_fired = 0;
+      network_client->length_shots_fired = (
+        0x00
+      );
 
       clic3_memory_reallocate_raw(
         &network_client->shots_fired,
-        0
+        0x00
       );
 
       pthread_mutex_unlock(
@@ -1707,8 +1993,13 @@ void scene_gameplay_poll(
       );
 
       for (
-        unsigned int index_network_host_client = 0;
-        index_network_host_client < network_host->length_clients;
+        unsigned int index_network_host_client = (
+          0x00
+        );
+        (
+          index_network_host_client <
+          network_host->length_clients
+        );
         ++index_network_host_client
       ) {
         struct network_host_client* network_host_client = (
@@ -1721,7 +2012,8 @@ void scene_gameplay_poll(
           (
             network_host_client->status &
             network_client_status_connected
-          ) == 0
+          ) ==
+          0x00
         ) {
           continue;
         }
@@ -1741,8 +2033,13 @@ void scene_gameplay_poll(
         );
 
         for (
-          unsigned int index_shot_fired = 0;
-          index_shot_fired < network_host_client->length_shots_fired;
+          unsigned int index_shot_fired = (
+            0x00
+          );
+          (
+            index_shot_fired <
+            network_host_client->length_shots_fired
+          );
           ++index_shot_fired
         ) {
           struct network_data_shot_fired* network_data_shot_fired = &(
@@ -1759,7 +2056,7 @@ void scene_gameplay_poll(
 
           index_projectile = (
             index_projectile +
-            1
+            0x01
           );
 
           object_projectile_initialize(
@@ -1767,20 +2064,28 @@ void scene_gameplay_poll(
             metil->renderer_interface.metal_device,
             network_data_shot_fired->position,
             (struct math_c_vector3_float) {
-              .x = network_data_shot_fired->angle.x,
-              .y = network_data_shot_fired->angle.y,
-              .z = 0.0f
+              .x = (
+                network_data_shot_fired->angle.x
+              ),
+              .y = (
+                network_data_shot_fired->angle.y
+              ),
+              .z = (
+                0x00
+              )
             },
             network_data_shot_fired->time,
-            200.0f
+            0xc8
           );
         }
 
-        network_host_client->length_shots_fired = 0;
+        network_host_client->length_shots_fired = (
+          0x00
+        );
 
         clic3_memory_reallocate_raw(
           &network_host_client->shots_fired,
-          0
+          0x00
         );
 
         pthread_mutex_unlock(
@@ -1831,7 +2136,8 @@ void scene_gameplay_poll(
   );
 
   if (
-    player_data->is_boosted == 1
+    player_data->is_boosted ==
+    0x01
   ) {
     unsigned long int delta_time_boost = (
       metil_scene_gameplay->time_input -
@@ -1839,26 +2145,33 @@ void scene_gameplay_poll(
     );
 
     metil_renderer_data_object_hud_boosted->noise = (
-      delta_time_boost > 2000
-      ? 2000
-      : delta_time_boost
+      math_c_minimum_unsigned_int(
+        delta_time_boost,
+        0x07d0
+      )
     );
   } else {
     metil_renderer_data_object_hud_boosted->noise = (
-      2000
+      0x07d0
     );
   }
 
   metil_renderer_data_object_hud_jumping->noise = (
-    player_data->is_jumping != 0
-    ? 0
-    : 2000
+    (
+      player_data->is_jumping !=
+      0x00
+    )
+    ? 0x00
+    : 0x07d0
   );
 
   metil_renderer_data_object_hud_jumping_secondary->noise = (
-    player_data->is_jumping_secondary != 0
-    ? 0
-    : 2000
+    (
+      player_data->is_jumping_secondary !=
+      0x00
+    )
+    ? 0x00
+    : 0x07d0
   );
 
   if (
@@ -1880,8 +2193,9 @@ void scene_gameplay_poll(
       network_command_enemies,
       (
         data_length_unsigned_int +
-        metil_group_enemies->length * (
-          1 +
+        metil_group_enemies->length *
+        (
+          0x01 +
           data_length_math_c_vector3_float +
           data_length_float
         )
@@ -1895,8 +2209,13 @@ void scene_gameplay_poll(
     );
 
     for (
-      unsigned int index_enemy = 0;
-      index_enemy < metil_group_enemies->length;
+      unsigned int index_enemy = (
+        0x00
+      );
+      (
+        index_enemy <
+        metil_group_enemies->length
+      );
       ++index_enemy
     ) {
       struct metil_object* metil_object_enemies = (
@@ -1931,8 +2250,13 @@ void scene_gameplay_poll(
     }
 
     for (
-      unsigned int index_network_host_client = 0;
-      index_network_host_client < network_host->length_clients;
+      unsigned int index_network_host_client = (
+        0x00
+      );
+      (
+        index_network_host_client <
+        network_host->length_clients
+      );
       ++index_network_host_client
     ) {
       struct network_host_client* network_host_client = (
@@ -1945,7 +2269,8 @@ void scene_gameplay_poll(
         (
           network_host_client->status &
           network_client_status_connected
-        ) == 0
+        ) ==
+        0x00
       ) {
         continue;
       }
@@ -1979,11 +2304,13 @@ void scene_gameplay_destroy(
     metil_scene_gameplay->data
   );
 
-  metil_scene_gameplay->data = 0;
+  metil_scene_gameplay->data = (
+    0x00
+  );
 
   metil_scene_gameplay->length_renderables = (
     metil_scene_gameplay->length_renderables -
-    1
+    0x01
   );
 
   metil_scene_destroy_default(

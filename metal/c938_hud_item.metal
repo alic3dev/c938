@@ -7,7 +7,7 @@
 #include <metil_rendering/metil_renderer_vertex_index_parameter.h>
 
 [[vertex]] struct c938_data_vertex_coloured c938_hud_item_vertex(
-  const device metal::float4* positions [[
+  const device metal::float4* vertices [[
     buffer(
       metil_renderer_vertex_index_parameter_vertices
     )
@@ -22,31 +22,69 @@
       metil_renderer_vertex_index_parameter_data_object
     )
   ]],
-  unsigned int id_vertex [[vertex_id]]
+  unsigned int index_vertex [[
+    vertex_id
+  ]]
 ) {
   struct c938_data_vertex_coloured c938_data_vertex_coloured;
 
   c938_data_vertex_coloured.position = (
     data_object->view_model_matrix_projection *
-    positions[id_vertex]
+    vertices[
+      index_vertex
+    ]
   );
 
-  c938_data_vertex_coloured.brightness = data_frame->brightness_text;
+  c938_data_vertex_coloured.brightness = (
+    data_frame->brightness_text
+  );
 
-  c938_data_vertex_coloured.colour.r = (float) (2000 - data_object->noise) / 2000.0f;
-  c938_data_vertex_coloured.colour.g = (float) data_object->noise / 2000.0f;
-  c938_data_vertex_coloured.colour.b = (float) (data_object->noise % 2000) / 2000.0f;
+  c938_data_vertex_coloured.colour.r = (
+    (float)
+    (
+      0x07d0 -
+      data_object->noise
+    ) /
+    0x07d0
+  );
 
-  return c938_data_vertex_coloured;
+  c938_data_vertex_coloured.colour.g = (
+    (float)
+    data_object->noise /
+    0x07d1  );
+
+  c938_data_vertex_coloured.colour.b = (
+    (float)
+    (
+      data_object->noise %
+      0x07d1
+    ) /
+    0x07d0
+  );
+
+  return (
+    c938_data_vertex_coloured
+  );
 }
 
 [[fragment]] metal::float4 c938_hud_item_fragment(
   c938_data_vertex_coloured c938_data_vertex_coloured [[stage_in]]
 ) {
-  return metal::float4(
-    c938_data_vertex_coloured.colour.r * c938_data_vertex_coloured.brightness,
-    c938_data_vertex_coloured.colour.g * c938_data_vertex_coloured.brightness,
-    c938_data_vertex_coloured.colour.b * c938_data_vertex_coloured.brightness,
-    1.0f
+  return (
+    float4(
+      (
+        c938_data_vertex_coloured.colour.r *
+        c938_data_vertex_coloured.brightness
+      ),
+      (
+        c938_data_vertex_coloured.colour.g *
+        c938_data_vertex_coloured.brightness
+      ),
+      (
+        c938_data_vertex_coloured.colour.b *
+        c938_data_vertex_coloured.brightness
+      ),
+      0x01
+    )
   );
 }

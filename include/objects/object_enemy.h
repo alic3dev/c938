@@ -10,8 +10,8 @@
 
 #include <Metal/MTLDevice.h>
 
-#define enemy_distance_speed_boost 400.0f
-#define enemy_distance_speed_boost_half (enemy_distance_speed_boost / 2.0f)
+#define enemy_distance_speed_boost 0x0190
+#define enemy_distance_speed_boost_half 0xc8
 
 void object_enemy_initialize(
   struct metil_object* _Nonnull,

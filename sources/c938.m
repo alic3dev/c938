@@ -23,7 +23,9 @@
 #include <metil_scenes/metil_scene_controller.h>
 
 #if target_os_ios
-char* c938_executable_path = 0;
+char* c938_executable_path = (
+  0x00
+);
 #endif
 
 int main(
@@ -36,7 +38,9 @@ int main(
 ) {
   #if target_os_ios
   c938_executable_path = (
-    parameters[0]
+    parameters[
+      0x00
+    ]
   );
 
   metil_view_controller_on_view_did_load = (
@@ -46,8 +50,18 @@ int main(
   return UIApplicationMain(
     length_parameters,
     parameters,
-    NSStringFromClass([metil_application class]),
-    NSStringFromClass([metil_application_delegate class])
+    NSStringFromClass(
+      [
+        metil_application
+        class
+      ]
+    ),
+    NSStringFromClass(
+      [
+        metil_application_delegate
+        class
+      ]
+    )
   );
   #else
   return metil_initialize(
@@ -62,7 +76,7 @@ int main(
 #if target_os_ios
 void c938_view_controller_on_view_did_load() {
   metil_initialize(
-    1,
+    0x01,
     &c938_executable_path,
     "c938",
     c938_renderer_on_initialize
@@ -86,22 +100,19 @@ void c938_renderer_on_initialize(
   );
 
   metil->renderer_interface.rendering_properties->colour_clear.x = (
-    0.0f *
-    metil->rendering_properties.brightness
+    0x00
   );
 
   metil->renderer_interface.rendering_properties->colour_clear.y = (
-    0.0f *
-    metil->rendering_properties.brightness
+    0x00
   );
 
   metil->renderer_interface.rendering_properties->colour_clear.z = (
-    0.0f *
-    metil->rendering_properties.brightness
+    0x00
   );
 
   metil->renderer_interface.rendering_properties->colour_clear.w = (
-    1.0f
+    0x01
   );
 
   c938_pipeline_index_building = [
@@ -255,7 +266,7 @@ void c938_renderer_on_initialize(
   metil_scene_controller_on_scene_change_add(
     metil_scene_controller,
     c938_on_scene_change,
-    0
+    0x00
   );
 }
 
@@ -281,18 +292,22 @@ void c938_on_scene_change(
     id_scene
   ) {
     case scene_id_unknown:
-    case scene_id_menu_main:
+    case scene_id_menu_main: {
       scene_menu_main_initialize(
         metil,
         metil_scene
       );
+
       break;
-    case scene_id_gameplay:
+    }
+    case scene_id_gameplay: {
       scene_gameplay_initialize(
         metil,
         metil_scene
       );
+
       break;
+    }
   }
 }
 

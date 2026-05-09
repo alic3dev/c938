@@ -12,11 +12,11 @@
 void scene_gameplay_group_players_resize(
   struct metil* metil,
   struct metil_group* metil_group_players,
-  unsigned int length_players,
-  id<MTLTexture> metal_texture_player
+  unsigned int length_players
 ) {
   if (
-    metil_group_players->length < length_players
+    metil_group_players->length <
+    length_players
   ) {
     unsigned int players_original = (
       metil_group_players->length
@@ -34,8 +34,13 @@ void scene_gameplay_group_players_resize(
     );
 
     for (
-      unsigned int index_player_new = players_original;
-      index_player_new < metil_group_players->length;
+      unsigned int index_player_new = (
+        players_original
+      );
+      (
+        index_player_new <
+        metil_group_players->length
+      );
       ++index_player_new
     ) {
       struct metil_object* metil_object_player = (
@@ -47,20 +52,20 @@ void scene_gameplay_group_players_resize(
       object_player_initialize(
         metil,
         metil_object_player,
-        metal_texture_player,
-        0
+        0x00
       );
     }
   } else {
     while (
-      metil_group_players->length > length_players
+      metil_group_players->length >
+      length_players
     ) {
       metil_group_destroy_renderable_at_index(
         metil,
         metil_group_players,
         (
           metil_group_players->length -
-          1
+          0x01
         )
       );
     }

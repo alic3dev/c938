@@ -2,14 +2,15 @@
 
 #include <c938_metal/c938_data_vertex_textured_coloured.h>
 
+#include <math_c_bound.h>
+#include <math_c_vector_distance.h>
+
 #include <metil_rendering/metil_renderer_data_frame.h>
 #include <metil_rendering/metil_renderer_data_object.h>
 #include <metil_rendering/metil_renderer_vertex_index_parameter.h>
 
-#include <metal_texture>
-
 [[vertex]] struct c938_data_vertex_textured_coloured c938_building_vertex(
-  const device metal::float4* positions [[
+  const device metal::float4* vertices [[
     buffer(
       metil_renderer_vertex_index_parameter_vertices
     )
@@ -24,70 +25,90 @@
       metil_renderer_vertex_index_parameter_data_object
     )
   ]],
-  unsigned int id_vertex [[vertex_id]]
+  unsigned int index_vertex [[
+    vertex_id
+  ]]
 ) {
   struct c938_data_vertex_textured_coloured c938_data_vertex_textured_coloured;
 
   c938_data_vertex_textured_coloured.position = (
     data_object->view_model_matrix_projection *
-    positions[
-      id_vertex
+    vertices[
+      index_vertex
     ]
   );
 
-  float distance = metal::distance(
-    metal::float4(
-      metal::float4(
-        data_object->position.x,
-        data_object->position.y,
-        data_object->position.z,
-        1.0f
-      ) +
-      positions[
-        id_vertex
-      ]
+  struct math_c_vector3_float vertex_with_translation = {
+    .x = (
+      data_object->position.x +
+      vertices[
+        index_vertex
+      ].x
     ),
-    metal::float4(
-      data_frame->position_player.x,
-      data_frame->position_player.y,
-      data_frame->position_player.z,
-      1.0f
+    .y = (
+      data_object->position.y +
+      vertices[
+        index_vertex
+      ].y
+    ),
+    .z = (
+      data_object->position.z +
+      vertices[
+        index_vertex
+      ].z
+    )
+  };
+
+  struct math_c_vector3_float position_player = {
+    .x = (
+      data_frame->position_player.x
+    ),
+    .y = (
+      data_frame->position_player.y
+    ),
+    .z = (
+      data_frame->position_player.z
+    )
+  };
+
+  float distance = (
+    math_c_vector3_distance_float_fastest(
+      &vertex_with_translation,
+      &position_player
     )
   );
 
   c938_data_vertex_textured_coloured.brightness = (
     (
-      positions[
-        id_vertex
-      ].y > 0.0f
+      (
+        vertices[
+          index_vertex
+        ].y >
+        0x00
+      )
       ? (
         data_frame->brightness *
-        positions[
-          id_vertex
-        ].z > 0.0f
-        ? (
-          positions[
-            id_vertex
-          ].x > 0.0f
+        (
+          (
+            vertices[
+              index_vertex
+            ].z >
+            0x00
+          )
           ? 0.9f
-          : 0.9f
+          : 0x01
         )
-        : 1.0f
       )
       : 0.013f
     ) *
-    metal::fmin(
-      metal::fmax(
-        (
-          1.0f -
-          (
-            distance /
-            10000.0f
-          )
-        ),
-        0.5f
+    math_c_bound_float(
+      (
+        0x01 -
+        distance /
+        0x2710
       ),
-      1.0f
+      0x01,
+      0.5f
     )
   );
 
@@ -98,12 +119,13 @@
     data_object->colour.w
   );
 
-  return c938_data_vertex_textured_coloured;
+  return (
+    c938_data_vertex_textured_coloured
+  );
 }
 
 [[fragment]] metal::float4 c938_building_fragment(
-  c938_data_vertex_textured_coloured c938_data_vertex_textured_coloured [[stage_in]],
-  metal::texture2d<half> texture [[texture(0)]]
+  c938_data_vertex_textured_coloured c938_data_vertex_textured_coloured [[stage_in]]
 ) {
   float brightness = (
     c938_data_vertex_textured_coloured.brightness *

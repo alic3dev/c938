@@ -2,8 +2,6 @@
 
 #include <metil_mesh/metil_mesh.h>
 
-#include <clic3_memory.h>
-
 #include <math_c_vector.h>
 
 void mesh_building_initialize(
@@ -12,8 +10,24 @@ void mesh_building_initialize(
   float height,
   float depth
 ) {
-  metil_mesh_initialize(
-    mesh
+  unsigned int layers = (
+    0x02
+  );
+
+  metil_mesh_initialize_with_lengths(
+    mesh,
+    (
+      layers *
+      0x04
+    ),
+    (
+      (
+        layers -
+        0x01
+      ) *
+      0x10 +
+      0x08
+    )
   );
 
   struct math_c_vector3_float size_half = {
@@ -43,56 +57,23 @@ void mesh_building_initialize(
     depth
   );
 
-  unsigned char layers = (
-    2
-  );
-
-  mesh->length_vertices = (
-    layers *
-    4
-  );
-
-  mesh->length_indices = (
-    (
-      layers -
-      1
-    ) *
-    16 +
-    8
-  );
-
-  clic3_memory_reallocate_raw(
-    &mesh->indices,
-    (
-      sizeof(
-        unsigned int
-      ) *
-      mesh->length_indices
-    )
-  );
-
-  clic3_memory_reallocate_raw(
-    &mesh->vertices,
-    (
-      sizeof(
-        struct math_c_vector4_float
-      ) *
-      mesh->length_vertices
-    )
-  );
-
   unsigned int index_index = (
-    0
+    0x00
   );
 
   for (
-    unsigned char index_layer = 0;
-    index_layer < layers;
+    unsigned char index_layer = (
+      0x00
+    );
+    (
+      index_layer <
+      layers
+    );
     ++index_layer
   ) {
     unsigned int index_vertex = (
       index_layer *
-      4
+      0x04
     );
 
     float position_y = (

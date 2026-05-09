@@ -63,9 +63,9 @@ float c938_audio_io_proc_scene_gameplay_frame_get(
           (
             (float)
             c938_audio_io_proc_scene_gameplay_length_time_switch /
-            2.0f
+            0x02
           ) -
-          1.0f
+          0x01
         )
       );
     } else {
@@ -113,10 +113,10 @@ float c938_audio_io_proc_scene_gameplay_frame_get(
         (
           (float)
           c938_audio_io_proc_scene_gameplay_length_time_life /
-          2.0f -
-          1.0f
-        ) *
-        0.5f
+          0x02 -
+          0x01
+        ) /
+        0x02
       );
     }
 
@@ -183,9 +183,7 @@ metil_audio_io_proc_macro_definition(
 ) {
   metil_audio_io_proc_macro_definition_initializer
 
-  struct metil_scene_controller* metil_scene_controller
-= (
-    metil->scene_controller
+  struct metil_scene_controller* metil_scene_controller = (    metil->scene_controller
   );
 
   struct metil_scene* metil_scene = &(
@@ -205,7 +203,8 @@ metil_audio_io_proc_macro_definition(
         index_channel,
         index_frame
       )
-    )      }
+    )
+  }
 
   metil_audio_io_proc_macro_definition_return
 }

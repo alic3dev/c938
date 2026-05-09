@@ -11,9 +11,9 @@
 #include <unistd.h>
 
 enum network_host_notification_type {
-  network_host_notification_type_default = 0,
-  network_host_notification_type_error = 1,
-  network_host_notification_type_data_map_requested = 2
+  network_host_notification_type_default            = 0x00,
+  network_host_notification_type_error              = 0x01,
+  network_host_notification_type_data_map_requested = 0x02
 };
 
 struct network_host {

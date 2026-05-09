@@ -694,10 +694,7 @@ void scene_menu_main_initialize(
     metil->renderer_interface.metal_device,
     metil_group_buildings,
     scene_menu_main_length_buildings_default,
-    100,
-    scene->textures[
-      scene_menu_main_textures_index_buildings
-    ]
+    0x64
   );
 
   scene->player.position.y = (

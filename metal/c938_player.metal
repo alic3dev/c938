@@ -6,10 +6,8 @@
 #include <metil_rendering/metil_renderer_data_object.h>
 #include <metil_rendering/metil_renderer_vertex_index_parameter.h>
 
-#include <metal_texture>
-
 [[vertex]] struct c938_data_vertex_textured_coloured c938_player_vertex(
-  const device metal::float4* positions [[
+  const device metal::float4* vertices [[
     buffer(
       metil_renderer_vertex_index_parameter_vertices
     )
@@ -24,14 +22,16 @@
       metil_renderer_vertex_index_parameter_data_object
     )
   ]],
-  unsigned int id_vertex [[vertex_id]]
+  unsigned int index_vertex [[
+    vertex_id
+  ]]
 ) {
   struct c938_data_vertex_textured_coloured c938_data_vertex_textured_coloured;
 
   c938_data_vertex_textured_coloured.position = (
     data_object->view_model_matrix_projection *
-    positions[
-      id_vertex
+    vertices[
+      index_vertex
     ]
   );
 
@@ -42,51 +42,51 @@
   unsigned char offset_frame = (
     (
       data_frame->frame /
-      10
+      0x0a
     ) %
-    100
+    0x64
   );
 
   c938_data_vertex_textured_coloured.colour.r = (
     (float)
     (
       (
-        id_vertex -
+        index_vertex -
         offset_frame
       ) %
-      10
+      0x0a
     ) /
-    10.0f
+    0x09
   );
 
   c938_data_vertex_textured_coloured.colour.g = (
     (float)
     (
       (
-        id_vertex -
+        index_vertex -
         offset_frame +
-        3
+        0x03
       ) %
-      10
+      0x0a
     ) /
-    10.0f
+    0x09
   );
 
   c938_data_vertex_textured_coloured.colour.b = (
     (float)
     (
       (
-        id_vertex -
+        index_vertex -
         offset_frame +
-        6
+        0x06
       ) %
-      10
+      0x0a
     ) /
-    10.0f
+    0x09
   );
 
   c938_data_vertex_textured_coloured.colour.a = (
-    1.0f
+    0x01
   );
 
   return (
@@ -94,26 +94,26 @@
   );
 }
 
-[[fragment]] metal::float4 c938_player_fragment(
+[[fragment]] float4 c938_player_fragment(
   struct c938_data_vertex_textured_coloured c938_data_vertex_textured_coloured [[stage_in]]
 ) {
-  return metal::float4(
-    (
-      c938_data_vertex_textured_coloured.colour.r *
-      c938_data_vertex_textured_coloured.brightness *
-      0.7f
-    ),
-    (
-      c938_data_vertex_textured_coloured.colour.g *
-      c938_data_vertex_textured_coloured.brightness *
-      0.7f
-    ),
-    (
-      c938_data_vertex_textured_coloured.colour.b *
-      c938_data_vertex_textured_coloured.brightness *
-      0.7f
-    ),
-    (
+  return (
+    float4(
+      (
+        c938_data_vertex_textured_coloured.colour.r *
+        c938_data_vertex_textured_coloured.brightness *
+        0.7f
+      ),
+      (
+        c938_data_vertex_textured_coloured.colour.g *
+        c938_data_vertex_textured_coloured.brightness *
+        0.7f
+      ),
+      (
+        c938_data_vertex_textured_coloured.colour.b *
+        c938_data_vertex_textured_coloured.brightness *
+        0.7f
+      ),
       c938_data_vertex_textured_coloured.colour.a
     )
   );

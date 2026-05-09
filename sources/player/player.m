@@ -78,7 +78,9 @@ void player_poll_input(
     }
   }
 
-  float speed_original = player->speed_movement;
+  float speed_original = (
+    player->speed_movement
+  );
 
   player->speed_movement = (
     player->speed_movement *
@@ -902,7 +904,7 @@ void player_destroy(
   struct metil* metil,
   struct metil_player* player
 ) {
-  free(
+  clic3_memory_free_raw(
     player->data
   );
 

@@ -13,33 +13,34 @@
 #include <CoreAudio/CoreAudio.h>
 #endif
 
-#define scene_gameplay_length_renderables 9
+#define scene_gameplay_length_renderables 0x0a
 
 enum scene_gameplay_renderables_index {
-  scene_gameplay_renderables_index_buildings = 0,
-  scene_gameplay_renderables_index_group_players = 1,
-  scene_gameplay_renderables_index_projectiles = 2,
-  scene_gameplay_renderables_index_enemies = 3,
-  scene_gameplay_renderables_index_hud_boosted = 4,
-  scene_gameplay_renderables_index_hud_jumping = 5,
-  scene_gameplay_renderables_index_hud_jumping_secondary = 6,
-  scene_gameplay_renderables_index_crosshair = 7,
-  scene_gameplay_renderables_index_group_logging = 8
+  scene_gameplay_renderables_index_buildings             = 0x00,
+  scene_gameplay_renderables_index_group_players         = 0x01,
+  scene_gameplay_renderables_index_projectiles           = 0x02,
+  scene_gameplay_renderables_index_enemies               = 0x03,
+  scene_gameplay_renderables_index_hud_boosted           = 0x04,
+  scene_gameplay_renderables_index_hud_jumping           = 0x05,
+  scene_gameplay_renderables_index_hud_jumping_secondary = 0x06,
+  scene_gameplay_renderables_index_group_hud_health      = 0x07,
+  scene_gameplay_renderables_index_crosshair             = 0x08,
+  scene_gameplay_renderables_index_group_logging         = 0x09
 };
 
 enum scene_gameplay_renderables_index_range {
-  scene_gameplay_renderables_index_range_hud_start = 4,
-  scene_gameplay_renderables_index_range_hud_end = 6
+  scene_gameplay_renderables_index_range_hud_start = 0x04,
+  scene_gameplay_renderables_index_range_hud_end   = 0x06
 };
 
 enum scene_gameplay_group_buildings_index {
-  scene_gameplay_group_buildings_index_starting = 1,
-  scene_gameplay_group_buildings_index_target = 3
+  scene_gameplay_group_buildings_index_starting = 0x01,
+  scene_gameplay_group_buildings_index_target   = 0x03
 };
 
 enum scene_gameplay_textures {
-  scene_gameplay_textures_index_player = 0,
-  scene_gameplay_textures_index_buildings = 0
+  scene_gameplay_textures_index_player = 0x00,
+  scene_gameplay_textures_index_buildings = 0x00
 };
 
 void scene_gameplay_initialize(
@@ -81,25 +82,5 @@ float scene_gameplay_io_proc_value_get(
   unsigned long int,
   unsigned long int
 );
-
-#if target_os_ios
-int scene_gameplay_io_proc(
-  unsigned char,
-  const AudioTimeStamp* _Nonnull,
-  unsigned int,
-  AudioBufferList* _Nonnull,
-  void* _Nonnull
-);
-#else
-OSStatus scene_gameplay_io_proc(
-  AudioObjectID,
-  const AudioTimeStamp* _Nonnull,
-  const AudioBufferList* _Nonnull,
-  const AudioTimeStamp* _Nonnull,
-  AudioBufferList* _Nonnull,
-  const AudioTimeStamp* _Nonnull,
-  void* _Nonnull
-);
-#endif
 
 #endif

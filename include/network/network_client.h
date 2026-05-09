@@ -15,11 +15,11 @@
 #include <unistd.h>
 
 enum network_client_notification_type {
-  network_client_notification_type_default = 0,
-  network_client_notification_type_error = 1,
-  network_client_notification_type_data_map_sent = 2,
-  network_client_notification_type_poll = 3,
-  network_client_notification_type_enemies = 4
+  network_client_notification_type_default       = 0x00,
+  network_client_notification_type_error         = 0x01,
+  network_client_notification_type_data_map_sent = 0x02,
+  network_client_notification_type_poll          = 0x03,
+  network_client_notification_type_enemies       = 0x04
 };
 
 struct network_client {

@@ -9,7 +9,7 @@ struct enemy_data {
   unsigned char life_maximum;
   unsigned char life;
 
-  float speed; // metres per second
+  float speed;
 
   struct math_c_vector3_float position_previous;
 

@@ -17,7 +17,7 @@
 
 [[fragment]] metal::float4 c938_text_fragment(
   struct c938_data_vertex_textured_coloured,
-  metal::texture2d<half>
+  metal::texture2d<float>
 );
 
 #endif

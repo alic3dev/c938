@@ -16,7 +16,6 @@
 #include <metil_scenes/metil_scene_controller.h>
 
 #include <Metal/MTLDevice.h>
-#include <Metal/MTLRenderCommandEncoder.h>
 
 void object_enemy_initialize(
   struct metil_object* object,
@@ -33,7 +32,9 @@ void object_enemy_initialize(
     MTLPrimitiveTypeLine
   );
 
-  object->poll = object_enemy_poll;
+  object->poll = (
+    object_enemy_poll
+  );
 
   object->index_pipeline_render = (
     c938_pipeline_index_enemy
@@ -47,13 +48,17 @@ void object_enemy_initialize(
     )
   );
 
-  object->position.x = position.x;
-  object->position.y = position.y;
-  object->position.z = position.z;
+  object->position.x = (
+    position.x
+  );
 
-  object->rotation.x = 0.0f;
-  object->rotation.y = 0.0f;
-  object->rotation.z = 0.0f;
+  object->position.y = (
+    position.y
+  );
+
+  object->position.z = (
+    position.z
+  );
 
   struct enemy_data* enemy_data = (
     object->buffers_vertex[
@@ -61,13 +66,26 @@ void object_enemy_initialize(
     ].buffer.contents
   );
 
-  enemy_data->colour.x = 1.0f;
-  enemy_data->colour.y = 1.0f;
-  enemy_data->colour.z = 1.0f;
+  enemy_data->colour.x = (
+    0x01
+  );
 
-  enemy_data->speed = speed;
+  enemy_data->colour.y = (
+    0x01
+  );
 
-  enemy_data->life_maximum = life;
+  enemy_data->colour.z = (
+    0x01
+  );
+
+  enemy_data->speed = (
+    speed
+  );
+
+  enemy_data->life_maximum = (
+    life
+  );
+
   enemy_data->life = (
     enemy_data->life_maximum
   );
@@ -80,9 +98,17 @@ void object_enemy_travel(
   unsigned long int* time_delta,
   float height
 ) {
-  enemy_data->position_previous.x = metil_object->position.x;
-  enemy_data->position_previous.y = metil_object->position.y;
-  enemy_data->position_previous.z = metil_object->position.z;
+  enemy_data->position_previous.x = (
+    metil_object->position.x
+  );
+
+  enemy_data->position_previous.y = (
+    metil_object->position.y
+  );
+
+  enemy_data->position_previous.z = (
+    metil_object->position.z
+  );
 
   float position_player_y = (
     position_player->y +
@@ -117,7 +143,8 @@ void object_enemy_travel(
   );
 
   if (
-    distance_total == 0.0f
+    distance_total ==
+    0x00
   ) {
     return;
   }
@@ -146,13 +173,15 @@ void object_enemy_travel(
   ) {
     speed = (
       speed +
-      speed * (
+      speed *
+      (
         (
           enemy_distance_speed_boost -
           distance_total
         ) /
         enemy_distance_speed_boost
-      ) * (
+      ) *
+      (
         distance_total /
         enemy_distance_speed_boost_half
       )
@@ -161,14 +190,16 @@ void object_enemy_travel(
 
   float distance = (
     (
-      (float) *time_delta /
-      1000.0f
+      (float)
+      *time_delta /
+      0x03e8
     ) *
     speed
   );
 
   if (
-    distance > distance_total
+    distance >
+    distance_total
   ) {
     distance = (
       distance_total
@@ -228,7 +259,10 @@ void object_enemy_poll(
       &metil_scene->player.position,
       enemy_data,
       &metil_scene->time_delta,
-      ((struct player_data*) metil_scene->player.data)->height
+      (
+        (struct player_data*)
+        metil_scene->player.data
+      )->height
     );
   }
 

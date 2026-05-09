@@ -3,18 +3,17 @@
 #include <metil_mesh/metil_mesh.h>
 #include <metil_player/metil_player_defaults.h>
 
-#include <clic3_memory.h>
-
-#include <math_c_vector.h>
-
-#include <math.h>
+#include <math_c_pi.h>
+#include <math_c_sine.h>
 
 void mesh_player_initialize(
   struct metil_mesh* mesh,
   struct metil_player_defaults* metil_player_defaults
 ) {
-  metil_mesh_initialize(
-    mesh
+  metil_mesh_initialize_with_lengths(
+    mesh,
+    0x0e,
+    0x27
   );
 
   mesh->size.x = (
@@ -29,125 +28,122 @@ void mesh_player_initialize(
     metil_player_defaults->size.z
   );
 
-  mesh->length_vertices = 14;
-
-  mesh->length_indices = (
-    (
-      mesh->length_vertices -
-      1
-    ) *
-    3
+  mesh->vertices[
+    0x00
+  ].x = (
+    0x00
   );
 
-  clic3_memory_reallocate_raw(
-    &mesh->indices,
-    (
-      sizeof(
-        unsigned int
-      ) *
-      mesh->length_indices
-    )
-  );
-
-  clic3_memory_reallocate_raw(
-    &mesh->vertices,
-    (
-      sizeof(
-        struct math_c_vector4_float
-      ) *
-      mesh->length_vertices
-    )
-  );
-
-  mesh->vertices[0].x = 0;
-
-  mesh->vertices[0].y = (
+  mesh->vertices[
+    0x00
+  ].y = (
     metil_player_defaults->size.y
   );
 
-  mesh->vertices[0].z = 0;
+  mesh->vertices[
+    0x00
+  ].z = (
+    0x00
+  );
 
-  mesh->vertices[0].w = 1.0f;
+  mesh->vertices[
+    0x00
+  ].w = (
+    0x01
+  );
 
   for (
-    unsigned char index_vertex = 1;
-    index_vertex < mesh->length_vertices;
+    unsigned char index_vertex = (
+      0x01
+    );
+    (
+      index_vertex <
+      mesh->length_vertices
+    );
     ++index_vertex
   ) {
     float angle = (
+      (float)
       (
-        (float)
-        (
-          index_vertex -
-          1
-        )
+        index_vertex -
+        0x01
       ) /
+      (float)
       (
-        (float)
-        (
-          mesh->length_vertices -
-          2
-        )
+        mesh->length_vertices -
+        0x02
       ) *
-      M_PI *
-      2.0f
+      math_c_pi_doubled
     );
 
     mesh->vertices[
       index_vertex
     ].x = (
-      cos(
-        angle
+      math_c_cosine(
+        angle,
+        math_c_pi
       ) *
       metil_player_defaults->size.x
     );
 
     mesh->vertices[
       index_vertex
-    ].y = 0;
+    ].y = (
+      0x00
+    );
 
     mesh->vertices[
       index_vertex
     ].z = (
-      sin(
-        angle
+      math_c_sine(
+        angle,
+        math_c_pi
       ) *
       metil_player_defaults->size.z
     );
 
     mesh->vertices[
       index_vertex
-    ].w = 1.0f;
+    ].w = (
+      0x01
+    );
   }
 
   for (
-    unsigned char index_index = 0;
-    index_index < (
-      mesh->length_indices /
-      3
+    unsigned char index_index = (
+      0x00
+    );
+    (
+      index_index <
+      (
+        mesh->length_indices /
+        0x03
+      )
     );
     ++index_index
   ) {
     mesh->indices[
       index_index *
-      3
-    ] = 0;
+      0x03
+    ] = (
+      0x00
+    );
 
     mesh->indices[
       index_index *
-      3 +
-      1
+      0x03 +
+      0x01
     ] = (
       index_index
     );
 
     mesh->indices[
       index_index *
-      3 +
-      2
+      0x03 +
+      0x02
     ] = (
       index_index +
-      1
+      0x01
     );
   }
 }

@@ -6,8 +6,6 @@
 #include <metil_rendering/metil_renderer_data_frame.h>
 #include <metil_rendering/metil_renderer_data_object.h>
 
-#include <metal_texture>
-
 [[vertex]] struct c938_data_vertex_textured_coloured c938_building_vertex(
   const device metal::float4*,
   constant struct metil_renderer_data_frame*,
@@ -16,8 +14,7 @@
 );
 
 [[fragment]] metal::float4 c938_building_fragment(
-  struct c938_data_vertex_textured_coloured,
-  metal::texture2d<half>
+  struct c938_data_vertex_textured_coloured
 );
 
 #endif

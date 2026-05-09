@@ -11,7 +11,10 @@ void c938_data_initialize(
     &c938_data->logging
   );
 
-  c938_data->network_host.initialized = 0;
+  c938_data->network_host.initialized = (
+    0x00
+  );
+
   c938_data->network_client.status = (
     network_client_status_none
   );

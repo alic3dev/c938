@@ -26,11 +26,15 @@ void generate_buildings(
   id<MTLDevice> metal_device,
   struct metil_group* metil_group_buildings,
   unsigned int length_buildings,
-  unsigned int index_target_building,
-  id<MTLTexture> texture
+  unsigned int index_target_building
 ) {
-  struct metil_object* object = (void*) 0;
-  struct metil_object* object_starting_point = (void*) 0;
+  struct metil_object* object = (
+    0x00
+  );
+
+  struct metil_object* object_starting_point = (
+    0x00
+  );
 
   metil_group_destroy(
     metil,
@@ -48,8 +52,12 @@ void generate_buildings(
   );
 
   struct math_c_vector2_float size_maximum = {
-    .x = 0.0f,
-    .y = 0.0f
+    .x = (
+      0x00
+    ),
+    .y = (
+      0x00
+    )
   };
 
   struct metil_renderer_data_object* data;
@@ -62,14 +70,19 @@ void generate_buildings(
     &rand_parameters,
     &rand_result,
     &rand_source,
-    6,
+    0x06,
     rand_mode_bytes,
     rand_source_type_divisive
   );
 
   for (
-    unsigned int index_building = 1;
-    index_building < length_buildings;
+    unsigned int index_building = (
+      0x01
+    );
+    (
+      index_building <
+      length_buildings
+    );
     ++index_building
   ) {
     rand_get(
@@ -90,24 +103,57 @@ void generate_buildings(
 
     mesh_building_initialize(
       &object->mesh,
-      83.0f + ((
-        rand_result.bytes[0] *
-        rand_result.bytes[1]
-      ) % 67),
-      1000.0f + ((
-        rand_result.bytes[2] *
-        rand_result.bytes[3]
-      ) % 500),
-      83.0f + ((
-        rand_result.bytes[4] *
-        rand_result.bytes[5]
-      ) % 67)
+      (
+        0x53 +
+        (
+          (
+            rand_result.bytes[
+              0x00
+            ] *
+            rand_result.bytes[
+              0x01
+            ]
+          ) %
+          0x43
+        )
+      ),
+      (
+        0x03e8 +
+        (
+          (
+            rand_result.bytes[
+              0x02
+            ] *
+            rand_result.bytes[
+              0x03
+            ]
+          ) %
+          0x01f4
+        )
+      ),
+      (
+        0x53 +
+        (
+          (
+            rand_result.bytes[
+              0x04
+            ] *
+            rand_result.bytes[
+              0x05
+            ]
+          ) %
+          0x43
+        )
+      )
     );
 
-    object->position.y = 0.0f;
+    object->position.y = (
+      0x00
+    );
 
     if (
-      index_building == 1
+      index_building ==
+      0x01
     ) {
       object_starting_point = metil_group_buildings->renderables[
         index_building
@@ -116,7 +162,7 @@ void generate_buildings(
       struct metil_object* metil_object_building_random;
 
       unsigned char colliding = (
-        0
+        0x00
       );
 
       do {
@@ -129,73 +175,88 @@ void generate_buildings(
         metil_object_building_random = metil_group_buildings->renderables[
           (
             rand_result.bytes[
-              0
+              0x00
             ] *
             rand_result.bytes[
-              1
+              0x01
             ]
           ) %
           index_building +
-          1
+          0x01
         ]->renderable;
 
         object->position.x = (
           rand_result.bytes[
-            2
-          ] - (
-            127.5f
-          )
+            0x02
+          ] -
+          127.5f
         );
 
         if (
-          object->position.x > 0.0f
+          object->position.x >
+          0x00
         ) {
           object->position.x = (
             object->position.x +
             metil_object_building_random->position.x +
-            metil_object_building_random->mesh.size.x / 2.0f +
-            object->mesh.size.x / 2.0f
+            metil_object_building_random->mesh.size.x /
+            0x02 +
+            object->mesh.size.x /
+            0x02
           );
         } else {
           object->position.x = (
             object->position.x -
             metil_object_building_random->position.x -
-            metil_object_building_random->mesh.size.x / 2.0f -
-            object->mesh.size.x / 2.0f
+            metil_object_building_random->mesh.size.x /
+            0x02 -
+            object->mesh.size.x /
+            0x02
           );
         }
 
         object->position.z = (
           rand_result.bytes[
-            3
-          ] - (
-            127.5f
-          )
+            0x03
+          ] -
+          127.5f
         );
 
         if (
-          object->position.z > 0.0f
+          object->position.z >
+          0x00
         ) {
           object->position.z = (
             object->position.z +
             metil_object_building_random->position.z +
-            metil_object_building_random->mesh.size.z / 2.0f +
-            object->mesh.size.z / 2.0f
+            metil_object_building_random->mesh.size.z /
+            0x02 +
+            object->mesh.size.z /
+            0x02
           );
         } else {
           object->position.z = (
             object->position.z -
             metil_object_building_random->position.z -
-            metil_object_building_random->mesh.size.z / 2.0f -
-            object->mesh.size.z / 2.0f
+            metil_object_building_random->mesh.size.z /
+            0x02 -
+            object->mesh.size.z /
+            0x02
           );
         }
 
-        colliding = 0;
+        colliding = (
+          0x00
+        );
 
         for (
-          unsigned int index_building_collision = 1;
-          index_building_collision < index_building;
+          unsigned int index_building_collision = (
+            0x01
+          );
+          (
+            index_building_collision <
+            index_building
+          );
           ++index_building_collision
         ) {
           struct metil_object* metil_object_building_collision_check = (
@@ -205,27 +266,74 @@ void generate_buildings(
           );
 
           if (
-            object->position.x - object->mesh.size.x / 2.0f <= metil_object_building_collision_check->position.x + metil_object_building_collision_check->mesh.size.x / 2.0f &&
-            object->position.x + object->mesh.size.x / 2.0f >= metil_object_building_collision_check->position.x - metil_object_building_collision_check->mesh.size.x / 2.0f &&
-            object->position.z - object->mesh.size.z / 2.0f <= metil_object_building_collision_check->position.z + metil_object_building_collision_check->mesh.size.z / 2.0f &&
-            object->position.z + object->mesh.size.z / 2.0f >= metil_object_building_collision_check->position.z - metil_object_building_collision_check->mesh.size.z / 2.0f
+            (
+              (
+                object->position.x -
+                object->mesh.size.x /
+                0x02
+              ) <=
+              (
+                metil_object_building_collision_check->position.x +
+                metil_object_building_collision_check->mesh.size.x /
+                0x02
+              )
+            ) &&
+            (
+              (
+                object->position.x +
+                object->mesh.size.x /
+                0x02
+              ) >=
+              (
+                metil_object_building_collision_check->position.x -
+                metil_object_building_collision_check->mesh.size.x /
+                0x02
+              )
+            ) &&
+            (
+              (
+                object->position.z -
+                object->mesh.size.z /
+                0x02
+              ) <=
+              (
+                metil_object_building_collision_check->position.z +
+                metil_object_building_collision_check->mesh.size.z /
+                0x02
+              )
+            ) &&
+            (
+              (
+                object->position.z +
+                object->mesh.size.z /
+                0x02
+              ) >=
+              (
+                metil_object_building_collision_check->position.z -
+                metil_object_building_collision_check->mesh.size.z /
+                0x02
+              )
+            )
           ) {
-            colliding = 1;
+            colliding = (
+              0x01
+            );
           }
         }
       } while (
-        colliding == 1
+        colliding ==
+        0x01
       );
 
       if (
-        index_building > 1
+        index_building >
+        0x01
       ) {
         float height = (
           rand_result.bytes[
-            4
-          ] - (
-            127.5f
-          ) +
+            0x04
+          ] -
+          127.5f +
           metil_object_building_random->mesh.size.y
         );
 
@@ -235,11 +343,6 @@ void generate_buildings(
         );
       }
     }
-
-    metil_object_texture_add(
-      object,
-      texture
-    );
 
     object->type_primitive = (
       MTLPrimitiveTypeLine
@@ -255,44 +358,67 @@ void generate_buildings(
     ].buffer.contents;
 
     if (
-      index_building == index_target_building
+      index_building ==
+      index_target_building
     ) {
-      data->colour.x = 0.0f;
-      data->colour.y = 0.0f;
-      data->colour.z = 1.0f;
-      data->colour.w = 1.0f;
+      data->colour.x = (
+        0x00
+      );
+
+      data->colour.y = (
+        0x00
+      );
     } else {
-      data->colour.x = 1.0f;
-      data->colour.y = 1.0f;
-      data->colour.z = 1.0f;
-      data->colour.w = 1.0f;
+      data->colour.x = (
+        0x01
+      );
+
+      data->colour.y = (
+        0x01
+      );
     }
+
+    data->colour.z = (
+      0x01
+    );
+
+    data->colour.w = (
+      0x01
+    );
 
     struct math_c_vector2_float limits = {
       .x = (
         math_c_maximum_float(
-          object->position.x + (
-            object->mesh.size.x /
-            2.0f
+          (
+            object->position.x +
+            (
+              object->mesh.size.x /
+              0x02
+            )
           ),
           math_c_absolute_float(
-            object->position.x - (
+            object->position.x -
+            (
               object->mesh.size.x /
-              2.0f
+              0x02
             )
           )
         )
       ),
       .y = (
         math_c_maximum_float(
-          object->position.z + (
-            object->mesh.size.z /
-            2.0f
+          (
+            object->position.z +
+            (
+              object->mesh.size.z /
+              0x02
+            )
           ),
           math_c_absolute_float(
-            object->position.z - (
+            object->position.z -
+            (
               object->mesh.size.z /
-              2.0f
+              0x02
             )
           )
         )
@@ -318,20 +444,21 @@ void generate_buildings(
 
   object = (
     metil_group_buildings->renderables[
-      0
+      0x00
     ]->renderable
   );
 
   mesh_building_initialize(
     &object->mesh, (
       size_maximum.x *
-      2.0f +
-      200.0f
+      0x02 +
+      0xc8
     ),
-    1.0f, (
+    0x01,
+    (
       size_maximum.y *
-      2.0f +
-      200.0f
+      0x02 +
+      0xc8
     )
   );
 
@@ -343,16 +470,13 @@ void generate_buildings(
     c938_pipeline_index_ground
   );
 
-  object->position.y = 0.0f;
+  object->position.y = (
+    0x00
+  );
 
   metil_object_buffers_initialize(
     object,
     metal_device
-  );
-
-  metil_object_texture_add(
-    object,
-    texture
   );
 
   rand_clean(

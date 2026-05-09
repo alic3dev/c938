@@ -18,17 +18,17 @@
 #include <CoreAudio/CoreAudio.h>
 #endif
 
-#define scene_menu_main_length_buildings_default 200
-#define scene_menu_main_time_scene_transition 333
+#define scene_menu_main_length_buildings_default 0xc8
+#define scene_menu_main_time_scene_transition 0x014d
 
-#define scene_menu_main_length_renderables 9
+#define scene_menu_main_length_renderables 0x09
 
 #define scene_menu_main_length_group_renderables_text_main menus_menu_main_length
 #define scene_menu_main_length_group_renderables_text_main_backing scene_menu_main_length_group_renderables_text_main
 
 #define scene_menu_main_length_group_renderables_text_menu_custom (\
   menus_menu_main_custom_length +\
-  1\
+  0x01\
 )
 #define scene_menu_main_length_group_renderables_text_menu_custom_backing scene_menu_main_length_group_renderables_text_menu_custom
 
@@ -36,15 +36,15 @@
 #define scene_menu_main_length_group_renderables_text_menu_network_backing scene_menu_main_length_group_renderables_text_menu_network
 
 enum scene_menu_main_renderables_index {
-  scene_menu_main_renderables_index_group_buildings = 0,
-  scene_menu_main_renderables_index_text_title = 1,
-  scene_menu_main_renderables_index_group_text_menu_main_backing = 2,
-  scene_menu_main_renderables_index_group_text_menu_main = 3,
-  scene_menu_main_renderables_index_group_text_menu_custom_backing = 4,
-  scene_menu_main_renderables_index_group_text_menu_custom = 5,
-  scene_menu_main_renderables_index_group_text_menu_network_backing = 6,
-  scene_menu_main_renderables_index_group_text_menu_network = 7,
-  scene_menu_main_renderables_index_group_logging = 8
+  scene_menu_main_renderables_index_group_buildings                 = 0x00,
+  scene_menu_main_renderables_index_text_title                      = 0x01,
+  scene_menu_main_renderables_index_group_text_menu_main_backing    = 0x02,
+  scene_menu_main_renderables_index_group_text_menu_main            = 0x03,
+  scene_menu_main_renderables_index_group_text_menu_custom_backing  = 0x04,
+  scene_menu_main_renderables_index_group_text_menu_custom          = 0x05,
+  scene_menu_main_renderables_index_group_text_menu_network_backing = 0x06,
+  scene_menu_main_renderables_index_group_text_menu_network         = 0x07,
+  scene_menu_main_renderables_index_group_logging                   = 0x08
 };
 
 enum scene_menu_main_renderables_group_text_main_index {
@@ -63,16 +63,16 @@ enum scene_menu_main_renderables_group_text_main_index {
 };
 
 enum scene_menu_main_renderables_group_text_menu_custom_index {
-  scene_menu_main_renderables_group_text_menu_custom_index_start = 0,
-  scene_menu_main_renderables_group_text_menu_custom_index_mode_target = 1,
-  scene_menu_main_renderables_group_text_menu_custom_index_mode_enemies = 2,
-  scene_menu_main_renderables_group_text_menu_custom_index_length_buildings = 3,
-  scene_menu_main_renderables_group_text_menu_custom_index_multiplier_buildings = 4,
-  scene_menu_main_renderables_group_text_menu_custom_index_length_enemies = 5,
-  scene_menu_main_renderables_group_text_menu_custom_index_multiplier_enemies = 6,
-  scene_menu_main_renderables_group_text_menu_custom_index_speed_movement = 7,
-  scene_menu_main_renderables_group_text_menu_custom_index_multiplier_speed_movement = 8,
-  scene_menu_main_renderables_group_text_menu_custom_index_menu_back = 9
+  scene_menu_main_renderables_group_text_menu_custom_index_start                     = 0x00,
+  scene_menu_main_renderables_group_text_menu_custom_index_mode_target               = 0x01,
+  scene_menu_main_renderables_group_text_menu_custom_index_mode_enemies              = 0x02,
+  scene_menu_main_renderables_group_text_menu_custom_index_length_buildings          = 0x03,
+  scene_menu_main_renderables_group_text_menu_custom_index_multiplier_buildings      = 0x04,
+  scene_menu_main_renderables_group_text_menu_custom_index_length_enemies            = 0x05,
+  scene_menu_main_renderables_group_text_menu_custom_index_multiplier_enemies        = 0x06,
+  scene_menu_main_renderables_group_text_menu_custom_index_speed_movement            = 0x07,
+  scene_menu_main_renderables_group_text_menu_custom_index_multiplier_speed_movement = 0x08,
+  scene_menu_main_renderables_group_text_menu_custom_index_menu_back                 = 0x09
 };
 
 enum scene_menu_main_renderables_group_text_main_network_index {
@@ -87,12 +87,12 @@ enum scene_menu_main_renderables_group_text_main_network_index {
   )
 };
 
-#define scene_menu_main_length_textures 2
+#define scene_menu_main_length_textures 0x02
 
 enum scene_menu_main_textures_index {
-  scene_menu_main_textures_index_title = 0,
-  scene_menu_main_textures_index_buildings = 1,
-  scene_menu_main_textures_index_text_backing = 1
+  scene_menu_main_textures_index_title        = 0x00,
+  scene_menu_main_textures_index_buildings    = 0x01,
+  scene_menu_main_textures_index_text_backing = 0x01
 };
 
 void scene_menu_main_initialize(

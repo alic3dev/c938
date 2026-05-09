@@ -27,8 +27,7 @@ const unsigned long int data_length_parameters_gameplay = (
   sizeof(
     struct parameters_gameplay
   ) -
-  // this is minus the networked parameter since that is application specific
-  1
+  0x01
 );
 
 const unsigned long int data_length_unsigned_int = (

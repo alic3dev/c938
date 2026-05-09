@@ -2,39 +2,18 @@
 
 #include <metil_mesh/metil_mesh.h>
 
-#include <math_c_vector.h>
-
-#include <stdlib.h>
-
 void mesh_crosshair_initialize(
   struct metil_mesh* mesh
 ) {
-  metil_mesh_initialize(mesh);
+  metil_mesh_initialize_with_lengths(
+    mesh,
+    0x04,
+    0x04
+  );
 
   mesh->size.x = 0.02f;
   mesh->size.y = 0.02f;
   mesh->size.z = 0.0f;
-
-  mesh->length_vertices = 4;
-  mesh->length_indices = 4;
-
-  mesh->indices = realloc(
-    mesh->indices,
-    sizeof(unsigned int) *
-    mesh->length_indices
-  );
-
-  mesh->vertices = realloc(
-    mesh->vertices,
-    sizeof(struct math_c_vector4_float) *
-    mesh->length_vertices
-  );
-
-  //     0
-  //     |
-  // 2 --+-- 3
-  //     |
-  //     1
 
   mesh->vertices[0].x = 0.0f;
   mesh->vertices[0].y = 0.01f;
