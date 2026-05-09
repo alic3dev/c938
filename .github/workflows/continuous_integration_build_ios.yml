@@ -113,7 +113,7 @@ jobs:
         run: cd clic3 && make target_device=iphone target_device_version=${{ env.target_device_version }}
       - name: make_math_c
         if: steps.cache_restore_math_c.outputs.cache-hit != 'true'
-        run: cd math_c && make target_device=iphone target_device_version=${{ env.target_device_version }}
+        run: cd math_c && make target_device=iphone target_device_version=${{ env.target_device_version }} target_metal_standard=${{ env.target_metal_standard }}
       - name: make_cer0
         if: steps.cache_restore_cer0.outputs.cache-hit != 'true'
         run: cd cer0 && make target_device=iphone target_device_version=${{ env.target_device_version }}
