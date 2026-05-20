@@ -9,6 +9,7 @@
 #include <data/player_data.h>
 #include <data/projectile_data.h>
 #include <data/scene_gameplay_data.h>
+#include <enumerations/c938_handedness.h>
 #include <generate/generate_buildings.h>
 #include <mesh/mesh_hud_item.h>
 #include <mesh/mesh_player.h>
@@ -19,6 +20,7 @@
 #include <network/network_host.h>
 #include <objects/object_crosshair.h>
 #include <objects/object_enemy.h>
+#include <objects/object_gun.h>
 #include <objects/object_player.h>
 #include <objects/object_projectile.h>
 #include <player/player.h>
@@ -174,6 +176,7 @@ void scene_gameplay_initialize(
     ) {
       case scene_gameplay_renderables_index_buildings:
       case scene_gameplay_renderables_index_group_players:
+      case scene_gameplay_renderables_index_group_guns:
       case scene_gameplay_renderables_index_projectiles:
       case scene_gameplay_renderables_index_enemies:
       case scene_gameplay_renderables_index_group_hud_health: {
@@ -286,6 +289,12 @@ void scene_gameplay_initialize(
       scene_gameplay_renderables_index_group_players
     ].renderable
   );
+  
+  struct metil_group* metil_group_guns = (
+    metil_scene_gameplay->renderables[
+      scene_gameplay_renderables_index_group_guns
+    ].renderable
+  );
 
   metil_group_add_length_initialize(
     metil_group_players,
@@ -301,11 +310,41 @@ void scene_gameplay_initialize(
 
   object_player_initialize(
     metil,
-    metil_object_player,    0x01
+    metil_object_player,
+    0x01
   );
-
-  struct metil_object* metil_object_crosshair = (
-    metil_scene_gameplay->renderables[
+  
+  metil_group_add_length_initialize(
+    metil_group_guns,
+    0x02,
+    metil_renderable_type_object
+  );
+  
+  struct metil_object* c938_gun_right = (
+    metil_group_guns->renderables[
+      0x00
+    ]->renderable
+  );
+  
+  struct metil_object* c938_gun_left = (
+    metil_group_guns->renderables[
+      0x01
+    ]->renderable
+  );
+  
+  object_gun_initialize(
+    metil,
+    c938_gun_right,
+    c938_handedness_right
+  );
+  
+  object_gun_initialize(
+    metil,
+    c938_gun_left,
+    c938_handedness_left
+  );
+    
+  struct metil_object* metil_object_crosshair = (    metil_scene_gameplay->renderables[
       scene_gameplay_renderables_index_crosshair
     ].renderable
   );
@@ -581,10 +620,27 @@ void scene_gameplay_populate(
       scene_gameplay_renderables_index_group_players
     ].renderable
   );
-
+  
+  struct metil_group* metil_group_guns = (
+    metil_scene_gameplay->renderables[
+      scene_gameplay_renderables_index_group_guns
+    ].renderable
+  );
   struct metil_object* metil_object_player = (
     metil_group_players->renderables[
       0x00
+    ]->renderable
+  );
+  
+  struct metil_object* c938_object_gun_right = (
+    metil_group_guns->renderables[
+      0x00
+    ]->renderable
+  );
+  
+  struct metil_object* c938_object_gun_left = (
+    metil_group_guns->renderables[
+      0x01
     ]->renderable
   );
 
@@ -823,8 +879,25 @@ void scene_gameplay_populate(
   metil_object_player->position.y = (
     metil_scene_gameplay->player.position.y
   );
-
-  metil_group_destroy(
+  
+  c938_object_gun_right->position.x = (
+    0x04
+  );
+  
+  c938_object_gun_right->position.y = (
+    metil_object_player->position.y +
+    0x06
+  );
+  
+  c938_object_gun_left->position.x = -(
+    0x04
+  );
+  
+  c938_object_gun_left->position.y = (
+    metil_object_player->position.y +
+    0x06
+  );   
+      metil_group_destroy(
     metil,
     metil_group_enemies
   );

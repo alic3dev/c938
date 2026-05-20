@@ -13,24 +13,25 @@
 #include <CoreAudio/CoreAudio.h>
 #endif
 
-#define scene_gameplay_length_renderables 0x0a
+#define scene_gameplay_length_renderables 0x0b
 
 enum scene_gameplay_renderables_index {
   scene_gameplay_renderables_index_buildings             = 0x00,
   scene_gameplay_renderables_index_group_players         = 0x01,
-  scene_gameplay_renderables_index_projectiles           = 0x02,
-  scene_gameplay_renderables_index_enemies               = 0x03,
-  scene_gameplay_renderables_index_hud_boosted           = 0x04,
-  scene_gameplay_renderables_index_hud_jumping           = 0x05,
-  scene_gameplay_renderables_index_hud_jumping_secondary = 0x06,
-  scene_gameplay_renderables_index_group_hud_health      = 0x07,
-  scene_gameplay_renderables_index_crosshair             = 0x08,
-  scene_gameplay_renderables_index_group_logging         = 0x09
+  scene_gameplay_renderables_index_group_guns            = 0x02,
+  scene_gameplay_renderables_index_projectiles           = 0x03,
+  scene_gameplay_renderables_index_enemies               = 0x04,
+  scene_gameplay_renderables_index_hud_boosted           = 0x05,
+  scene_gameplay_renderables_index_hud_jumping           = 0x06,
+  scene_gameplay_renderables_index_hud_jumping_secondary = 0x07,
+  scene_gameplay_renderables_index_group_hud_health      = 0x08,
+  scene_gameplay_renderables_index_crosshair             = 0x09,
+  scene_gameplay_renderables_index_group_logging         = 0x0a
 };
 
 enum scene_gameplay_renderables_index_range {
-  scene_gameplay_renderables_index_range_hud_start = 0x04,
-  scene_gameplay_renderables_index_range_hud_end   = 0x06
+  scene_gameplay_renderables_index_range_hud_start = 0x05,
+  scene_gameplay_renderables_index_range_hud_end   = 0x07
 };
 
 enum scene_gameplay_group_buildings_index {
