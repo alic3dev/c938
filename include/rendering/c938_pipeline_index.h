@@ -3,6 +3,7 @@
 
 extern unsigned short int c938_pipeline_index_building;
 extern unsigned short int c938_pipeline_index_ground;
+extern unsigned short int c938_pipeline_index_gun;
 extern unsigned short int c938_pipeline_index_hud_item;
 extern unsigned short int c938_pipeline_index_player;
 extern unsigned short int c938_pipeline_index_text;

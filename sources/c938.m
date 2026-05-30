@@ -138,6 +138,18 @@ void c938_renderer_on_initialize(
       newFunctionWithName: @"c938_ground_vertex"
     ]
   ];
+  
+  c938_pipeline_index_gun = [
+    metil->renderer_interface.renderer
+    pipeline_add: [
+      metil->library.library
+      newFunctionWithName: @"c938_gun_fragment"
+    ]
+    function_vertex: [
+      metil->library.library
+      newFunctionWithName: @"c938_gun_vertex"
+    ]
+  ];
 
   c938_pipeline_index_hud_item = [
     metil->renderer_interface.renderer

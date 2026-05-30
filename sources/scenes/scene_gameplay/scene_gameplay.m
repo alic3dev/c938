@@ -31,6 +31,7 @@
 #include <clic3_memory.h>
 
 #include <math_c_minimum.h>
+#include <math_c_pi.h>
 
 #include <metil.h>
 #include <metil_audio/metil_audio_io_proc.h>
@@ -344,7 +345,8 @@ void scene_gameplay_initialize(
     c938_handedness_left
   );
     
-  struct metil_object* metil_object_crosshair = (    metil_scene_gameplay->renderables[
+  struct metil_object* metil_object_crosshair = (
+    metil_scene_gameplay->renderables[
       scene_gameplay_renderables_index_crosshair
     ].renderable
   );
@@ -357,7 +359,7 @@ void scene_gameplay_initialize(
   scene_gameplay_populate(
     metil,
     metil_scene_gameplay,
-    1
+    0x01
   );
 
   metil_audio_io_proc_add(
@@ -1120,6 +1122,12 @@ void scene_gameplay_poll(
   struct metil_group* metil_group_players = (
     metil_scene_gameplay->renderables[
       scene_gameplay_renderables_index_group_players
+    ].renderable
+  );
+  
+  struct metil_group* metil_group_guns = (
+    metil_scene_gameplay->renderables[
+      scene_gameplay_renderables_index_group_guns
     ].renderable
   );
 
@@ -1949,6 +1957,41 @@ void scene_gameplay_poll(
   metil_object_player->position.z = (
     metil_scene_gameplay->player.position.z
   );
+  
+  for (
+    unsigned char index_gun = (
+      0x00
+    );
+    (
+      index_gun <
+      metil_group_guns->length
+    );
+    ++index_gun
+  ) {
+    struct metil_object* metil_object_gun = (
+      metil_group_guns->renderables[
+        index_gun
+      ]->renderable
+    );
+    
+    metil_object_gun->position.x = (
+      metil_object_player->position.x
+    );
+    
+    metil_object_gun->position.y = (
+      metil_object_player->position.y +
+      0x0a
+    );
+    
+    metil_object_gun->position.z = (
+      metil_object_player->position.z
+    );
+    
+    metil_object_gun->rotation.y = (
+      -metil_scene_gameplay->player.rotation.y -
+      math_c_pi
+    );
+  }
 
   if (
     scene_gameplay_data->parameters->networked !=

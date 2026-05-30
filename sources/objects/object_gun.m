@@ -1,6 +1,7 @@
 #include <objects/object_gun.h>
 
 #include <mesh/mesh_gun.h>
+#include <rendering/c938_pipeline_index.h>
 
 void object_gun_initialize(
   struct metil* metil,
@@ -14,6 +15,10 @@ void object_gun_initialize(
   
   c938_object_gun->type_primitive = (
     MTLPrimitiveTypeLine
+  );
+  
+  c938_object_gun->index_pipeline_render = (
+    c938_pipeline_index_gun
   );
   
   metil_object_buffers_initialize(
