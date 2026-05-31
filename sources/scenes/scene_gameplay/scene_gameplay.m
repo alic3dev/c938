@@ -333,13 +333,13 @@ void scene_gameplay_initialize(
     ]->renderable
   );
   
-  object_gun_initialize(
+  c938_object_gun_initialize(
     metil,
     c938_gun_right,
     c938_handedness_right
   );
   
-  object_gun_initialize(
+  c938_object_gun_initialize(
     metil,
     c938_gun_left,
     c938_handedness_left
