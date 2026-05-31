@@ -1980,11 +1980,17 @@ void scene_gameplay_poll(
     
     metil_object_gun->position.y = (
       metil_object_player->position.y +
-      0x0a
+      0x0f +
+      metil_scene_gameplay->player.rotation.x /
+      0x02
     );
     
     metil_object_gun->position.z = (
       metil_object_player->position.z
+    );
+    
+    metil_object_gun->rotation.x = -(
+      metil_scene_gameplay->player.rotation.x
     );
     
     metil_object_gun->rotation.y = (

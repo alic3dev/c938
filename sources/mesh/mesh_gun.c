@@ -2448,9 +2448,9 @@ void mesh_gun_initialize(
       mesh_gun->vertices[
         index_vertex
       ].z +
-      0x02
+      0x04
     );
-      
+    
     mesh_gun->vertices[
       index_vertex
     ].z = (
@@ -2461,13 +2461,15 @@ void mesh_gun_initialize(
     if (
       handedness ==
       c938_handedness_right
-    ) {      mesh_gun->vertices[
+    ) {
+      mesh_gun->vertices[
         index_vertex
       ].x = -(
         mesh_gun->vertices[
           index_vertex
         ].x
-      );    }
+      );
+    }
   }
 
   mesh_gun->indices[
