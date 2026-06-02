@@ -2,6 +2,7 @@
 
 #include <c938_metal/c938_data_vertex_textured_coloured.h>
 
+#include <math_c_absolute.h>
 #include <math_c_bound.h>
 #include <math_c_modulus.h>
 #include <math_c_vector_distance.h>
@@ -125,14 +126,17 @@
       index_vertex *
       34.234f
     )
-    % 0x02
+    %
+    0x02
   );
-
-  c938_data_vertex_textured_coloured.colour = metal::float4(
-    data_object->colour.x,
-    data_object->colour.y,
-    data_object->colour.z,
-    data_object->colour.w
+  
+  c938_data_vertex_textured_coloured.colour = (
+    float4(
+      data_object->colour.x,
+      data_object->colour.y,
+      data_object->colour.z,
+      data_object->colour.w
+    )
   );
 
   return (
@@ -172,41 +176,267 @@
     metal::r_address::repeat,
     metal::s_address::repeat
   );
+  
+  constexpr metal::sampler sampler_no_repeat(
+    metal::mag_filter::linear
+  );
+  
   float4 sample = (
     texture.sample(
       sampler,
-      c938_data_vertex_textured_coloured.position_texture * 0.1
+      (
+        c938_data_vertex_textured_coloured.position_texture *
+        0.1f
+      )
     ) *
     texture_two.sample(
       sampler,
-      c938_data_vertex_textured_coloured.position_texture * 0.1
+      (
+        c938_data_vertex_textured_coloured.position_texture *
+        0.1f
+      )
     ) *
     texture_three.sample(
       sampler,
-      c938_data_vertex_textured_coloured.position_texture * 0.1
+      (
+        c938_data_vertex_textured_coloured.position_texture *
+        0.1f
+      )
     ) *
     texture_four.sample(
       sampler,
-      c938_data_vertex_textured_coloured.position_texture * 0.1
+      (
+        c938_data_vertex_textured_coloured.position_texture *
+        0.1f
+      )
     )
   );
   
-  sample.w = 1;
-     return metal::float4(
-    (
-      c938_data_vertex_textured_coloured.colour.r *
-      brightness
-    ),
-    (
-      c938_data_vertex_textured_coloured.colour.g *
-      brightness
-    ),
-    (
-      c938_data_vertex_textured_coloured.colour.b *
-      brightness
-    ),
-    (
-      c938_data_vertex_textured_coloured.colour.a
-    )
-  ) * sample;
+  sample = (
+    float4(
+      (
+        c938_data_vertex_textured_coloured.colour.x *
+        brightness
+      ),
+      (
+        c938_data_vertex_textured_coloured.colour.y *
+        brightness
+      ),
+      (
+        c938_data_vertex_textured_coloured.colour.z *
+        brightness
+      ),
+      (
+        c938_data_vertex_textured_coloured.colour.w
+      )
+    ) *
+    sample
+  );
+  
+  if (
+    c938_data_vertex_textured_coloured.colour.x !=
+    0x01
+  ) {
+    sample = (
+      sample *
+      1.125f
+    );
+    
+    float max = (
+      sample.x
+    );
+    
+    if (
+      max <
+      sample.y
+    ) {
+      max = (
+        sample.y
+      );
+    }
+    
+    if (
+      max <
+      sample.z
+    ) {
+      max = (
+        sample.z
+      );
+    }
+    
+    sample.x = (
+      max
+    );
+    
+    sample.y = (
+      max
+    );
+    
+    sample.z = (
+      max
+    );
+    
+    float2 position_sample = (
+      (
+        c938_data_vertex_textured_coloured.position_texture +
+        (
+          0.23f +
+          (float)
+          (
+            (unsigned int)
+            (
+              math_c_absolute_float(
+                c938_data_vertex_textured_coloured.position.x
+              ) +
+              math_c_absolute_float(
+                c938_data_vertex_textured_coloured.position.y
+              )
+            ) %
+            0x0a
+          ) *
+          0.1f
+        )
+      )
+    );
+    
+    position_sample.x = (
+      math_c_modulus_mirror_float(
+        position_sample.x,
+        0x01
+      )
+    );
+    
+    position_sample.y = (
+      math_c_modulus_mirror_float(
+        position_sample.y * 0x03,
+        0x01
+      )
+    );  
+      
+    float4 sample_additional = (
+      texture_four.sample(
+        sampler_no_repeat,
+        position_sample * 0x05
+      ) *
+      0.05f
+    );
+    
+    if (
+      (
+        sample_additional.x >
+        sample_additional.y
+      ) &&
+      (
+        sample_additional.x >
+        sample_additional.z
+      )
+    ) {
+      sample_additional.y = (
+        0x00
+      );
+      
+      sample_additional.z = (
+        0x00
+      );
+    } else if (
+      (
+        sample_additional.y >
+        sample_additional.x
+      ) &&
+      (
+        sample_additional.y >
+        sample_additional.z
+      )
+    ) {
+      sample_additional.x = (
+        0x00
+      );
+      
+      sample_additional.z = (
+        0x00
+      );
+    } else {
+      sample_additional.x = (
+        0x00
+      );
+      
+      sample_additional.y = (
+        0x00
+      );
+    }
+    
+    sample_additional = (
+      sample_additional *
+      0.25f
+    );
+    
+    if (
+      sample_additional.x !=
+      0x00
+    ) {
+      sample_additional.x = (
+        sample_additional.x +
+        0.75f
+      );
+    }
+    
+    if (
+      sample_additional.y !=
+      0x00
+    ) {
+      sample_additional.y = (
+        sample_additional.y +
+        0.75f
+      );
+    }
+    
+    sample_additional.z = (
+        math_c_modulus_mirror_float(
+          (
+            sample_additional.x +
+            sample_additional.y
+          ),
+          0x01
+        )
+      );
+    
+    
+    if (
+      sample_additional.z <
+      0.755f
+    ) {
+      sample_additional.z = (
+        0x00
+      );
+    } else {
+      sample_additional.z = (
+        sample_additional.z *
+        0.5f +
+        0.5f
+      );
+    }
+    
+    if (
+      sample_additional.x >
+      0x00
+    ) {
+      sample_additional.x = (
+        0x00
+      );
+    } 
+    
+    sample = (
+      sample +
+      sample_additional *
+      0.25f
+    );
+  }
+  
+  sample.w = (
+    0x01
+  );
+  
+  return (
+    sample
+  );
 }
