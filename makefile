@@ -268,6 +268,7 @@ ${file_output}: ${files_objects_c} ${files_objects_objc} ${file_output_metal} ${
 ifneq (${debug}, 1)
 	${strip} ${strip_flags} ${file_output}
 endif
+	cp -a ${directory_textures} ${directory_output_textures}
 ifneq (${release}, 1)
 ifeq (${debug}, 1)
 	if [[ ! -f ${directory_app_contents_macos}/cer0_debug.${version_target_cer0}.dylib ]]; then ln -s ${shell realpath ${file_cer0_library}} ${directory_app_contents_macos}/cer0_debug.${version_target_cer0}.dylib; fi
@@ -291,6 +292,7 @@ ifeq (${target_os},ios)
 ${file_output}: ${files_objects_c} ${files_objects_objc} ${file_output_metal} ${files_storyboards_compiled} ${file_output_info_plist} ${files_textures_resources}
 	mkdir -p ${directory_output}
 	${cc} ${c_flags_platform} ${c_flags_frameworks} ${files_objects_c} ${files_objects_objc} ${files_libraries} -o ${file_output}
+	cp -a ${directory_textures} ${directory_output_textures}
 endif
 
 ${directory_output_textures}/%: ${directory_textures}/%
