@@ -138,6 +138,10 @@
       data_object->colour.w
     )
   );
+  
+  c938_data_vertex_textured_coloured.offset = (
+    data_frame->frame
+  );
 
   return (
     c938_data_vertex_textured_coloured
@@ -301,14 +305,48 @@
     
     position_sample.x = (
       math_c_modulus_mirror_float(
-        position_sample.x,
+        (
+          position_sample.x +
+          (
+            (float)
+            c938_data_vertex_textured_coloured.offset
+          ) /
+          0x03e8 +
+          (
+            (float)
+            (
+              ( 
+                (unsigned int)
+                c938_data_vertex_textured_coloured.offset
+              ) /
+              0x11
+            ) /
+            0x64
+          )
+        ),
         0x01
       )
     );
     
     position_sample.y = (
       math_c_modulus_mirror_float(
-        position_sample.y * 0x03,
+        (
+          position_sample.y *
+          0x03 +
+          (
+            (float)
+            c938_data_vertex_textured_coloured.offset
+          ) /
+          0x3a98 +
+          (
+            (float)
+            (
+              (                (unsigned int)
+                c938_data_vertex_textured_coloured.offset
+              ) /
+              0x10
+            ) /
+            0x64          )                     ),
         0x01
       )
     );  
