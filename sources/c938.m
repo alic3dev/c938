@@ -21,6 +21,7 @@
 #include <metil_rendering/metil_renderer_interface.h>
 #include <metil_scenes/metil_scene.h>
 #include <metil_scenes/metil_scene_controller.h>
+#include <metil_texture_store.h>
 
 #if target_os_ios
 char* c938_executable_path = (
@@ -249,6 +250,33 @@ void c938_renderer_on_initialize(
 
   metil->text_defaults.object_text_index_pipeline_render = (
     c938_pipeline_index_text
+  );
+  
+  metil_texture_store_add(
+    &metil->texture_store,
+    0x16,
+    "buildings/building_ext.png",
+    "buildings/building_ext_2.png",
+    "buildings/building_ext_3.png",
+    "buildings/building_ext_4.png",
+    "buildings/building_1.png",
+    "buildings/building_2.png",
+    "buildings/building_3.png",
+    "buildings/building_5.png",
+    "buildings/building_6.png",
+    "buildings/building_7.png",
+    "buildings/building_8.png",
+    "buildings/building_11.png",
+    "buildings/building_12.png",
+    "buildings/building_13.png",
+    "buildings/building_14.png",
+    "ground/ground.png",
+    "sky/sky.png",
+    "sky/sky_2.png",
+    "sky/sky_3.png",
+    "sky/sky_4.png",
+    "sky/sky_5.png",
+    "sky/sky_6.png"
   );
 
   metil->data = (
