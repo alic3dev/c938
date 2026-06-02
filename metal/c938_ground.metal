@@ -9,6 +9,8 @@
 #include <metil_rendering/metil_renderer_data_object.h>
 #include <metil_rendering/metil_renderer_vertex_index_parameter.h>
 
+#include <metal_texture>
+
 [[vertex]] struct c938_data_vertex_textured c938_ground_vertex(
   const device metal::float4* vertices [[
     buffer(
@@ -38,28 +40,16 @@
 
   c938_data_vertex_textured.brightness = (
     data_frame->brightness *
-    math_c_maximum_float(
-      (
-        math_c_minimum_float(
-          0x01 -
-          (
-            (
-              vertices[
-                index_vertex
-              ].z +
-              data_object->size.z /
-              0x02
-            ) /
-            data_object->size.z *
-            0x08
-          ),
-          0x01
-        ) /
-        0x02
-      ),
-      0x00
-    ) *
-    0.013
+    0.05
+  );
+  
+  c938_data_vertex_textured.position_texture.x = (
+    index_vertex % 0x02
+  );
+  
+  c938_data_vertex_textured.position_texture.y = (
+    index_vertex /
+     0x02
   );
 
   return (
@@ -68,12 +58,26 @@
 }
 
 [[fragment]] metal::float4 c938_ground_fragment(
-  c938_data_vertex_textured c938_data_vertex_textured [[stage_in]]
+  c938_data_vertex_textured c938_data_vertex_textured [[stage_in]],
+  metal::texture2d<float> texture [[
+    texture(
+      0x00
+    )
+  ]]
 ) {
-  return metal::float4(
+  constexpr metal::sampler sampler(
+    metal::t_address::repeat,
+    metal::r_address::repeat,
+    metal::s_address::repeat
+  );
+
+  return float4(
     c938_data_vertex_textured.brightness,
     c938_data_vertex_textured.brightness,
     c938_data_vertex_textured.brightness,
     0x01
-  );
+  ) * texture.sample(sampler,  c938_data_vertex_textured.position_texture * 0x0a ) *
+  texture.sample(sampler,  c938_data_vertex_textured.position_texture * 0x01 ) *
+  texture.sample(sampler,  c938_data_vertex_textured.position_texture * 0xd )
+    ;
 }
