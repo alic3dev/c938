@@ -269,6 +269,7 @@ ifneq (${debug}, 1)
 	${strip} ${strip_flags} ${file_output}
 endif
 	cp -a ${directory_textures} ${directory_output_textures}
+	rm ${directory_output_textures}/readme.md
 ifneq (${release}, 1)
 ifeq (${debug}, 1)
 	if [[ ! -f ${directory_app_contents_macos}/cer0_debug.${version_target_cer0}.dylib ]]; then ln -s ${shell realpath ${file_cer0_library}} ${directory_app_contents_macos}/cer0_debug.${version_target_cer0}.dylib; fi
@@ -293,6 +294,7 @@ ${file_output}: ${files_objects_c} ${files_objects_objc} ${file_output_metal} ${
 	mkdir -p ${directory_output}
 	${cc} ${c_flags_platform} ${c_flags_frameworks} ${files_objects_c} ${files_objects_objc} ${files_libraries} -o ${file_output}
 	cp -a ${directory_textures} ${directory_output_textures}
+	rm ${directory_output_textures}/readme.md
 endif
 
 ${directory_output_textures}/%: ${directory_textures}/%
