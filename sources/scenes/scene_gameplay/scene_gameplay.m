@@ -37,6 +37,7 @@
 #include <metil_audio/metil_audio_io_proc.h>
 #include <metil_debug/metil_debug_log.h>
 #include <metil_group.h>
+#include <metil_mesh/metil_mesh_sphere.h>
 #include <metil_object.h>
 #include <metil_paths/metil_paths.h>
 #include <metil_positioning.h>
@@ -203,7 +204,49 @@ void scene_gameplay_initialize(
       }
     }
   }
+  
+  struct metil_object* sky = metil_scene_gameplay->renderables[
+  0
+  ].renderable;
+  
+  metil_mesh_sphere_initialize(
+    &sky->mesh,
+    0xffff,
+    (struct math_c_vector2_unsigned_short_int) {
+    
+ .x = (
+         0x1f
+       ),.y = ( 0x1f)
+     }  );
+  
+metil_object_buffers_initialize(
+ sky,
+ metil->renderer_interface.metal_device);
+ 
+  metil_object_texture_add(
+        sky,
+        metil->texture_store.textures[
+          0x14
+        ]
+      );
+      
+      metil_object_texture_add(
+        sky,
+        metil->texture_store.textures[
+          0x14
+        ]
+      );
+      
+      metil_object_texture_add(
+        sky,
+        metil->texture_store.textures[
+          0x14
+        ]
+      );
+      
+sky->index_pipeline_render = c938_pipeline_index_sky;
 
+    
   metil_scene_gameplay->renderables[
     scene_gameplay_renderables_index_group_logging
   ].type = (
