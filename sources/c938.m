@@ -222,6 +222,18 @@ void c938_renderer_on_initialize(
       newFunctionWithName: @"c938_enemy_vertex"
     ]
   ];
+  
+  c938_pipeline_index_sky = [
+    metil->renderer_interface.renderer
+    pipeline_add: [
+      metil->library.library
+      newFunctionWithName: @"c938_sky_fragment"
+    ]
+    function_vertex: [
+      metil->library.library
+      newFunctionWithName: @"c938_sky_vertex"
+    ]
+  ];
 
   c938_pipeline_index_text_backing_menu = [
     metil->renderer_interface.renderer
