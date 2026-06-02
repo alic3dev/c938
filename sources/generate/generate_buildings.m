@@ -344,10 +344,6 @@ void generate_buildings(
       }
     }
 
-    object->type_primitive = (
-      MTLPrimitiveTypeLine
-    );
-
     metil_object_buffers_initialize(
       object,
       metal_device
@@ -440,6 +436,48 @@ void generate_buildings(
         limits.y
       );
     }
+    
+    for (
+      unsigned char index_texture = (
+        0x00
+      );
+      (
+        index_texture <
+        0x03
+      );
+      ++index_texture
+    ) {
+      metil_object_texture_add(
+        object,
+        metil->texture_store.textures[
+          index_texture
+        
+        ]
+        
+      );    }
+    
+    for (
+      unsigned char index_texture = (
+        0x00
+      );
+      (
+        index_texture <
+        0x04
+      );
+      ++index_texture
+    ) {
+      metil_object_texture_add(
+        object,
+        metil->texture_store.textures[
+          (
+            index_texture +
+            index_building
+          ) %
+          0x0b +
+          0x04
+        ]
+      );
+    }
   }
 
   object = (
@@ -462,10 +500,6 @@ void generate_buildings(
     )
   );
 
-  object->type_primitive = (
-    MTLPrimitiveTypeLine
-  );
-
   object->index_pipeline_render = (
     c938_pipeline_index_ground
   );
@@ -478,6 +512,26 @@ void generate_buildings(
     object,
     metal_device
   );
+  
+  
+  
+  
+  metil_object_texture_add(
+        object,
+        metil->texture_store.textures[
+          0x0f
+        ]
+      );
+      
+      
+      
+      
+      
+      
+      
+      
+     
+     
 
   rand_clean(
     &rand_result,
