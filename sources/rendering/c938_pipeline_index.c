@@ -9,4 +9,5 @@ unsigned short int c938_pipeline_index_text              = 0x00;
 unsigned short int c938_pipeline_index_crosshair         = 0x00;
 unsigned short int c938_pipeline_index_projectile        = 0x00;
 unsigned short int c938_pipeline_index_enemy             = 0x00;
+unsigned short int c938_pipeline_index_sky               = 0x00;
 unsigned short int c938_pipeline_index_text_backing_menu = 0x00;
