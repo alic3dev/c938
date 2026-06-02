@@ -139,7 +139,7 @@ void c938_renderer_on_initialize(
       newFunctionWithName: @"c938_ground_vertex"
     ]
   ];
-  
+
   c938_pipeline_index_gun = [
     metil->renderer_interface.renderer
     pipeline_add: [
@@ -223,7 +223,7 @@ void c938_renderer_on_initialize(
       newFunctionWithName: @"c938_enemy_vertex"
     ]
   ];
-  
+
   c938_pipeline_index_sky = [
     metil->renderer_interface.renderer
     pipeline_add: [
@@ -251,7 +251,7 @@ void c938_renderer_on_initialize(
   metil->text_defaults.object_text_index_pipeline_render = (
     c938_pipeline_index_text
   );
-  
+
   metil_texture_store_add(
     &metil->texture_store,
     0x16,

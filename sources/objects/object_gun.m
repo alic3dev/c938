@@ -18,20 +18,20 @@ void c938_object_gun_initialize(
     &c938_object_gun->mesh,
     handedness
   );
-  
+
   c938_object_gun->type_primitive = (
     MTLPrimitiveTypeLine
   );
-  
+
   c938_object_gun->index_pipeline_render = (
     c938_pipeline_index_gun
   );
-  
+
   metil_object_buffers_initialize(
     c938_object_gun,
     metil->renderer_interface.metal_device
   );
-  
+
   c938_object_gun->data = (
     clic3_memory_allocate_raw(
       sizeof(
@@ -39,27 +39,27 @@ void c938_object_gun_initialize(
       )
     )
   );
-  
+
   struct c938_data_gun_data* c938_data_gun_data = (
     c938_object_gun->data
   );
-  
+
   c938_animation_gun_idle_initialize(
     &c938_data_gun_data->animation_idle,
     &c938_object_gun->position,
     &c938_object_gun->rotation
   );
-  
+
   metil_animation_start(
     &c938_data_gun_data->animation_idle,
     metil_renderable_type_object,
     0x00
   );
-  
+
   c938_object_gun->poll = (
     c938_object_gun_poll
   );
-  
+
   c938_object_gun->destroy = (
     c938_object_gun_destroy
   );
@@ -76,13 +76,13 @@ void c938_object_gun_poll(
   struct c938_data_gun_data* c938_data_gun_data = (
     c938_object_gun->data
   );
-  
+
   metil_animation_poll(
     &c938_data_gun_data->animation_idle,
     metil_renderable_type_object,
     0x00
   );
-  
+
   metil_object_poll(
     metil,
     c938_object_gun,
@@ -104,10 +104,9 @@ void c938_object_gun_destroy(
   c938_animation_gun_idle_destroy(
     &c938_data_gun_data->animation_idle
   );
-  
+
   metil_object_destroy(
     metil,
     c938_object_gun
-  );  
+  );
 }
-

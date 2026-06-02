@@ -265,49 +265,49 @@ void mesh_building_initialize(
       0x01
     );
   }
-  
+
   for (
     unsigned int index_index = 0;
     index_index < mesh->length_indices;
     ++index_index
   ) { mesh->indices[index_index] = 0; }
-  
+
   mesh->indices[
     0x00
   ] = (
     0x00
   );
-  
+
   mesh->indices[
     0x01
   ] = (
     0x01
   );
-  
+
   mesh->indices[
     0x02
   ] = (
     0x02
   );
-  
+
   mesh->indices[
     0x03
   ] = (
     0x02
   );
-  
+
   mesh->indices[
     0x04
   ] = (
     0x03
   );
-  
+
   mesh->indices[
     0x05
   ] = (
     0x00
   );
-  
+
   for (
     unsigned int index_index = (
       0x06
@@ -331,25 +331,25 @@ void mesh_building_initialize(
       ) /
       0x18
     );
-    
+
     unsigned int index_vertex = (
       index_layer *
       0x04
     );
-  
+
     mesh->indices[
       index_index
     ] = (
       index_vertex
     );
-    
+
     mesh->indices[
       index_index +
       0x01
     ] = (
       index_vertex +
       0x01    );
-    
+
     mesh->indices[
       index_index +
       0x02
@@ -357,7 +357,7 @@ void mesh_building_initialize(
       index_vertex +
       0x04
     );
-    
+
     mesh->indices[
       index_index +
       0x03
@@ -365,7 +365,7 @@ void mesh_building_initialize(
       index_vertex +
       0x04
     );
-    
+
     mesh->indices[
       index_index +
       0x04
@@ -373,7 +373,7 @@ void mesh_building_initialize(
       index_vertex +
       0x05
     );
-    
+
     mesh->indices[
       index_index +
       0x05
@@ -381,7 +381,7 @@ void mesh_building_initialize(
       index_vertex +
       0x01
     );
-    
+
     mesh->indices[
       index_index +
       0x06
@@ -389,7 +389,7 @@ void mesh_building_initialize(
       index_vertex +
       0x01
     );
-    
+
     mesh->indices[
       index_index +
       0x07
@@ -397,7 +397,7 @@ void mesh_building_initialize(
       index_vertex +
       0x02
     );
-    
+
     mesh->indices[
       index_index +
       0x08
@@ -405,7 +405,7 @@ void mesh_building_initialize(
       index_vertex +
       0x05
     );
-    
+
     mesh->indices[
       index_index +
       0x09
@@ -413,7 +413,7 @@ void mesh_building_initialize(
       index_vertex +
       0x05
     );
-    
+
     mesh->indices[
       index_index +
       0x0a
@@ -421,7 +421,7 @@ void mesh_building_initialize(
       index_vertex +
       0x06
     );
-    
+
     mesh->indices[
       index_index +
       0x0b
@@ -429,7 +429,7 @@ void mesh_building_initialize(
       index_vertex +
       0x02
     );
-    
+
     mesh->indices[
       index_index +
       0x0c
@@ -437,7 +437,7 @@ void mesh_building_initialize(
       index_vertex +
       0x02
     );
-    
+
     mesh->indices[
       index_index +
       0x0d
@@ -445,7 +445,7 @@ void mesh_building_initialize(
       index_vertex +
       0x03
     );
-    
+
     mesh->indices[
       index_index +
       0x0e
@@ -453,7 +453,7 @@ void mesh_building_initialize(
       index_vertex +
       0x06
     );
-    
+
     mesh->indices[
       index_index +
       0x0f
@@ -461,7 +461,7 @@ void mesh_building_initialize(
       index_vertex +
       0x06
     );
-    
+
     mesh->indices[
       index_index +
       0x10
@@ -469,7 +469,7 @@ void mesh_building_initialize(
       index_vertex +
       0x07
     );
-    
+
     mesh->indices[
       index_index +
       0x11
@@ -477,7 +477,7 @@ void mesh_building_initialize(
       index_vertex +
       0x03
     );
-    
+
     mesh->indices[
       index_index +
       0x12
@@ -485,7 +485,7 @@ void mesh_building_initialize(
       index_vertex +
       0x03
     );
-    
+
     mesh->indices[
       index_index +
       0x13
@@ -493,7 +493,7 @@ void mesh_building_initialize(
       index_vertex +
       0x07
     );
-    
+
     mesh->indices[
       index_index +
       0x14
@@ -501,7 +501,7 @@ void mesh_building_initialize(
       index_vertex +
       0x04
     );
-    
+
     mesh->indices[
       index_index +
       0x15
@@ -509,7 +509,7 @@ void mesh_building_initialize(
       index_vertex +
       0x04
     );
-    
+
     mesh->indices[
       index_index +
       0x16
@@ -517,7 +517,7 @@ void mesh_building_initialize(
       index_vertex +
       0x00
     );
-    
+
     mesh->indices[
       index_index +
       0x17
@@ -526,7 +526,7 @@ void mesh_building_initialize(
       0x03
     );
   }
-  
+
   mesh->indices[
     mesh->length_indices -
     0x06
@@ -534,7 +534,7 @@ void mesh_building_initialize(
     mesh->length_vertices -
     0x04
   );
-  
+
   mesh->indices[
     mesh->length_indices -
     0x05
@@ -542,7 +542,7 @@ void mesh_building_initialize(
     mesh->length_vertices -
     0x03
   );
-  
+
   mesh->indices[
     mesh->length_indices -
     0x04
@@ -550,7 +550,7 @@ void mesh_building_initialize(
     mesh->length_vertices -
     0x02
   );
-  
+
   mesh->indices[
     mesh->length_indices -
     0x03
@@ -558,7 +558,7 @@ void mesh_building_initialize(
     mesh->length_vertices -
     0x02
   );
-  
+
   mesh->indices[
     mesh->length_indices -
     0x02
@@ -566,7 +566,7 @@ void mesh_building_initialize(
     mesh->length_vertices -
     0x04
   );
-  
+
   mesh->indices[
     mesh->length_indices -
     0x01

@@ -15,7 +15,7 @@ void c938_animation_gun_idle_initialize(
   metil_animation_initialize(
     c938_animation_gun_idle
   );
-  
+
   c938_animation_gun_idle->data = (
     clic3_memory_allocate_raw(
       sizeof(
@@ -23,53 +23,53 @@ void c938_animation_gun_idle_initialize(
       )
     )
   );
-  
+
   struct c938_animation_gun_idle_data* c938_animation_gun_idle_data = (
     c938_animation_gun_idle->data
   );
-  
+
   c938_animation_gun_idle_data->position = (
     position
   );
-  
+
   c938_animation_gun_idle_data->rotation = (
     rotation
   );
-  
+
   c938_animation_gun_idle_data->position_offset.x = (
     0x00
   );
-  
+
   c938_animation_gun_idle_data->position_offset.y = (
     0x00
   );
-  
+
   c938_animation_gun_idle_data->position_offset.z = (
     0x00
   );
-  
+
   c938_animation_gun_idle->loops = (
     metil_animation_loop_loops_mirrored
   );
-  
+
   c938_animation_gun_idle->length = (
     0x1388
   );
-  
+
   c938_animation_gun_idle->start = (
     c938_animation_gun_idle_start
   );
-  
+
   c938_animation_gun_idle->poll = (
     c938_animation_gun_idle_poll
-  );  
+  );
 }
 
 void c938_animation_gun_idle_start(
   struct metil_animation* c938_animation_gun_idle,
   enum metil_renderable_type metil_renderable_type,
   void* data
-) {  
+) {
 }
 
 void c938_animation_gun_idle_poll(
@@ -83,22 +83,22 @@ void c938_animation_gun_idle_poll(
   struct c938_animation_gun_idle_data* c938_animation_gun_idle_data = (
     c938_animation_gun_idle->data
   );
-  
+
   c938_animation_gun_idle_data->position->x = (
     c938_animation_gun_idle_data->position->x -
     c938_animation_gun_idle_data->position_offset.x
   );
-  
+
   c938_animation_gun_idle_data->position->y = (
     c938_animation_gun_idle_data->position->y -
     c938_animation_gun_idle_data->position_offset.y
   );
-  
+
   c938_animation_gun_idle_data->position->z = (
     c938_animation_gun_idle_data->position->z -
     c938_animation_gun_idle_data->position_offset.z
   );
-  
+
   c938_animation_gun_idle_data->position_offset.x = (
     (float)
     (
@@ -117,7 +117,7 @@ void c938_animation_gun_idle_poll(
     ) /
     0x64
   );
-  
+
   c938_animation_gun_idle_data->position_offset.y = (
     (float)
     (
@@ -136,7 +136,7 @@ void c938_animation_gun_idle_poll(
     ) /
     0x64
   );
-  
+
   c938_animation_gun_idle_data->position_offset.z = (
     (float)
     (
@@ -155,21 +155,21 @@ void c938_animation_gun_idle_poll(
     ) /
     0x64
   );
-  
+
   c938_animation_gun_idle_data->position->x = (
     c938_animation_gun_idle_data->position->x +
     c938_animation_gun_idle_data->position_offset.x
   );
-  
+
   c938_animation_gun_idle_data->position->y = (
     c938_animation_gun_idle_data->position->y +
     c938_animation_gun_idle_data->position_offset.y
   );
-  
+
   c938_animation_gun_idle_data->position->z = (
     c938_animation_gun_idle_data->position->z +
     c938_animation_gun_idle_data->position_offset.z
-  );                
+  );
 }
 
 void c938_animation_gun_idle_destroy(
@@ -179,4 +179,3 @@ void c938_animation_gun_idle_destroy(
     c938_animation_gun_idle->data
   );
 }
-

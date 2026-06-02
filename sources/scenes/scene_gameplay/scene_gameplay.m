@@ -204,49 +204,48 @@ void scene_gameplay_initialize(
       }
     }
   }
-  
+
   struct metil_object* sky = metil_scene_gameplay->renderables[
   0
   ].renderable;
-  
+
   metil_mesh_sphere_initialize(
     &sky->mesh,
     0xffff,
     (struct math_c_vector2_unsigned_short_int) {
-    
+
  .x = (
          0x1f
        ),.y = ( 0x1f)
      }  );
-  
+
 metil_object_buffers_initialize(
  sky,
  metil->renderer_interface.metal_device);
- 
+
   metil_object_texture_add(
         sky,
         metil->texture_store.textures[
           0x14
         ]
       );
-      
+
       metil_object_texture_add(
         sky,
         metil->texture_store.textures[
           0x14
         ]
       );
-      
+
       metil_object_texture_add(
         sky,
         metil->texture_store.textures[
           0x14
         ]
       );
-      
+
 sky->index_pipeline_render = c938_pipeline_index_sky;
 
-    
   metil_scene_gameplay->renderables[
     scene_gameplay_renderables_index_group_logging
   ].type = (
@@ -333,7 +332,7 @@ sky->index_pipeline_render = c938_pipeline_index_sky;
       scene_gameplay_renderables_index_group_players
     ].renderable
   );
-  
+
   struct metil_group* metil_group_guns = (
     metil_scene_gameplay->renderables[
       scene_gameplay_renderables_index_group_guns
@@ -357,37 +356,37 @@ sky->index_pipeline_render = c938_pipeline_index_sky;
     metil_object_player,
     0x01
   );
-  
+
   metil_group_add_length_initialize(
     metil_group_guns,
     0x02,
     metil_renderable_type_object
   );
-  
+
   struct metil_object* c938_gun_right = (
     metil_group_guns->renderables[
       0x00
     ]->renderable
   );
-  
+
   struct metil_object* c938_gun_left = (
     metil_group_guns->renderables[
       0x01
     ]->renderable
   );
-  
+
   c938_object_gun_initialize(
     metil,
     c938_gun_right,
     c938_handedness_right
   );
-  
+
   c938_object_gun_initialize(
     metil,
     c938_gun_left,
     c938_handedness_left
   );
-    
+
   struct metil_object* metil_object_crosshair = (
     metil_scene_gameplay->renderables[
       scene_gameplay_renderables_index_crosshair
@@ -665,7 +664,7 @@ void scene_gameplay_populate(
       scene_gameplay_renderables_index_group_players
     ].renderable
   );
-  
+
   struct metil_group* metil_group_guns = (
     metil_scene_gameplay->renderables[
       scene_gameplay_renderables_index_group_guns
@@ -676,13 +675,13 @@ void scene_gameplay_populate(
       0x00
     ]->renderable
   );
-  
+
   struct metil_object* c938_object_gun_right = (
     metil_group_guns->renderables[
       0x00
     ]->renderable
   );
-  
+
   struct metil_object* c938_object_gun_left = (
     metil_group_guns->renderables[
       0x01
@@ -924,24 +923,24 @@ void scene_gameplay_populate(
   metil_object_player->position.y = (
     metil_scene_gameplay->player.position.y
   );
-  
+
   c938_object_gun_right->position.x = (
     0x04
   );
-  
+
   c938_object_gun_right->position.y = (
     metil_object_player->position.y +
     0x06
   );
-  
+
   c938_object_gun_left->position.x = -(
     0x04
   );
-  
+
   c938_object_gun_left->position.y = (
     metil_object_player->position.y +
     0x06
-  );   
+  );
       metil_group_destroy(
     metil,
     metil_group_enemies
@@ -1167,7 +1166,7 @@ void scene_gameplay_poll(
       scene_gameplay_renderables_index_group_players
     ].renderable
   );
-  
+
   struct metil_group* metil_group_guns = (
     metil_scene_gameplay->renderables[
       scene_gameplay_renderables_index_group_guns
@@ -2000,7 +1999,7 @@ void scene_gameplay_poll(
   metil_object_player->position.z = (
     metil_scene_gameplay->player.position.z
   );
-  
+
   for (
     unsigned char index_gun = (
       0x00
@@ -2016,26 +2015,26 @@ void scene_gameplay_poll(
         index_gun
       ]->renderable
     );
-    
+
     metil_object_gun->position.x = (
       metil_object_player->position.x
     );
-    
+
     metil_object_gun->position.y = (
       metil_object_player->position.y +
       0x0f +
       metil_scene_gameplay->player.rotation.x /
       0x02
     );
-    
+
     metil_object_gun->position.z = (
       metil_object_player->position.z
     );
-    
+
     metil_object_gun->rotation.x = -(
       metil_scene_gameplay->player.rotation.x
     );
-    
+
     metil_object_gun->rotation.y = (
       -metil_scene_gameplay->player.rotation.y -
       math_c_pi

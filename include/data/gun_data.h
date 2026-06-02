@@ -9,4 +9,3 @@ struct c938_data_gun_data {
 };
 
 #endif
-

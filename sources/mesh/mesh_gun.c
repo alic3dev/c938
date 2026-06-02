@@ -2425,7 +2425,7 @@ void mesh_gun_initialize(
   ].w = (
     1.000000f
   );
-  
+
   for (
     unsigned int index_vertex = (
       0x00
@@ -2440,8 +2440,8 @@ void mesh_gun_initialize(
       mesh_gun->vertices[
         index_vertex
       ].x
-    );  
-    
+    );
+
     mesh_gun->vertices[
       index_vertex
     ].x = (
@@ -2450,14 +2450,14 @@ void mesh_gun_initialize(
       ].z +
       0x04
     );
-    
+
     mesh_gun->vertices[
       index_vertex
     ].z = (
       z -
       0x06
     );
-    
+
     if (
       handedness ==
       c938_handedness_right
@@ -6289,4 +6289,3 @@ void mesh_gun_initialize(
   );
 
 }
-
