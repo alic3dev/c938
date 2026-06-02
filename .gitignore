@@ -2,8 +2,8 @@ air
 metalar
 objects
 output
-textures
+textures/*
+!textures/readme.md
 !sources/objects
 !include/objects
 !sources/textures
-!include/textures
