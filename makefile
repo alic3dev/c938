@@ -186,6 +186,8 @@ files_objects_objc=${patsubst ${directory_sources}/%.m,${directory_objects_objc}
 files_metal=${wildcard ${directory_metal}/*.metal}
 files_air=${patsubst ${directory_metal}/%.metal,${directory_air}/%.air,${files_metal}}
 
+files_textures=${addprefix ${directory_textures}/,${shell cat "${directory_textures}/list"}}
+
 files_metalar_math_c=${directory_math_c_metalar}/math_c_absolute.metalar ${directory_math_c_metalar}/math_c_bound.metalar ${directory_math_c_metalar}/math_c_maximum.metalar ${directory_math_c_metalar}/math_c_minimum.metalar ${directory_math_c_metalar}/math_c_modulus.metalar ${directory_math_c_metalar}/math_c_power.metalar
 files_metalar_math_c:=${files_metalar_math_c} ${directory_math_c_metalar}/math_c_sine.metalar ${directory_math_c_metalar}/math_c_square_root.metalar ${directory_math_c_metalar}/math_c_vector_distance.metalar
 
@@ -385,18 +387,21 @@ else
 endif
 endif
 
-pull_content: ${directory_textures} ${files_content_textures}
+pull_content: ${files_textures}
 
-pull_content_all: ${directory_textures} ${files_content_textures_always}
+pull_content_all: ${files_textures_always}
 
-${directory_textures}:
-	mkdir -p ${directory_textures}
+url_remote_texture_prefix=https://3v1jlfp7bog1vp9k.public.blob.vercel-storage.com/c938
 
-${prefix_content_texture}/%:
-	if [[ ! -f ${patsubst ${prefix_content_texture}/%,${directory_textures}/%,$@} ]]; then curl ${patsubst ${prefix_content_texture}/%,${url_content_textures}/%,$@} -o ${patsubst ${prefix_content_texture}/%,${directory_textures}/%,$@}; fi
-
-${prefix_content_texture_always}/%:
-	curl ${patsubst ${prefix_content_texture_always}/%,${url_content_textures}/%,$@} -o ${patsubst ${prefix_content_texture_always}/%,${directory_textures}/%,$@}
+ifdef pull_content_overwrite
+${directory_textures}/%.png: .always
+	if [[ ! -d "${shell dirname ${@}}" ]]; then mkdir "${shell dirname ${@}}"; fi
+	curl "${url_remote_texture_prefix}/${@}" -o "${@}";
+else
+${directory_textures}/%.png:
+	if [[ ! -d "${shell dirname ${@}}" ]]; then mkdir "${shell dirname ${@}}"; fi
+	if [[ ! -f "${url_remote_texture_prefix}/${@}" ]]; then curl "${url_remote_texture_prefix}/${@}" -o "${@}"; fi
+endif
 
 clean_all: clean
 
