@@ -4,10 +4,13 @@
 #include <metil.h>
 #include <metil_object.h>
 
+#include <Metal/MTLTexture.h>
+
 void c938_object_gun_initialize(
   struct metil* _Nonnull,
   struct metil_object* _Nonnull,
-  unsigned char
+  unsigned char,
+  id<MTLTexture> _Nonnull
 );
 
 void c938_object_gun_poll(

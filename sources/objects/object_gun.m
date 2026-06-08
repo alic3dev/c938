@@ -9,10 +9,13 @@
 
 #include <metil_object/metil_object.h>
 
+#include <Metal/MTLTexture.h>
+
 void c938_object_gun_initialize(
   struct metil* metil,
   struct metil_object* c938_object_gun,
-  unsigned char handedness
+  unsigned char handedness,
+  id<MTLTexture> texture_gun
 ) {
   mesh_gun_initialize(
     &c938_object_gun->mesh,
@@ -20,7 +23,7 @@ void c938_object_gun_initialize(
   );
 
   c938_object_gun->type_primitive = (
-    MTLPrimitiveTypeLine
+    MTLPrimitiveTypeTriangleStrip
   );
 
   c938_object_gun->index_pipeline_render = (
@@ -30,6 +33,11 @@ void c938_object_gun_initialize(
   metil_object_buffers_initialize(
     c938_object_gun,
     metil->renderer_interface.metal_device
+  );
+  
+  metil_object_texture_add(
+    c938_object_gun,
+    texture_gun
   );
 
   c938_object_gun->data = (

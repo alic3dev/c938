@@ -206,45 +206,51 @@ void scene_gameplay_initialize(
   }
 
   struct metil_object* sky = metil_scene_gameplay->renderables[
-  0
+    0x00
   ].renderable;
 
   metil_mesh_sphere_initialize(
     &sky->mesh,
     0xffff,
     (struct math_c_vector2_unsigned_short_int) {
+      .x = (
+        0x1f
+      ),
+      .y = (
+        0x1f
+      )
+    }
+  );
 
- .x = (
-         0x1f
-       ),.y = ( 0x1f)
-     }  );
-
-metil_object_buffers_initialize(
- sky,
- metil->renderer_interface.metal_device);
+  metil_object_buffers_initialize(
+    sky,
+    metil->renderer_interface.metal_device
+  );
 
   metil_object_texture_add(
-        sky,
-        metil->texture_store.textures[
-          0x14
-        ]
-      );
+    sky,
+    metil->texture_store.textures[
+      0x14
+    ]
+  );
 
-      metil_object_texture_add(
-        sky,
-        metil->texture_store.textures[
-          0x14
-        ]
-      );
+  metil_object_texture_add(
+    sky,
+    metil->texture_store.textures[
+      0x14
+    ]
+  );
 
-      metil_object_texture_add(
-        sky,
-        metil->texture_store.textures[
-          0x14
-        ]
-      );
+  metil_object_texture_add(
+    sky,
+    metil->texture_store.textures[
+      0x14
+    ]
+  );
 
-sky->index_pipeline_render = c938_pipeline_index_sky;
+  sky->index_pipeline_render = (
+    c938_pipeline_index_sky
+  );
 
   metil_scene_gameplay->renderables[
     scene_gameplay_renderables_index_group_logging
@@ -378,13 +384,19 @@ sky->index_pipeline_render = c938_pipeline_index_sky;
   c938_object_gun_initialize(
     metil,
     c938_gun_right,
-    c938_handedness_right
+    c938_handedness_right,
+    metil->texture_store.textures[
+      0x00
+    ]
   );
 
   c938_object_gun_initialize(
     metil,
     c938_gun_left,
-    c938_handedness_left
+    c938_handedness_left,
+    metil->texture_store.textures[
+      0x00
+    ]
   );
 
   struct metil_object* metil_object_crosshair = (

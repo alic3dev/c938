@@ -71,13 +71,29 @@
     metal::s_address::repeat
   );
 
-  return float4(
-    c938_data_vertex_textured.brightness,
-    c938_data_vertex_textured.brightness,
-    c938_data_vertex_textured.brightness,
-    0x01
-  ) * texture.sample(sampler,  c938_data_vertex_textured.position_texture * 0x0a ) *
-  texture.sample(sampler,  c938_data_vertex_textured.position_texture * 0x01 ) *
-  texture.sample(sampler,  c938_data_vertex_textured.position_texture * 0xd )
-    ;
-}
+  return (
+    float4(
+      c938_data_vertex_textured.brightness,
+      c938_data_vertex_textured.brightness,
+      c938_data_vertex_textured.brightness,
+      0x01
+    ) *
+    texture.sample(
+      sampler, 
+      (
+        c938_data_vertex_textured.position_texture *
+        0x0a
+      )
+    ) *
+    texture.sample(
+      sampler, 
+      c938_data_vertex_textured.position_texture
+    ) *
+    texture.sample(
+      sampler, 
+      (
+        c938_data_vertex_textured.position_texture *
+        0x0d
+      )
+    )
+  );}
