@@ -4,6 +4,7 @@ objects
 output
 textures/*
 !textures/readme.md
+!textures/list
 !sources/objects
 !include/objects
 !sources/textures
