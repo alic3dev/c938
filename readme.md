@@ -12,11 +12,13 @@
 
 ## multi_player
 
-| | |
-|-|-|
-| <img width=1811 height=1200 alt=c938::multiplayer src=https://github.com/user-attachments/assets/57a8a7b0-c62f-4403-876d-e484e941254d /> | <img width=1920 height=1205 alt=c938::multiplayer::second src=https://github.com/user-attachments/assets/024f4976-f80a-439f-b983-fc9bbdee1307 /> |
+<img width="1920" height="1243" alt="c938_multiplayer_with_terminal" src="https://github.com/user-attachments/assets/1b559c51-d6d9-4fd0-9b47-b6f177ac704e" />
 
-<img width=1920 height=1206 alt=c938::multiplayer::third src=https://github.com/user-attachments/assets/2ea41731-9462-445d-968b-5a18830bebf7 />
+| | | |
+|-|-|-|
+| <img width="1920" height="1243" alt="c938_multiplayer_with_terminal_two" src="https://github.com/user-attachments/assets/c0dc75c7-13c5-4e98-979d-6a6db8c64250" /> | <img width="1920" height="1243" alt="c938_multiplayer" src="https://github.com/user-attachments/assets/5ee18ca2-bea2-4e0a-b45e-26baf5673973" /> | <img width="1920" height="1243" alt="c938_multiplayer_two" src="https://github.com/user-attachments/assets/5f12a562-4d3e-4fcc-a0ba-1ac95157edb0" /> |
+
+https://github.com/user-attachments/assets/7e2dcc52-7932-4739-bd92-5d0b4e147719
 
 ### [host|client]::architecture
 
