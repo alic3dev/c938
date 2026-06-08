@@ -52,6 +52,7 @@ https://github.com/user-attachments/assets/7e2dcc52-7932-4739-bd92-5d0b4e147719
 - - `rendering_properties:brightness`: `float`
 - - `rendering_properties:brightness_text`: `float`
 - - `rendering_properties:fps_display`: `int`
+- - `rendering_properties:display_sync: `int`
 
 ### example
 
@@ -82,13 +83,25 @@ make pull_content
 #### redownload
 
 ```zsh
-make pull_content_all
+make pull_content pull_content_overwrite=1
 ```
 
 ### build
 
 ```zsh
 make
+```
+
+#### build for ios
+
+```zsh
+make target_device=iphone
+```
+
+##### sign, install, and run on/for ios
+
+```zsh
+make target_device=iphone sign install run
 ```
 
 #### options
