@@ -22,12 +22,12 @@ void network_data_map_initialize(
   network_data_packet_initialize(
     network_data_map->packet,
     network_command_data_map,
-    0
+    0x00
   );
 
   pthread_mutex_init(
     &network_data_map->mutex,
-    0
+    0x00
   );
 }
 

@@ -953,7 +953,8 @@ void scene_gameplay_populate(
     metil_object_player->position.y +
     0x06
   );
-      metil_group_destroy(
+  
+  metil_group_destroy(
     metil,
     metil_group_enemies
   );

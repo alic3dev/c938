@@ -451,10 +451,9 @@ void generate_buildings(
         object,
         metil->texture_store.textures[
           index_texture
-
         ]
-
-      );    }
+      );
+    }
 
     for (
       unsigned char index_texture = (
@@ -514,11 +513,11 @@ void generate_buildings(
   );
 
   metil_object_texture_add(
-        object,
-        metil->texture_store.textures[
-          0x0f
-        ]
-      );
+    object,
+    metil->texture_store.textures[
+      0x0f
+    ]
+  );
 
   rand_clean(
     &rand_result,

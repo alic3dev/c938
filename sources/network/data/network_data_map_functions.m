@@ -268,14 +268,46 @@ void network_data_map_parse(
       size_building.z
     );
 
-    metil_object_building->type_primitive = (
-      MTLPrimitiveTypeLine
-    );
+    for (
+      unsigned char index_texture = (
+        0x00
+      );
+      (
+        index_texture <
+        0x03
+      );
+      ++index_texture
+    ) {
+      metil_object_texture_add(
+        metil_object_building,
+        metil->texture_store.textures[
+          index_texture
+        ]
+      );
+    }
 
-    metil_object_texture_add(
-      metil_object_building,
-      texture_building
-    );
+    for (
+      unsigned char index_texture = (
+        0x00
+      );
+      (
+        index_texture <
+        0x04
+      );
+      ++index_texture
+    ) {
+      metil_object_texture_add(
+        metil_object_building,
+        metil->texture_store.textures[
+          (
+            index_texture +
+            index_building
+          ) %
+          0x0b +
+          0x04
+        ]
+      );
+    }
 
     metil_object_buffers_initialize(
       metil_object_building,
@@ -354,7 +386,8 @@ void network_data_map_parse(
       metil->texture_store.textures[
         0x16 +
         (
-          index_enemy %          0x09
+          index_enemy %
+          0x09
         )
       ],
       position_enemy,
