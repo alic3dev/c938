@@ -71,6 +71,7 @@ rendering_properties:fps_display->{1};
 - - [`interrupt_handler`](https://github.com/alic3dev/interrupt_handler)
 - - [`math_c`](https://github.com/alic3dev/math_c)
 - - [`metil`](https://github.com/alic3dev/metil)
+- - [`rand`](https://github.com/alic3dev/rand)
 
 ### content
 
