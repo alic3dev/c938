@@ -186,7 +186,8 @@ files_objects_objc=${patsubst ${directory_sources}/%.m,${directory_objects_objc}
 files_metal=${wildcard ${directory_metal}/*.metal}
 files_air=${patsubst ${directory_metal}/%.metal,${directory_air}/%.air,${files_metal}}
 
-files_metalar_math_c=${directory_math_c_metalar}/math_c_absolute.metalar ${directory_math_c_metalar}/math_c_bound.metalar ${directory_math_c_metalar}/math_c_maximum.metalar ${directory_math_c_metalar}/math_c_minimum.metalar ${directory_math_c_metalar}/math_c_modulus.metalar ${directory_math_c_metalar}/math_c_power.metalar ${directory_math_c_metalar}/math_c_square_root.metalar ${directory_math_c_metalar}/math_c_vector_distance.metalar
+files_metalar_math_c=${directory_math_c_metalar}/math_c_absolute.metalar ${directory_math_c_metalar}/math_c_bound.metalar ${directory_math_c_metalar}/math_c_maximum.metalar ${directory_math_c_metalar}/math_c_minimum.metalar ${directory_math_c_metalar}/math_c_modulus.metalar ${directory_math_c_metalar}/math_c_power.metalar
+files_metalar_math_c:=${files_metalar_math_c} ${directory_math_c_metalar}/math_c_sine.metalar ${directory_math_c_metalar}/math_c_square_root.metalar ${directory_math_c_metalar}/math_c_vector_distance.metalar
 
 ifeq (${target_os},macos)
 files_storyboards=${directory_storyboards}/c938.storyboard
