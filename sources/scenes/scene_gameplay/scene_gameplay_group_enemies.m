@@ -31,8 +31,13 @@ void scene_gameplay_group_enemies_resize(
     );
 
     for (
-      unsigned int index_enemy_new = enemies_original;
-      index_enemy_new < metil_group_enemies->length;
+      unsigned int index_enemy_new = (
+        enemies_original
+      );
+      (
+        index_enemy_new <
+        metil_group_enemies->length
+      );
       ++index_enemy_new
     ) {
       struct metil_object* metil_object_enemy = (
@@ -44,25 +49,39 @@ void scene_gameplay_group_enemies_resize(
       object_enemy_initialize(
         metil_object_enemy,
         metil->renderer_interface.metal_device,
+        metil->texture_store.textures[
+          0x16 +
+          (
+            index_enemy_new %
+            0x09
+          )
+        ],
         (struct math_c_vector3_float) {
-          .x = 0,
-          .y = 0,
-          .z = 0
+          .x = (
+            0x00
+          ),
+          .y = (
+            0x00
+          ),
+          .z = (
+            0x00
+          )
         },
-        4,
-        0.0f
+        0x04,
+        0x00
       );
     }
   } else {
     while (
-      metil_group_enemies->length > length_enemies
+      metil_group_enemies->length >
+      length_enemies
     ) {
       metil_group_destroy_renderable_at_index(
         metil,
         metil_group_enemies,
         (
           metil_group_enemies->length -
-          1
+          0x01
         )
       );
     }

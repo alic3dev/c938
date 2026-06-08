@@ -4,7 +4,8 @@
 #include <metil_mesh/metil_mesh.h>
 
 void mesh_enemy_initialize(
-  struct metil_mesh*
+  struct metil_mesh*,
+  float
 );
 
 #endif

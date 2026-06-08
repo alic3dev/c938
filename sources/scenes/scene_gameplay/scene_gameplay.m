@@ -1117,6 +1117,15 @@ void scene_gameplay_populate(
     object_enemy_initialize(
       metil_object_enemy,
       metil->renderer_interface.metal_device,
+      metil->texture_store.textures[
+        0x16 +
+        (
+          rand_result.bytes[
+            0x03
+          ] %
+          0x09
+        )
+      ],
       position_enemy,
       0x04,
       speed_enemy

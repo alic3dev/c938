@@ -39,7 +39,7 @@ void network_data_map_set(
   unsigned long int length_bytes_buildings = (
     metil_group_buildings->length *
     data_length_math_c_vector3_float *
-    2
+    0x02
   );
 
   unsigned long int length_bytes_enemies = (
@@ -84,8 +84,13 @@ void network_data_map_set(
   );
 
   for (
-    unsigned int index_building = 0;
-    index_building < metil_group_buildings->length;
+    unsigned int index_building = (
+      0x00
+    );
+    (
+      index_building <
+      metil_group_buildings->length
+    );
     ++index_building
   ) {
     struct metil_object* metil_object_building = (
@@ -114,8 +119,13 @@ void network_data_map_set(
   );
 
   for (
-    unsigned int index_enemy = 0;
-    index_enemy < metil_group_enemies->length;
+    unsigned int index_enemy = (
+      0x00
+    );
+    (
+      index_enemy <
+      metil_group_enemies->length
+    );
     ++index_enemy
   ) {
     struct metil_object* metil_object_enemy = (
@@ -218,8 +228,13 @@ void network_data_map_parse(
   );
 
   for (
-    unsigned int index_building = 0;
-    index_building < length_buildings;
+    unsigned int index_building = (
+      0x00
+    );
+    (
+      index_building <
+      length_buildings
+    );
     ++index_building
   ) {
     struct metil_object* metil_object_building = (
@@ -273,10 +288,21 @@ void network_data_map_parse(
       ].buffer.contents
     );
 
-    metil_object_building_data->colour.x = 1.0f;
-    metil_object_building_data->colour.y = 1.0f;
-    metil_object_building_data->colour.z = 1.0f;
-    metil_object_building_data->colour.w = 1.0f;
+    metil_object_building_data->colour.x = (
+      0x01
+    );
+    
+    metil_object_building_data->colour.y = (
+      0x01
+    );
+    
+    metil_object_building_data->colour.z = (
+      0x01
+    );
+    
+    metil_object_building_data->colour.w = (
+      0x01
+    );
   }
 
   network_data_packet_read(
@@ -292,8 +318,13 @@ void network_data_map_parse(
   );
 
   for (
-    unsigned int index_enemy = 0;
-    index_enemy < metil_group_enemies->length;
+    unsigned int index_enemy = (
+      0x00
+    );
+    (
+      index_enemy <
+      metil_group_enemies->length
+    );
     ++index_enemy
   ) {
     struct metil_object* metil_object_enemy = (
@@ -320,8 +351,14 @@ void network_data_map_parse(
     object_enemy_initialize(
       metil_object_enemy,
       metil->renderer_interface.metal_device,
+      metil->texture_store.textures[
+        0x16 +
+        (
+          index_enemy %          0x09
+        )
+      ],
       position_enemy,
-      4,
+      0x04,
       speed_enemy
     );
   }
@@ -339,7 +376,8 @@ void network_data_map_parse(
   );
 
   if (
-    *target_building < metil_group_buildings->length
+    *target_building <
+    metil_group_buildings->length
   ) {
     struct metil_object* metil_object_building = (
       metil_group_buildings->renderables[
@@ -353,10 +391,21 @@ void network_data_map_parse(
       ].buffer.contents
     );
 
-    metil_object_building_data->colour.x = 0.0f;
-    metil_object_building_data->colour.y = 0.0f;
-    metil_object_building_data->colour.z = 1.0f;
-    metil_object_building_data->colour.w = 1.0f;
+    metil_object_building_data->colour.x = (
+      0x00
+    );
+    
+    metil_object_building_data->colour.y = (
+      0x00
+    );
+    
+    metil_object_building_data->colour.z = (
+      0x01
+    );
+    
+    metil_object_building_data->colour.w = (
+      0x01
+    );
   }
 
   pthread_mutex_unlock(

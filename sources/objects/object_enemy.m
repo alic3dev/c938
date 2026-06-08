@@ -16,20 +16,27 @@
 #include <metil_scenes/metil_scene_controller.h>
 
 #include <Metal/MTLDevice.h>
+#include <Metal/MTLTexture.h>
 
 void object_enemy_initialize(
   struct metil_object* object,
   id<MTLDevice> metal_device,
+  id<MTLTexture> texture_enemy,
   struct math_c_vector3_float position,
   unsigned char life,
   float speed
 ) {
   mesh_enemy_initialize(
-    &object->mesh
+    &object->mesh,
+    (
+      position.x +
+      position.y +
+      position.z
+    )
   );
 
   object->type_primitive = (
-    MTLPrimitiveTypeLine
+    MTLPrimitiveTypeTriangleStrip
   );
 
   object->poll = (
@@ -46,6 +53,11 @@ void object_enemy_initialize(
     sizeof(
       struct enemy_data
     )
+  );
+  
+  metil_object_texture_add(
+    object,
+    texture_enemy
   );
 
   object->position.x = (

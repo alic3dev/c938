@@ -9,5 +9,4 @@ void scene_gameplay_group_enemies_resize(
   struct metil_group* _Nonnull,
   unsigned int
 );
-
 #endif

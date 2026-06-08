@@ -9,6 +9,7 @@
 #include <metil_object.h>
 
 #include <Metal/MTLDevice.h>
+#include <Metal/MTLTexture.h>
 
 #define enemy_distance_speed_boost 0x0190
 #define enemy_distance_speed_boost_half 0xc8
@@ -16,6 +17,7 @@
 void object_enemy_initialize(
   struct metil_object* _Nonnull,
   id<MTLDevice> _Nonnull,
+  id<MTLTexture> _Nonnull,
   struct math_c_vector3_float,
   unsigned char,
   float
