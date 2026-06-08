@@ -95,6 +95,7 @@ make
 - `device_identifier`:which_device_to_install_to_or_run_on
 - `disable_metal_fast_options=1`:disables->{`metal`::`fast_modes `};
 - `provisioning_profile_identifier`:which_provisioning_profile_identifier_to_use_for_signing_entitlements
+- `pull_content_overwrite`:if_set->redownloads_all_content_even_if_the_files_already_exist.using(`pull_content`)
 - `release=1`:uses_static_libraries_instead_of_dylibs
 - `target_device`:sets_the_target_device_platform->{values::[`mac`|`iphone`]}
 - `target_device_version`:sets_the_target_version.for->{`macos`|`metal`};
