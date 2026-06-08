@@ -1389,6 +1389,9 @@ void scene_gameplay_poll(
           object_projectile_initialize(
             metil_object_projectile,
             metil->renderer_interface.metal_device,
+            metil->texture_store.textures[
+              0x1e
+            ],
             network_data_shot_fired.position,
             (struct math_c_vector3_float) {
               .x = (
@@ -2247,6 +2250,9 @@ void scene_gameplay_poll(
           object_projectile_initialize(
             metil_object_projectile,
             metil->renderer_interface.metal_device,
+            metil->texture_store.textures[
+              0x1e
+            ],
             network_data_shot_fired->position,
             (struct math_c_vector3_float) {
               .x = (

@@ -9,10 +9,12 @@
 #include <metil_object.h>
 
 #include <Metal/MTLDevice.h>
+#include <Metal/MTLTexture.h>
 
 void object_projectile_initialize(
   struct metil_object* _Nonnull,
   id<MTLDevice> _Nonnull,
+  id<MTLTexture> _Nonnull,
   struct math_c_vector3_float,
   struct math_c_vector3_float,
   unsigned long int,

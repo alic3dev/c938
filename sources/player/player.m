@@ -875,6 +875,9 @@ void player_poll(
     object_projectile_initialize(
       metil_object_projectile,
       player_data->metal_device,
+      metil->texture_store.textures[
+        0x1e
+      ],
       position_projectile,
       angle_projectile,
       *player_data->time,

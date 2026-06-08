@@ -254,7 +254,7 @@ void c938_renderer_on_initialize(
 
   metil_texture_store_add(
     &metil->texture_store,
-    0x1e,
+    0x1f,
     "buildings/building_ext.png",
     "buildings/building_ext_2.png",
     "buildings/building_ext_3.png",
@@ -284,7 +284,8 @@ void c938_renderer_on_initialize(
     "clouds/cloud_0x04.png",
     "clouds/cloud_0x05.png",
     "clouds/cloud_0x06.png",
-    "clouds/cloud_0x07.png"
+    "clouds/cloud_0x07.png",
+    "ice/ice_0x00.png"
   );
 
   metil->data = (

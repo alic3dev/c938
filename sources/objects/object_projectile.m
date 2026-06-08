@@ -15,10 +15,12 @@
 #include <metil_scenes/metil_scene_controller.h>
 
 #include <Metal/MTLDevice.h>
+#include <Metal/MTLTexture.h>
 
 void object_projectile_initialize(
   struct metil_object* object,
   id<MTLDevice> metal_device,
+  id<MTLTexture> texture_projectile,
   struct math_c_vector3_float position,
   struct math_c_vector3_float angle,
   unsigned long int time_fired,
@@ -29,7 +31,7 @@ void object_projectile_initialize(
   );
 
   object->type_primitive = (
-    MTLPrimitiveTypeLineStrip
+    MTLPrimitiveTypeTriangleStrip
   );
 
   object->poll = (
@@ -46,6 +48,11 @@ void object_projectile_initialize(
     sizeof(
       struct projectile_data
     )
+  );
+  
+  metil_object_texture_add(
+    object,
+    texture_projectile
   );
 
   object->position.x = (
@@ -79,15 +86,15 @@ void object_projectile_initialize(
   );
 
   projectile_data->colour.x = (
-    0.1f
+    0x01
   );
 
   projectile_data->colour.y = (
-    0.7f
+    0x01
   );
 
   projectile_data->colour.z = (
-    0.8f
+    0x01
   );
 
   projectile_data->time_fired = (
