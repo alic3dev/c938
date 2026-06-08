@@ -1,14 +1,14 @@
 # c938
 
-<img width=1052 height=195 alt=c938::logo src=https://github.com/user-attachments/assets/0bad47bd-a51a-4a21-bd07-08c75cf4a11e />
+<img width="1966" height="1250" alt="c938_menu" src="https://github.com/user-attachments/assets/bcbf5271-37bd-4a38-8ab5-b963bbfd74d9" />
 
 ## single_player
 
-<img width=1966 height=1250 alt=c938::menu src=https://github.com/user-attachments/assets/65728c10-e960-4af4-98a9-307680d26c86 />
+<img width="1966" height="1250" alt="c938_gameplay_enemies" src="https://github.com/user-attachments/assets/1b5cb13a-4750-48e5-b1cc-e651e9413ee1" />
 
 | | |
 |-|-|
-| <img width=1966 height=1250 alt=c938::single_player src=https://github.com/user-attachments/assets/8e7ecba0-8f7f-48e5-a12c-706c7ea275ab /> | <img width=1966 height=1250 alt=c938::single_player::second src=https://github.com/user-attachments/assets/6fddbc52-7a2d-427a-8a12-667c490c0ace /> |
+| <img width="1966" height="1250" alt="c938_gameplay_projectiles" src="https://github.com/user-attachments/assets/9546c92c-52ea-415e-9d31-400a2384d2da" /> | <img width="1966" height="1250" alt="c938_projectiles_enemies" src="https://github.com/user-attachments/assets/440a737e-21d0-4f5c-b852-1a6d6c2c48c0" /> |
 
 ## multi_player
 
